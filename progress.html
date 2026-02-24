@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress - FlowFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-accent: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --bg-dark: #0a0a0f;
+            --bg-card: #1a1a24;
+            --bg-sidebar: #0f0f16;
+            --text-primary: #ffffff;
+            --text-secondary: #a8a8b8;
+            --accent: #f5576c;
+            --border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.8rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 3rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-2);
+            color: #fff;
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            margin-top: auto;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gradient-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-info h4 {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .user-info p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem 3rem;
+            width: calc(100% - 280px);
+        }
+
+        .header {
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .time-filters {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            padding: 0.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .time-btn {
+            padding: 0.7rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .time-btn.active {
+            background: var(--gradient-2);
+            color: #fff;
+        }
+
+        /* Stats Summary */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .stat-card:nth-child(2)::before {
+            background: var(--gradient-2);
+        }
+
+        .stat-card:nth-child(3)::before {
+            background: var(--gradient-3);
+        }
+
+        .stat-card:nth-child(4)::before {
+            background: var(--gradient-accent);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .trend-positive {
+            color: #4ade80;
+        }
+
+        .trend-negative {
+            color: #f87171;
+        }
+
+        /* Chart Cards */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .chart-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .chart-value {
+            text-align: right;
+        }
+
+        .chart-number {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chart-change {
+            color: #4ade80;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 1.5rem;
+        }
+
+        /* SVG Chart */
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: url(#lineGradient);
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .chart-area {
+            fill: url(#areaGradient);
+        }
+
+        .chart-dot {
+            fill: #f5576c;
+            filter: drop-shadow(0 0 8px rgba(245, 87, 108, 0.6));
+        }
+
+        .chart-grid {
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 1;
+        }
+
+        .chart-label {
+            fill: var(--text-secondary);
+            font-size: 12px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 1.5rem;
+            height: 300px;
+            padding: 1rem 0;
+        }
+
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar {
+            width: 100%;
+            background: var(--gradient-2);
+            border-radius: 10px 10px 0 0;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .bar-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Workout History Table */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-table td {
+            font-weight: 500;
+        }
+
+        .workout-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .workout-badge {
+            display: inline-block;
+            padding: 0.4rem 0.9rem;
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .workout-badge.cardio {
+            background: rgba(245, 87, 108, 0.15);
+            color: #f5576c;
+        }
+
+        .workout-badge.strength {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+        }
+
+        /* Personal Records */
+        .records-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .record-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.75rem;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .record-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent);
+        }
+
+        .record-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .record-value {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .record-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .record-date {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1.5rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .records-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-table {
+                font-size: 0.85rem;
+            }
+
+            .history-table th,
+            .history-table td {
+                padding: 1rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">FlowFit</div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="workouts.html" class="nav-link">
+                        <span class="nav-icon">💪</span>
+                        <span>Workouts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="programs.html" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        <span>Programs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="progress.html" class="nav-link active">
+                        <span class="nav-icon">📈</span>
+                        <span>Progress</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">🏆</span>
+                        <span>Achievements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">💳</span>
+                        <span>Subscription</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="user-avatar">JD</div>
+                <div class="user-info">
+                    <h4>John Doe</h4>
+                    <p>Pro Member</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <h1>Your Progress</h1>
+                    <p>Track your fitness journey and celebrate your wins</p>
+                </div>
+                <div class="time-filters">
+                    <button class="time-btn">7D</button>
+                    <button class="time-btn active">30D</button>
+                    <button class="time-btn">90D</button>
+                    <button class="time-btn">1Y</button>
+                </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value">12.5k</div>
+                    <div class="stat-label">Calories Burned</div>
+                    <div class="stat-trend trend-positive">
+                        ↑ 15% from last month
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-value">18.5</div>
+                    <div class="stat-label">Hours Trained</div>
+                    <div class="stat-trend trend-positive">
+                        ↑ 22% from last month
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💪</div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Workouts Completed</div>
+                    <div class="stat-trend trend-positive">
+                        ↑ 8% from last month
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-value">175</div>
+                    <div class="stat-label">Avg. Heart Rate</div>
+                    <div class="stat-trend trend-negative">
+                        ↓ 3% from last month
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="chart-grid">
+                <!-- Workout Frequency -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">Workout Frequency</h3>
+                            <p class="chart-subtitle">Last 30 days</p>
+                        </div>
+                        <div class="chart-value">
+                            <div class="chart-number">24</div>
+                            <div class="chart-change">↑ 8% vs last month</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <svg class="chart-svg" viewBox="0 0 600 300">
+                            <defs>
+                                <linearGradient id="lineGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="areaGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#4facfe;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#4facfe;stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <line class="chart-grid" x1="50" y1="50" x2="550" y2="50" />
+                            <line class="chart-grid" x1="50" y1="100" x2="550" y2="100" />
+                            <line class="chart-grid" x1="50" y1="150" x2="550" y2="150" />
+                            <line class="chart-grid" x1="50" y1="200" x2="550" y2="200" />
+                            <line class="chart-grid" x1="50" y1="250" x2="550" y2="250" />
+                            
+                            <path style="fill: url(#areaGradient2)" d="M 50 200 L 125 180 L 200 190 L 275 140 L 350 160 L 425 100 L 500 120 L 550 80 L 550 250 L 50 250 Z" />
+                            
+                            <path style="fill: none; stroke: url(#lineGradient2); stroke-width: 3; stroke-linecap: round;" d="M 50 200 L 125 180 L 200 190 L 275 140 L 350 160 L 425 100 L 500 120 L 550 80" />
+                            
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="50" cy="200" r="5" />
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="125" cy="180" r="5" />
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="200" cy="190" r="5" />
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="275" cy="140" r="5" />
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="350" cy="160" r="5" />
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="425" cy="100" r="5" />
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="500" cy="120" r="5" />
+                            <circle style="fill: #4facfe; filter: drop-shadow(0 0 8px rgba(79, 172, 254, 0.6));" cx="550" cy="80" r="5" />
+                            
+                            <text class="chart-label" x="50" y="275" text-anchor="middle">W1</text>
+                            <text class="chart-label" x="200" y="275" text-anchor="middle">W2</text>
+                            <text class="chart-label" x="350" y="275" text-anchor="middle">W3</text>
+                            <text class="chart-label" x="500" y="275" text-anchor="middle">W4</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Calories Burned -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">Calories Burned</h3>
+                            <p class="chart-subtitle">Weekly average</p>
+                        </div>
+                        <div class="chart-value">
+                            <div class="chart-number">3.2K</div>
+                            <div class="chart-change">↑ 15% vs last month</div>
+                        </div>
+                    </div>
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar" style="height: 60%;" data-value="2.8K"></div>
+                            <div class="bar-label">Week 1</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height: 75%;" data-value="3.1K"></div>
+                            <div class="bar-label">Week 2</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height: 85%;" data-value="3.4K"></div>
+                            <div class="bar-label">Week 3</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar" style="height: 95%;" data-value="3.6K"></div>
+                            <div class="bar-label">Week 4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Records -->
+            <div class="chart-card" style="margin-bottom: 3rem;">
+                <div class="chart-header">
+                    <div>
+                        <h3 class="chart-title">Personal Records</h3>
+                        <p class="chart-subtitle">Your best performances</p>
+                    </div>
+                </div>
+
+                <div class="records-grid">
+                    <div class="record-card">
+                        <div class="record-icon">💪</div>
+                        <div class="record-value">45</div>
+                        <div class="record-label">Max Push-ups</div>
+                        <div class="record-date">Set on Feb 15, 2026</div>
+                    </div>
+
+                    <div class="record-card">
+                        <div class="record-icon">🦵</div>
+                        <div class="record-value">120</div>
+                        <div class="record-label">Max Squats</div>
+                        <div class="record-date">Set on Feb 12, 2026</div>
+                    </div>
+
+                    <div class="record-card">
+                        <div class="record-icon">🧘</div>
+                        <div class="record-value">3:45</div>
+                        <div class="record-label">Longest Plank</div>
+                        <div class="record-date">Set on Feb 18, 2026</div>
+                    </div>
+
+                    <div class="record-card">
+                        <div class="record-icon">🏃</div>
+                        <div class="record-value">35</div>
+                        <div class="record-label">Max Burpees</div>
+                        <div class="record-date">Set on Feb 10, 2026</div>
+                    </div>
+
+                    <div class="record-card">
+                        <div class="record-icon">⏱️</div>
+                        <div class="record-value">75</div>
+                        <div class="record-label">Longest Workout</div>
+                        <div class="record-date">Set on Feb 16, 2026</div>
+                    </div>
+
+                    <div class="record-card">
+                        <div class="record-icon">🔥</div>
+                        <div class="record-value">850</div>
+                        <div class="record-label">Max Calories</div>
+                        <div class="record-date">Set on Feb 16, 2026</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout History -->
+            <div class="chart-card full-width">
+                <div class="chart-header">
+                    <div>
+                        <h3 class="chart-title">Recent Workouts</h3>
+                        <p class="chart-subtitle">Your training history</p>
+                    </div>
+                </div>
+
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Workout</th>
+                            <th>Type</th>
+                            <th>Duration</th>
+                            <th>Calories</th>
+                            <th>Exercises</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Feb 19, 2026</td>
+                            <td class="workout-name">Full Body Strength</td>
+                            <td><span class="workout-badge strength">Strength</span></td>
+                            <td>45 min</td>
+                            <td>420 kcal</td>
+                            <td>8</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 18, 2026</td>
+                            <td class="workout-name">Core Blast</td>
+                            <td><span class="workout-badge">Core</span></td>
+                            <td>30 min</td>
+                            <td>280 kcal</td>
+                            <td>6</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 17, 2026</td>
+                            <td class="workout-name">HIIT Cardio</td>
+                            <td><span class="workout-badge cardio">Cardio</span></td>
+                            <td>35 min</td>
+                            <td>480 kcal</td>
+                            <td>7</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 16, 2026</td>
+                            <td class="workout-name">Lower Body Power</td>
+                            <td><span class="workout-badge strength">Strength</span></td>
+                            <td>50 min</td>
+                            <td>520 kcal</td>
+                            <td>9</td>
+                        </tr>
+                        <tr>
+                            <td>Feb 15, 2026</td>
+                            <td class="workout-name">Upper Body Pump</td>
+                            <td><span class="workout-badge strength">Strength</span></td>
+                            <td>40 min</td>
+                            <td>380 kcal</td>
+                            <td>8</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+      
+      // Require authentication
+requireAuth();
+        // Animate bars on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.bar').forEach((bar, index) => {
+                const height = bar.style.height;
+                bar.style.height = '0';
+                setTimeout(() => {
+                    bar.style.height = height;
+                }, index * 200);
+            });
+        });
+
+        // Time filter buttons
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+    
+    <script src="js/api.js"></script>
+</body>
+</html>
