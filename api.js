@@ -5,7 +5,7 @@
 
 // Configuration
 const API_CONFIG = {
-    baseURL: 'http://localhost:5000/api/v1', // Change to production URL when deploying
+    baseURL: 'https://fit.cctamcc.site', // Change to production URL when deploying
     timeout: 30000,
     retryAttempts: 3,
 };
