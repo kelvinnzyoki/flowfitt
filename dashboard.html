@@ -825,6 +825,8 @@
     </div>
 
     <script>
+
+        <script src="api.js"></script>
       
       // Require authentication
 requireAuth();
@@ -864,6 +866,37 @@ requireAuth();
         // Get workout history
         const history = await ProgressAPI.getWorkoutHistory(5);
         renderWorkoutHistory(history.data);
+
+        // Get user data
+        const userResponse = await AuthAPI.getCurrentUser();
+        if (userResponse.success) {
+            const user = userResponse.data;
+            displayUserInfo(user);
+        }
+        
+        // Get streak data
+        const streakResponse = await ProgressAPI.getStreaks();
+        if (streakResponse.success) {
+            displayStreak(streakResponse.data);
+        }
+        
+        // Get stats
+        const statsResponse = await ProgressAPI.getStats('7d');
+        if (statsResponse.success) {
+            displayStats(statsResponse.data);
+        }
+        
+        // Get recent progress
+        const progressResponse = await ProgressAPI.getUserProgress();
+        if (progressResponse.success) {
+            displayRecentWorkouts(progressResponse.data);
+        }
+        
+        // Get achievements
+        const achievementsResponse = await ProgressAPI.getAchievements();
+        if (achievementsResponse.success) {
+            displayAchievements(achievementsResponse.data);
+        }
         
         LoadingManager.hide();
     } catch (error) {
@@ -873,8 +906,85 @@ requireAuth();
     }
 }
 
-// Call on page load
-document.addEventListener('DOMContentLoaded', loadDashboardData);
+
+        function displayUserInfo(user) {
+    // Update user name if element exists
+    const nameElement = document.querySelector('.user-name, .user-greeting');
+    if (nameElement) {
+        const displayName = user.name || user.email.split('@')[0];
+        nameElement.textContent = `Welcome, ${displayName}!`;
+    }
+}
+
+function displayStreak(streakData) {
+    const streakElement = document.querySelector('.stat-value');
+    if (streakElement) {
+        streakElement.textContent = streakData.currentStreak || 0;
+    }
+}
+
+function displayStats(stats) {
+    // Total workouts
+    const workoutsEl = document.querySelector('[data-stat="workouts"]');
+    if (workoutsEl) {
+        workoutsEl.textContent = stats.totalWorkouts || 0;
+    }
+    
+    // Total duration (convert seconds to hours)
+    const durationEl = document.querySelector('[data-stat="duration"]');
+    if (durationEl) {
+        const hours = (stats.totalDuration / 3600).toFixed(1);
+        durationEl.textContent = `${hours}h`;
+    }
+    
+    // Total calories
+    const caloriesEl = document.querySelector('[data-stat="calories"]');
+    if (caloriesEl) {
+        caloriesEl.textContent = Math.round(stats.totalCalories || 0);
+    }
+}
+
+function displayRecentWorkouts(workouts) {
+    const container = document.querySelector('.workout-history, .recent-workouts');
+    if (!container || !workouts.length) return;
+    
+    const html = workouts.slice(0, 5).map(log => `
+        <div class="workout-item">
+            <div class="workout-info">
+                <h4>${log.exercise.name}</h4>
+                <p>${formatDate(log.date)} • ${formatDuration(log.duration)}</p>
+            </div>
+            <div class="workout-stats">
+                ${log.sets ? `${log.sets} sets` : ''} 
+                ${log.reps ? `${log.reps} reps` : ''}
+                ${log.caloriesBurned ? `${Math.round(log.caloriesBurned)} cal` : ''}
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+}
+
+function displayAchievements(achievements) {
+    const container = document.querySelector('.achievements-list');
+    if (!container) return;
+    
+    const unlocked = achievements.filter(a => a.unlocked).slice(0, 3);
+    const html = unlocked.map(achievement => `
+        <div class="achievement-badge">
+            <span class="achievement-icon">${achievement.icon}</span>
+            <div class="achievement-info">
+                <h4>${achievement.name}</h4>
+                <p>${achievement.description}</p>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html || '<p>No achievements yet. Start working out!</p>';
+}
+        
+
+
 
 
 async function handleLogout() {
@@ -882,9 +992,12 @@ async function handleLogout() {
         await AuthAPI.logout();
     }
 }
+
+        // Call on page load
+document.addEventListener('DOMContentLoaded', loadDashboardData);
    
     </script>
     
-    <script src="api.js"></script>
+    
 </body>
 </html>
