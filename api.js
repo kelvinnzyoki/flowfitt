@@ -11,7 +11,7 @@
 
 const API_CONFIG = {
     // UPDATE THIS TO YOUR VERCEL DEPLOYMENT URL
-    baseURL: 'https://your-backend.vercel.app/api/v1',
+    baseURL: 'https://fit.cctamcc.site/api/v1',
     // For local development: 'http://localhost:3000/api/v1'
     timeout: 30000,
 };
