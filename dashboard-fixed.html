@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FlowFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-accent: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --bg-dark: #0a0a0f;
+            --bg-card: #1a1a24;
+            --bg-sidebar: #0f0f16;
+            --text-primary: #ffffff;
+            --text-secondary: #a8a8b8;
+            --accent: #f5576c;
+            --border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.8rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 3rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-2);
+            color: #fff;
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+        }
+
+        .user-section {
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .user-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 87, 108, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(255, 87, 108, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 87, 108, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .greeting {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .date {
+            color: var(--text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .workout-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workout-info h4 {
+            margin-bottom: 0.3rem;
+        }
+
+        .workout-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .workout-stats {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .achievement-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+        }
+
+        .achievement-info h4 {
+            margin-bottom: 0.2rem;
+        }
+
+        .achievement-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .greeting {
+                font-size: 1.5rem;
+                margin-top: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">FlowFit</div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link active">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="workouts.html" class="nav-link">
+                        <span class="nav-icon">💪</span>
+                        Workouts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="programs.html" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Programs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="progress.html" class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        Progress
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <span class="nav-icon">👤</span>
+                        Profile
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-section">
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userEmail">user@example.com</p>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1 class="greeting" id="greeting">Welcome back!</h1>
+                <p class="date" id="currentDate">Loading...</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">🔥</span>
+                    </div>
+                    <div class="stat-value" id="streakValue">0</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">💪</span>
+                    </div>
+                    <div class="stat-value" id="workoutCount">0</div>
+                    <div class="stat-label">Total Workouts</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">⏱️</span>
+                    </div>
+                    <div class="stat-value" id="totalDuration">0h</div>
+                    <div class="stat-label">Total Time</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">🔥</span>
+                    </div>
+                    <div class="stat-value" id="totalCalories">0</div>
+                    <div class="stat-label">Calories Burned</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Recent Workouts -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Workouts</h2>
+                        <a href="workouts.html" class="btn btn-primary">Start Workout</a>
+                    </div>
+                    <div id="recentWorkouts">
+                        <div class="empty-state">No workouts yet. Start your first workout!</div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Achievements</h2>
+                    </div>
+                    <div id="achievements">
+                        <div class="empty-state">Complete workouts to unlock achievements!</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+        // Require authentication
+        requireAuth();
+
+        // Global variables
+        let currentUser = null;
+
+        // Toggle mobile sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-active');
+        }
+
+        // Update current date
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date().toLocaleDateString('en-US', options);
+            document.getElementById('currentDate').textContent = date;
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                LoadingManager.show('Loading dashboard...');
+
+                // Load user data
+                await loadUserData();
+
+                // Load streak
+                await loadStreak();
+
+                // Load stats
+                await loadStats();
+
+                // Load recent workouts
+                await loadRecentWorkouts();
+
+                // Load achievements
+                await loadAchievements();
+
+                LoadingManager.hide();
+            } catch (error) {
+                LoadingManager.hide();
+                console.error('Dashboard load error:', error);
+                Toast.error('Some data failed to load. Please refresh the page.');
+            }
+        }
+
+        // Load user data
+        async function loadUserData() {
+            try {
+                const response = await AuthAPI.getCurrentUser();
+                if (response.success && response.data) {
+                    currentUser = response.data;
+                    
+                    // Update user display
+                    const name = currentUser.name || currentUser.email.split('@')[0];
+                    document.getElementById('userName').textContent = name;
+                    document.getElementById('userEmail').textContent = currentUser.email;
+                    document.getElementById('greeting').textContent = `Welcome back, ${name}!`;
+                    
+                    // Update avatar
+                    const avatar = name.charAt(0).toUpperCase();
+                    document.getElementById('userAvatar').textContent = avatar;
+                }
+            } catch (error) {
+                console.error('Failed to load user data:', error);
+                // Don't show error toast - not critical
+            }
+        }
+
+        // Load streak
+        async function loadStreak() {
+            try {
+                const response = await ProgressAPI.getStreaks();
+                if (response.success && response.data) {
+                    document.getElementById('streakValue').textContent = response.data.currentStreak || 0;
+                }
+            } catch (error) {
+                console.error('Failed to load streak:', error);
+                document.getElementById('streakValue').textContent = '0';
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await ProgressAPI.getStats('30d');
+                if (response.success && response.data) {
+                    const stats = response.data;
+                    
+                    // Update workout count
+                    document.getElementById('workoutCount').textContent = stats.totalWorkouts || 0;
+                    
+                    // Update duration (convert seconds to hours)
+                    const hours = ((stats.totalDuration || 0) / 3600).toFixed(1);
+                    document.getElementById('totalDuration').textContent = `${hours}h`;
+                    
+                    // Update calories
+                    document.getElementById('totalCalories').textContent = Math.round(stats.totalCalories || 0);
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                // Keep default values
+            }
+        }
+
+        // Load recent workouts
+        async function loadRecentWorkouts() {
+            try {
+                const response = await ProgressAPI.getUserProgress();
+                if (response.success && response.data && response.data.length > 0) {
+                    const workouts = response.data.slice(0, 5);
+                    displayRecentWorkouts(workouts);
+                }
+            } catch (error) {
+                console.error('Failed to load recent workouts:', error);
+                // Keep empty state
+            }
+        }
+
+        // Display recent workouts
+        function displayRecentWorkouts(workouts) {
+            const container = document.getElementById('recentWorkouts');
+            
+            const html = workouts.map(log => {
+                const date = formatDate(log.date);
+                const duration = formatDuration(log.duration);
+                
+                return `
+                    <div class="workout-item">
+                        <div class="workout-info">
+                            <h4>${log.exercise.name}</h4>
+                            <p>${date} • ${duration}</p>
+                        </div>
+                        <div class="workout-stats">
+                            ${log.sets ? `${log.sets} sets` : ''} 
+                            ${log.reps ? `× ${log.reps} reps` : ''}
+                            ${log.caloriesBurned ? `<br>${Math.round(log.caloriesBurned)} cal` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // Load achievements
+        async function loadAchievements() {
+            try {
+                const response = await ProgressAPI.getAchievements();
+                if (response.success && response.data) {
+                    const unlocked = response.data.filter(a => a.unlocked);
+                    if (unlocked.length > 0) {
+                        displayAchievements(unlocked.slice(0, 3));
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load achievements:', error);
+                // Keep empty state
+            }
+        }
+
+        // Display achievements
+        function displayAchievements(achievements) {
+            const container = document.getElementById('achievements');
+            
+            const html = achievements.map(achievement => `
+                <div class="achievement-badge">
+                    <span class="achievement-icon">${achievement.icon}</span>
+                    <div class="achievement-info">
+                        <h4>${achievement.name}</h4>
+                        <p>${achievement.description}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // Handle logout
+        async function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                LoadingManager.show('Logging out...');
+                await AuthAPI.logout();
+                LoadingManager.hide();
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDate();
+            loadDashboard();
+        });
+
+        // Close mobile sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768 && 
+                sidebar.classList.contains('mobile-active') && 
+                !sidebar.contains(e.target) && 
+                !menuBtn.contains(e.target)) {
+                sidebar.classList.remove('mobile-active');
+            }
+        });
+    </script>
+</body>
+</html>
