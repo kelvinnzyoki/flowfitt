@@ -490,6 +490,118 @@
 
         // Global variables
         let currentUser = null;
+        // Load dashboard data
+    async function loadDashboard() {
+        try {
+            LoadingManager.show('Loading dashboard...');
+
+            // Get user data
+            const userResponse = await AuthAPI.getCurrentUser();
+            if (userResponse.success && userResponse.data) {
+                const user = userResponse.data;
+                const name = user.name || user.email.split('@')[0];
+                
+                // Update UI
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('greeting').textContent = `Welcome back, ${name}!`;
+            }
+
+            // Get streak
+            const streakResponse = await ProgressAPI.getStreaks();
+            if (streakResponse.success && streakResponse.data) {
+                document.getElementById('streakValue').textContent = 
+                    streakResponse.data.currentStreak || 0;
+            }
+
+            // Get stats (last 30 days)
+            const statsResponse = await ProgressAPI.getStats('30d');
+            if (statsResponse.success && statsResponse.data) {
+                const stats = statsResponse.data;
+                
+                // Update stats cards
+                document.getElementById('workoutCount').textContent = 
+                    stats.totalWorkouts || 0;
+                
+                const hours = ((stats.totalDuration || 0) / 3600).toFixed(1);
+                document.getElementById('totalDuration').textContent = `${hours}h`;
+                
+                document.getElementById('totalCalories').textContent = 
+                    Math.round(stats.totalCalories || 0);
+            }
+
+            // Get recent workouts
+            const progressResponse = await ProgressAPI.getUserProgress();
+            if (progressResponse.success && progressResponse.data) {
+                displayRecentWorkouts(progressResponse.data.slice(0, 5));
+            }
+
+            // Get achievements
+            const achievementsResponse = await ProgressAPI.getAchievements();
+            if (achievementsResponse.success && achievementsResponse.data) {
+                const unlocked = achievementsResponse.data.filter(a => a.unlocked);
+                displayAchievements(unlocked.slice(0, 3));
+            }
+
+            LoadingManager.hide();
+        } catch (error) {
+            LoadingManager.hide();
+            console.error('Dashboard load error:', error);
+            Toast.error('Failed to load some data. Please refresh.');
+        }
+    }
+
+    function displayRecentWorkouts(workouts) {
+        const container = document.getElementById('recentWorkouts') || 
+                         document.querySelector('.workout-history');
+        if (!container || workouts.length === 0) return;
+
+        const html = workouts.map(log => `
+            <div class="workout-item">
+                <div class="workout-info">
+                    <h4>${log.exercise.name}</h4>
+                    <p>${formatDate(log.date)} • ${formatDuration(log.duration)}</p>
+                </div>
+                <div class="workout-stats">
+                    ${log.sets ? `${log.sets} sets` : ''} 
+                    ${log.reps ? `× ${log.reps}` : ''}
+                    ${log.caloriesBurned ? `• ${Math.round(log.caloriesBurned)} cal` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = html;
+    }
+
+    function displayAchievements(achievements) {
+        const container = document.getElementById('achievements') || 
+                         document.querySelector('.achievements-list');
+        if (!container || achievements.length === 0) return;
+
+        const html = achievements.map(a => `
+            <div class="achievement-badge">
+                <span class="achievement-icon">${a.icon}</span>
+                <div class="achievement-info">
+                    <h4>${a.name}</h4>
+                    <p>${a.description}</p>
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = html;
+    }
+
+    // Add logout handler
+    async function handleLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            LoadingManager.show('Logging out...');
+            await AuthAPI.logout();
+            LoadingManager.hide();
+        }
+    }
+
+    // Load dashboard on page load
+    document.addEventListener('DOMContentLoaded', loadDashboard);
 
         // Toggle mobile sidebar
         function toggleSidebar() {
