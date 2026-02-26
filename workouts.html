@@ -858,7 +858,8 @@
     </div>
 
     <script>
-      
+
+<script src="api.js"></script>
       // Require authentication
 requireAuth();
         // Tab filtering
@@ -949,12 +950,164 @@ requireAuth();
         // Add your rendering logic here
     }
     
-    loadExercises();
+    let allExercises = [];
+let currentCategory = 'all';
+
+async function loadExercises() {
+    try {
+        LoadingManager.show('Loading exercises...');
+        
+        const response = await WorkoutsAPI.getExercises({ limit: 50 });
+        
+        if (response.success && response.data) {
+            allExercises = response.data;
+            displayExercises(allExercises);
+        }
+        
+        LoadingManager.hide();
+    } catch (error) {
+        LoadingManager.hide();
+        Toast.error('Failed to load exercises');
+        console.error('Load exercises error:', error);
+    }
+}
+
+function displayExercises(exercises) {
+    const grid = document.querySelector('.exercise-grid, .workouts-grid');
+    if (!grid) return;
+    
+    if (exercises.length === 0) {
+        grid.innerHTML = '<p>No exercises found</p>';
+        return;
+    }
+    
+    const html = exercises.map(exercise => `
+        <div class="exercise-card" data-id="${exercise.id}">
+            <div class="exercise-header">
+                <span class="exercise-icon">${getCategoryIcon(exercise.category)}</span>
+                <span class="exercise-category">${exercise.category}</span>
+            </div>
+            <h3 class="exercise-title">${exercise.name}</h3>
+            <p class="exercise-description">${exercise.description || 'No description available'}</p>
+            <div class="exercise-meta">
+                <span>🔥 ${Math.round(exercise.caloriesPerMin * 10)} cal/10min</span>
+            </div>
+            <div class="exercise-actions">
+                <button class="btn btn-primary" onclick="startExercise('${exercise.id}', '${exercise.name}')">
+                    Start Exercise
+                </button>
+                <button class="btn btn-ghost" onclick="viewExerciseDetails('${exercise.id}')">
+                    Details
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    grid.innerHTML = html;
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'STRENGTH': '💪',
+        'CARDIO': '🏃',
+        'FLEXIBILITY': '🧘',
+        'CORE': '🔥',
+    };
+    return icons[category.toUpperCase()] || '💪';
+}
+
+function filterByCategory(category) {
+    currentCategory = category;
+    
+    // Update active tab
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    if (category === 'all') {
+        displayExercises(allExercises);
+    } else {
+        const filtered = allExercises.filter(ex => 
+            ex.category.toUpperCase() === category.toUpperCase()
+        );
+        displayExercises(filtered);
+    }
+}
+
+async function searchExercises(query) {
+    if (query.length < 2) {
+        displayExercises(allExercises);
+        return;
+    }
+    
+    try {
+        const response = await WorkoutsAPI.searchExercises(query);
+        if (response.success && response.data) {
+            displayExercises(response.data);
+        }
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+async function startExercise(exerciseId, exerciseName) {
+    // Show workout logging modal
+    const duration = prompt(`How long did you exercise ${exerciseName}? (minutes)`);
+    if (!duration) return;
+    
+    const sets = prompt('How many sets? (optional)') || null;
+    const reps = prompt('How many reps per set? (optional)') || null;
+    
+    try {
+        LoadingManager.show('Logging workout...');
+        
+        const response = await ProgressAPI.logWorkout({
+            exerciseId,
+            duration: parseInt(duration) * 60, // Convert to seconds
+            sets: sets ? parseInt(sets) : null,
+            reps: reps ? parseInt(reps) : null,
+        });
+        
+        if (response.success) {
+            Toast.success('Workout logged successfully!');
+        }
+        
+        LoadingManager.hide();
+    } catch (error) {
+        LoadingManager.hide();
+        Toast.error('Failed to log workout');
+        console.error('Log workout error:', error);
+    }
+}
+
+async function viewExerciseDetails(exerciseId) {
+    try {
+        const response = await WorkoutsAPI.getExerciseById(exerciseId);
+        if (response.success && response.data) {
+            // Show modal with exercise details
+            alert(`${response.data.name}\n\n${response.data.description || 'No description'}`);
+        }
+    } catch (error) {
+        Toast.error('Failed to load exercise details');
+    }
+}
+
+// Search functionality
+const searchInput = document.querySelector('.search-input, input[type="search"]');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        searchExercises(e.target.value);
+    });
+}
+
+        // Load exercises on page load
+document.addEventListener('DOMContentLoaded', loadExercises);
    
     </script>
     
     
     
-    <script src="api.js"></script>
+    
 </body>
 </html>
