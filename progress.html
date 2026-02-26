@@ -857,7 +857,7 @@
     </div>
 
     <script>
-      
+      <script src="api.js"></script>
       // Require authentication
 requireAuth();
         // Animate bars on load
@@ -878,8 +878,112 @@ requireAuth();
                 btn.classList.add('active');
             });
         });
+
+
+    let currentPeriod = '30d';
+
+async function loadProgress() {
+    try {
+        LoadingManager.show('Loading progress...');
+        
+        // Get stats
+        const statsResponse = await ProgressAPI.getStats(currentPeriod);
+        if (statsResponse.success) {
+            displayStats(statsResponse.data);
+        }
+        
+        // Get workout history
+        const historyResponse = await ProgressAPI.getWorkoutHistory(20);
+        if (historyResponse.success) {
+            displayHistory(historyResponse.data);
+        }
+        
+        // Get streak
+        const streakResponse = await ProgressAPI.getStreaks();
+        if (streakResponse.success) {
+            displayStreak(streakResponse.data);
+        }
+        
+        LoadingManager.hide();
+    } catch (error) {
+        LoadingManager.hide();
+        Toast.error('Failed to load progress');
+        console.error('Load progress error:', error);
+    }
+}
+
+function displayStats(stats) {
+    // Update stat cards
+    document.querySelector('[data-stat="total-workouts"]').textContent = stats.totalWorkouts || 0;
+    document.querySelector('[data-stat="total-duration"]').textContent = formatDuration(stats.totalDuration || 0);
+    document.querySelector('[data-stat="total-calories"]').textContent = Math.round(stats.totalCalories || 0);
+    document.querySelector('[data-stat="avg-duration"]').textContent = formatDuration(stats.avgDuration || 0);
+    
+    // Display category breakdown chart
+    displayCategoryChart(stats.byCategory);
+}
+
+function displayHistory(history) {
+    const table = document.querySelector('.history-table tbody');
+    if (!table) return;
+    
+    const html = history.map(log => `
+        <tr>
+            <td>${formatDate(log.date)}</td>
+            <td>${log.exercise.name}</td>
+            <td>${formatDuration(log.duration)}</td>
+            <td>${log.sets || '-'}</td>
+            <td>${log.reps || '-'}</td>
+            <td>${log.caloriesBurned ? Math.round(log.caloriesBurned) : '-'}</td>
+        </tr>
+    `).join('');
+    
+    table.innerHTML = html;
+}
+
+function displayStreak(streak) {
+    document.querySelector('[data-stat="current-streak"]').textContent = streak.currentStreak || 0;
+    document.querySelector('[data-stat="longest-streak"]').textContent = streak.longestStreak || 0;
+}
+
+function displayCategoryChart(byCategory) {
+    // Simple bar chart using CSS
+    const container = document.querySelector('.category-chart');
+    if (!container) return;
+    
+    const total = Object.values(byCategory).reduce((sum, val) => sum + val, 0);
+    
+    const html = Object.entries(byCategory).map(([category, count]) => {
+        const percentage = total ? (count / total * 100) : 0;
+        return `
+            <div class="chart-bar">
+                <div class="bar-label">${category}</div>
+                <div class="bar-container">
+                    <div class="bar-fill" style="width: ${percentage}%"></div>
+                </div>
+                <div class="bar-value">${count}</div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = html;
+}
+
+function changePeriod(period) {
+    currentPeriod = period;
+    
+    // Update active button
+    document.querySelectorAll('[data-period]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    loadProgress();
+}
+
+document.addEventListener('DOMContentLoaded', loadProgress);
     </script>
     
-    <script src="api.js"></script>
+    
 </body>
 </html>
