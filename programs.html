@@ -819,6 +819,8 @@
     </div>
 
     <script>
+
+        <script src="api.js"></script>
       
       // Require authentication
 requireAuth();
@@ -843,8 +845,108 @@ requireAuth();
                 alert('Viewing program details! In production, this would show the full program breakdown.');
             });
         });
+
+
+    let allPrograms = [];
+
+async function loadPrograms() {
+    try {
+        LoadingManager.show('Loading programs...');
+        
+        // Get all programs
+        const programsResponse = await ProgramsAPI.getPrograms();
+        
+        if (programsResponse.success && programsResponse.data) {
+            allPrograms = programsResponse.data;
+            displayPrograms(allPrograms);
+        }
+        
+        // Get user enrollments
+        const enrollmentsResponse = await ProgramsAPI.getUserPrograms();
+        if (enrollmentsResponse.success && enrollmentsResponse.data) {
+            displayEnrollments(enrollmentsResponse.data);
+        }
+        
+        LoadingManager.hide();
+    } catch (error) {
+        LoadingManager.hide();
+        Toast.error('Failed to load programs');
+        console.error('Load programs error:', error);
+    }
+}
+
+function displayPrograms(programs) {
+    const grid = document.querySelector('.programs-grid');
+    if (!grid) return;
+    
+    const html = programs.map(program => `
+        <div class="program-card">
+            <h3>${program.title}</h3>
+            <p>${program.description || 'No description'}</p>
+            <div class="program-meta">
+                <span>📅 ${program.durationWeeks} weeks</span>
+                <span>📊 ${program.daysPerWeek} days/week</span>
+            </div>
+            <button class="btn btn-primary" onclick="enrollInProgram('${program.id}', '${program.title}')">
+                Enroll Now
+            </button>
+        </div>
+    `).join('');
+    
+    grid.innerHTML = html;
+}
+
+function displayEnrollments(enrollments) {
+    const container = document.querySelector('.my-programs, .enrollments-list');
+    if (!container) return;
+    
+    if (enrollments.length === 0) {
+        container.innerHTML = '<p>You are not enrolled in any programs yet</p>';
+        return;
+    }
+    
+    const html = enrollments.map(enrollment => `
+        <div class="enrollment-card">
+            <h3>${enrollment.program.title}</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${(enrollment.completedDays / (enrollment.program.durationWeeks * enrollment.program.daysPerWeek) * 100)}%"></div>
+            </div>
+            <p>Week ${enrollment.currentWeek}, Day ${enrollment.currentDay}</p>
+            <p>${enrollment.completedDays} days completed</p>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+}
+
+async function enrollInProgram(programId, programTitle) {
+    if (!confirm(`Enroll in ${programTitle}?`)) return;
+    
+    try {
+        LoadingManager.show('Enrolling...');
+        
+        const response = await ProgramsAPI.enrollInProgram(programId);
+        
+        if (response.success) {
+            Toast.success('Successfully enrolled!');
+            loadPrograms(); // Reload to show updated enrollments
+        }
+        
+        LoadingManager.hide();
+    } catch (error) {
+        LoadingManager.hide();
+        if (error.message.includes('already enrolled')) {
+            Toast.warning('You are already enrolled in this program');
+        } else {
+            Toast.error('Failed to enroll');
+        }
+        console.error('Enroll error:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadPrograms);
     </script>
     
-    <script src="api.js"></script>
+    
 </body>
 </html>
