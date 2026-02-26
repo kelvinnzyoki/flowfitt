@@ -873,6 +873,24 @@
         </div>
     </footer>
     
+    
     <script src="api.js"></script>
+<script>
+    // Update navigation based on auth state
+    document.addEventListener('DOMContentLoaded', () => {
+        updateNavigation();
+    });
+
+    // Update CTA links
+    document.querySelectorAll('a[href="dashboard.html"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (!isAuthenticated()) {
+                e.preventDefault();
+                window.location.href = 'register.html';
+            }
+        });
+    });
+</script>
+    
 </body>
 </html>
