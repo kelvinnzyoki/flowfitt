@@ -859,75 +859,75 @@
    <script src="api.js"></script>
     
     <script>
-      
-      // Require authentication
 requireAuth();
-        // Animate bars on load
-        window.addEventListener('load', () => {
-            document.querySelectorAll('.bar').forEach((bar, index) => {
-                const height = bar.style.height;
-                bar.style.height = '0';
-                setTimeout(() => {
-                    bar.style.height = height;
-                }, index * 200);
-            });
-        });
 
-        // Time filter buttons
-        document.querySelectorAll('.time-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
+let currentPeriod = '30d';
 
-
-    let currentPeriod = '30d';
-
+// Load all progress data
 async function loadProgress() {
     try {
         LoadingManager.show('Loading progress...');
         
         // Get stats
         const statsResponse = await ProgressAPI.getStats(currentPeriod);
-        if (statsResponse.success) {
+        if (statsResponse.success && statsResponse.data) {
             displayStats(statsResponse.data);
         }
         
         // Get workout history
         const historyResponse = await ProgressAPI.getWorkoutHistory(20);
-        if (historyResponse.success) {
+        if (historyResponse.success && historyResponse.data) {
             displayHistory(historyResponse.data);
         }
         
         // Get streak
         const streakResponse = await ProgressAPI.getStreaks();
-        if (streakResponse.success) {
+        if (streakResponse.success && streakResponse.data) {
             displayStreak(streakResponse.data);
+        }
+        
+        // Get achievements
+        const achievementsResponse = await ProgressAPI.getAchievements();
+        if (achievementsResponse.success && achievementsResponse.data) {
+            displayAchievements(achievementsResponse.data);
         }
         
         LoadingManager.hide();
     } catch (error) {
         LoadingManager.hide();
-        Toast.error('Failed to load progress');
-        console.error('Load progress error:', error);
+        Toast.error('Failed to load progress data');
+        console.error(error);
     }
 }
 
+// Display stats
 function displayStats(stats) {
     // Update stat cards
-    document.querySelector('[data-stat="total-workouts"]').textContent = stats.totalWorkouts || 0;
-    document.querySelector('[data-stat="total-duration"]').textContent = formatDuration(stats.totalDuration || 0);
-    document.querySelector('[data-stat="total-calories"]').textContent = Math.round(stats.totalCalories || 0);
-    document.querySelector('[data-stat="avg-duration"]').textContent = formatDuration(stats.avgDuration || 0);
+    updateStatCard('total-workouts', stats.totalWorkouts || 0);
+    updateStatCard('total-duration', formatDuration(stats.totalDuration || 0));
+    updateStatCard('total-calories', Math.round(stats.totalCalories || 0));
+    updateStatCard('avg-duration', formatDuration(stats.avgDuration || 0));
     
     // Display category breakdown chart
-    displayCategoryChart(stats.byCategory);
+    if (stats.byCategory) {
+        displayCategoryChart(stats.byCategory);
+    }
 }
 
+function updateStatCard(dataAttr, value) {
+    const el = document.querySelector(`[data-stat="${dataAttr}"]`);
+    if (el) el.textContent = value;
+}
+
+// Display workout history table
 function displayHistory(history) {
-    const table = document.querySelector('.history-table tbody');
-    if (!table) return;
+    const tbody = document.querySelector('.history-table tbody, .workout-history');
+    if (!tbody) return;
+    
+    if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No workout history yet</td></tr>';
+        return;
+    }
     
     const html = history.map(log => `
         <tr>
@@ -940,30 +940,36 @@ function displayHistory(history) {
         </tr>
     `).join('');
     
-    table.innerHTML = html;
+    tbody.innerHTML = html;
 }
 
+// Display streak
 function displayStreak(streak) {
-    document.querySelector('[data-stat="current-streak"]').textContent = streak.currentStreak || 0;
-    document.querySelector('[data-stat="longest-streak"]').textContent = streak.longestStreak || 0;
+    updateStatCard('current-streak', streak.currentStreak || 0);
+    updateStatCard('longest-streak', streak.longestStreak || 0);
 }
 
+// Display category breakdown chart
 function displayCategoryChart(byCategory) {
-    // Simple bar chart using CSS
-    const container = document.querySelector('.category-chart');
+    const container = document.querySelector('.category-chart, .chart-container');
     if (!container) return;
     
     const total = Object.values(byCategory).reduce((sum, val) => sum + val, 0);
+    if (total === 0) {
+        container.innerHTML = '<p class="empty-state">No data yet</p>';
+        return;
+    }
     
     const html = Object.entries(byCategory).map(([category, count]) => {
-        const percentage = total ? (count / total * 100) : 0;
+        const percentage = (count / total * 100).toFixed(1);
+        
         return `
             <div class="chart-bar">
                 <div class="bar-label">${category}</div>
                 <div class="bar-container">
                     <div class="bar-fill" style="width: ${percentage}%"></div>
                 </div>
-                <div class="bar-value">${count}</div>
+                <div class="bar-value">${count} (${percentage}%)</div>
             </div>
         `;
     }).join('');
@@ -971,6 +977,33 @@ function displayCategoryChart(byCategory) {
     container.innerHTML = html;
 }
 
+// Display achievements
+function displayAchievements(achievements) {
+    const container = document.querySelector('.achievements-grid, .achievements-list');
+    if (!container) return;
+    
+    const unlocked = achievements.filter(a => a.unlocked);
+    
+    if (unlocked.length === 0) {
+        container.innerHTML = '<p class="empty-state">Complete workouts to unlock achievements!</p>';
+        return;
+    }
+    
+    const html = unlocked.map(achievement => `
+        <div class="achievement-badge ${achievement.unlocked ? 'unlocked' : 'locked'}">
+            <span class="achievement-icon">${achievement.icon}</span>
+            <div class="achievement-info">
+                <h4>${achievement.name}</h4>
+                <p>${achievement.description}</p>
+                <span class="achievement-points">${achievement.points} points</span>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+}
+
+// Change time period
 function changePeriod(period) {
     currentPeriod = period;
     
@@ -983,6 +1016,15 @@ function changePeriod(period) {
     loadProgress();
 }
 
+// Logout handler
+async function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        LoadingManager.show('Logging out...');
+        await AuthAPI.logout();
+    }
+}
+
+// Load on page load
 document.addEventListener('DOMContentLoaded', loadProgress);
     </script>
     
