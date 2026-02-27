@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programs - FlowFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-accent: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --bg-dark: #0a0a0f;
+            --bg-card: #1a1a24;
+            --bg-sidebar: #0f0f16;
+            --text-primary: #ffffff;
+            --text-secondary: #a8a8b8;
+            --accent: #f5576c;
+            --border: rgba(255, 255, 255, 0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); padding: 2rem 1.5rem; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; }
+        .logo { font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 3rem; }
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item { margin-bottom: 0.5rem; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; color: var(--text-secondary); text-decoration: none; border-radius: 12px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .nav-link.active { background: var(--gradient-2); color: #fff; }
+        .nav-icon { font-size: 1.4rem; }
+        .user-profile { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 15px; margin-top: auto; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; }
+        .user-info h4 { font-weight: 700; font-size: 0.95rem; }
+        .user-info p { color: var(--text-secondary); font-size: 0.85rem; }
+        .main-content { margin-left: 280px; flex: 1; padding: 2rem 3rem; width: calc(100% - 280px); }
+        .header { margin-bottom: 3rem; }
+        .header h1 { font-family: 'Archivo Black', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        .header p { color: var(--text-secondary); font-size: 1.1rem; }
+        .featured-section { margin-bottom: 4rem; }
+        .section-title { font-family: 'Archivo Black', sans-serif; font-size: 2rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; }
+        .section-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gradient-2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        /* Program Cards */
+        .programs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 2.5rem; }
+        .program-card { background: var(--bg-card); border-radius: 25px; border: 1px solid var(--border); overflow: hidden; transition: all 0.4s ease; position: relative; }
+        .program-card:hover { transform: translateY(-8px); box-shadow: 0 25px 70px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.1); }
+        .program-header { height: 180px; background: var(--gradient-1); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+        .program-card:nth-child(3n+2) .program-header { background: var(--gradient-2); }
+        .program-card:nth-child(3n+3) .program-header { background: var(--gradient-3); }
+        .program-badge { display: inline-block; padding: 0.5rem 1.2rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; align-self: flex-start; }
+        .program-title { font-family: 'Archivo Black', sans-serif; font-size: 1.9rem; line-height: 1.1; letter-spacing: -1px; }
+        .program-body { padding: 2rem; }
+        .program-description { color: var(--text-secondary); line-height: 1.7; margin-bottom: 2rem; min-height: 50px; }
+        .program-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+        .meta-item { text-align: center; }
+        .meta-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .meta-label { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.3rem; }
+        .meta-value { font-weight: 700; font-size: 1.05rem; }
+        .program-progress { margin-bottom: 1.5rem; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .progress-label { font-weight: 600; font-size: 0.9rem; }
+        .progress-percentage { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+        .progress-bar { height: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--gradient-2); border-radius: 10px; transition: width 0.8s ease; }
+        .program-cta { display: flex; gap: 1rem; }
+        .btn-program { flex: 1; padding: 1rem; border-radius: 15px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: 'DM Sans', sans-serif; }
+        .btn-enroll { background: var(--gradient-accent); color: #000; }
+        .btn-enroll:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,87,108,0.3); }
+        .btn-continue { background: var(--gradient-2); color: #fff; }
+        .btn-continue:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(240,147,251,0.3); }
+        .btn-details { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-primary); }
+        .btn-details:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+        .btn-enrolled { background: rgba(74,222,128,0.15); border: 1px solid #4ade80; color: #4ade80; cursor: default; }
+        .btn-completed { background: rgba(79,172,254,0.15); border: 1px solid #4facfe; color: #4facfe; cursor: default; }
+        .enrolled-badge { display: inline-block; padding: 0.3rem 0.8rem; background: rgba(74,222,128,0.15); color: #4ade80; border-radius: 50px; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .empty-state { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary); font-size: 1rem; }
+        .loading-state { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary); }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; padding: 1.5rem; }
+            .programs-grid { grid-template-columns: 1fr; }
+            .program-meta { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="logo">FlowFit</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="workouts.html" class="nav-link"><span class="nav-icon">💪</span><span>Workouts</span></a></li>
+            <li class="nav-item"><a href="programs.html" class="nav-link active"><span class="nav-icon">📋</span><span>Programs</span></a></li>
+            <li class="nav-item"><a href="progress.html" class="nav-link"><span class="nav-icon">📈</span><span>Progress</span></a></li>
+        </ul>
+        <!-- FIX #14: populated by populateSidebarUser() in api.js -->
+        <div class="user-profile">
+            <div class="user-avatar">?</div>
+            <div class="user-info"><h4>Loading...</h4><p>Member</p></div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Workout Programs</h1>
+            <p>Structured plans to help you achieve your fitness goals</p>
+        </div>
+
+        <!-- FIX #11: Unique ID for enrollments section -->
+        <div class="featured-section" id="enrollmentsSection" style="display:none;">
+            <h2 class="section-title">
+                <span class="section-icon">🔥</span>
+                Your Active Programs
+            </h2>
+            <!-- FIX #11: Unique ID so displayEnrollments() can target it -->
+            <div class="programs-grid" id="enrollmentsGrid">
+                <div class="loading-state">Loading your programs...</div>
+            </div>
+        </div>
+
+        <!-- FIX #10/#13: Unique ID for available programs -->
+        <div class="featured-section">
+            <h2 class="section-title">
+                <span class="section-icon">⚡</span>
+                Available Programs
+            </h2>
+            <!-- FIX #10: Unique ID so displayPrograms() doesn't collide with enrollments grid -->
+            <div class="programs-grid" id="availableProgramsGrid">
+                <div class="loading-state">⏳ Loading programs...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="api.js"></script>
+<script>
+requireAuth();
+
+let allPrograms = [];
+let myEnrollments = [];
+
+async function loadPrograms() {
+    try {
+        LoadingManager.show('Loading programs...');
+
+        const [programsRes, enrollmentsRes] = await Promise.all([
+            ProgramsAPI.getPrograms({ limit: 50 }),
+            ProgramsAPI.getUserPrograms(),
+        ]);
+
+        if (enrollmentsRes.success && enrollmentsRes.data) {
+            myEnrollments = enrollmentsRes.data;
+            displayEnrollments(myEnrollments);
+        }
+
+        if (programsRes.success && programsRes.data) {
+            allPrograms = programsRes.data;
+            displayPrograms(allPrograms);
+        } else {
+            document.getElementById('availableProgramsGrid').innerHTML =
+                '<div class="empty-state">No programs available yet. Check back soon!</div>';
+        }
+    } catch (error) {
+        Toast.error('Failed to load programs');
+        document.getElementById('availableProgramsGrid').innerHTML =
+            '<div class="empty-state">⚠️ Could not load programs. Check your connection.</div>';
+        console.error(error);
+    } finally {
+        LoadingManager.hide();
+    }
+}
+
+// FIX #11: displayEnrollments now targets #enrollmentsGrid
+function displayEnrollments(enrollments) {
+    const section = document.getElementById('enrollmentsSection');
+    const grid = document.getElementById('enrollmentsGrid');
+
+    if (!enrollments || enrollments.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    // FIX #12: full program-header / program-body structure matching CSS
+    grid.innerHTML = enrollments.map(enrollment => {
+        const prog = enrollment.program;
+        const totalDays = (prog.durationWeeks || 0) * (prog.daysPerWeek || 0);
+        const pct = totalDays > 0 ? Math.round(enrollment.completedDays / totalDays * 100) : 0;
+        const isCompleted = !enrollment.isActive && enrollment.completedAt;
+
+        return `
+        <div class="program-card">
+            <div class="program-header">
+                <span class="program-badge">${isCompleted ? '✅ Completed' : '🔥 In Progress'}</span>
+                <h3 class="program-title">${escHtml(prog.title)}</h3>
+            </div>
+            <div class="program-body">
+                <p class="program-description">${escHtml(prog.description || 'Your active training program.')}</p>
+                <div class="program-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon">📅</div>
+                        <div class="meta-label">Duration</div>
+                        <div class="meta-value">${prog.durationWeeks || '?'} Weeks</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">📆</div>
+                        <div class="meta-label">Days/Week</div>
+                        <div class="meta-value">${prog.daysPerWeek || '?'}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">🏁</div>
+                        <div class="meta-label">Week</div>
+                        <div class="meta-value">${enrollment.currentWeek} / ${prog.durationWeeks || '?'}</div>
+                    </div>
+                </div>
+                <div class="program-progress">
+                    <div class="progress-header">
+                        <span class="progress-label">Progress — Day ${enrollment.completedDays} of ${totalDays || '?'}</span>
+                        <span class="progress-percentage">${pct}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${pct}%"></div>
+                    </div>
+                </div>
+                <div class="program-cta">
+                    ${isCompleted
+                        ? `<button class="btn-program btn-completed" disabled>✅ Completed</button>`
+                        : `<button class="btn-program btn-continue"
+                            onclick="viewProgramDetails('${enrollment.program.id}', '${escAttr(prog.title)}')">
+                            Continue Program →
+                           </button>`
+                    }
+                    <button class="btn-program btn-details"
+                        onclick="viewProgramDetails('${prog.id}', '${escAttr(prog.title)}')">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// FIX #10/#12/#13: displayPrograms targets #availableProgramsGrid with correct card HTML
+function displayPrograms(programs) {
+    const grid = document.getElementById('availableProgramsGrid');
+    if (!programs || programs.length === 0) {
+        grid.innerHTML = '<div class="empty-state">No programs available yet.</div>';
+        return;
+    }
+
+    // FIX #12: Full program-header / program-body / program-meta structure matching CSS
+    grid.innerHTML = programs.map(prog => {
+        const enrollment = myEnrollments.find(e => e.programId === prog.id);
+        const isEnrolled  = !!enrollment;
+        const isCompleted = enrollment && !enrollment.isActive;
+        const totalDays   = (prog.durationWeeks || 0) * (prog.daysPerWeek || 0);
+        const pct = (enrollment && totalDays > 0)
+            ? Math.round(enrollment.completedDays / totalDays * 100)
+            : 0;
+
+        return `
+        <div class="program-card">
+            <div class="program-header">
+                <span class="program-badge">${prog.isPremium ? '⭐ Premium' : 'Free'}</span>
+                <h3 class="program-title">${escHtml(prog.title)}</h3>
+            </div>
+            <div class="program-body">
+                <p class="program-description">${escHtml(prog.description || 'No description provided.')}</p>
+                <div class="program-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon">📅</div>
+                        <div class="meta-label">Duration</div>
+                        <div class="meta-value">${prog.durationWeeks || '?'} Weeks</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">🎯</div>
+                        <div class="meta-label">Days/Week</div>
+                        <div class="meta-value">${prog.daysPerWeek || '?'}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">👥</div>
+                        <div class="meta-label">Enrolled</div>
+                        <div class="meta-value">${prog._count?.enrollments ?? '—'}</div>
+                    </div>
+                </div>
+                ${isEnrolled ? `
+                <div class="program-progress">
+                    <div class="progress-header">
+                        <span class="progress-label">${isCompleted ? '✅ Completed' : 'Your Progress'}</span>
+                        <span class="progress-percentage">${pct}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${pct}%"></div>
+                    </div>
+                </div>` : ''}
+                <div class="program-cta">
+                    ${isCompleted
+                        ? `<button class="btn-program btn-completed" disabled>✅ Completed</button>`
+                        : isEnrolled
+                            ? `<button class="btn-program btn-enrolled" disabled>✓ Enrolled</button>`
+                            : `<button class="btn-program btn-enroll"
+                                onclick="enrollInProgram('${prog.id}', '${escAttr(prog.title)}')">
+                                Enroll Now
+                               </button>`
+                    }
+                    <button class="btn-program btn-details"
+                        onclick="viewProgramDetails('${prog.id}', '${escAttr(prog.title)}')">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function enrollInProgram(programId, programTitle) {
+    if (!confirm(`Enroll in "${programTitle}"?`)) return;
+    try {
+        LoadingManager.show('Enrolling...');
+        const response = await ProgramsAPI.enrollInProgram(programId);
+        if (response.success) {
+            Toast.success(`Enrolled in ${programTitle}! 🎉`);
+            await loadPrograms(); // Refresh both sections
+        }
+    } catch (error) {
+        if (error.message.includes('already enrolled')) {
+            Toast.warning('You are already enrolled in this program');
+        } else {
+            Toast.error(error.message || 'Failed to enroll');
+        }
+    } finally {
+        LoadingManager.hide();
+    }
+}
+
+async function viewProgramDetails(programId, programTitle) {
+    try {
+        LoadingManager.show('Loading details...');
+        const res = await ProgramsAPI.getProgramById(programId);
+        LoadingManager.hide();
+        if (res.success && res.data) {
+            const prog = res.data;
+            const weeks = prog.weeks?.length || 0;
+            const days  = prog.weeks?.reduce((s, w) => s + (w.days?.length || 0), 0) || 0;
+            alert(`${prog.title}\n\n${prog.description || ''}\n\nDuration: ${prog.durationWeeks} weeks\nDays/week: ${prog.daysPerWeek}\nTotal weeks in plan: ${weeks}\nTotal day sessions: ${days}`);
+        }
+    } catch (err) {
+        LoadingManager.hide();
+        Toast.error('Could not load program details');
+    }
+}
+
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(str) {
+    return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+async function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) await AuthAPI.logout();
+}
+
+document.addEventListener('DOMContentLoaded', loadPrograms);
+</script>
+</body>
+</html>
