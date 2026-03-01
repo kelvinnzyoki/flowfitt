@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FlowFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+    --bg-primary: #050505;
+    --bg-secondary: #0b0b0f;
+    --bg-card: rgba(18, 18, 22, 0.92);
+    --bg-elevated: #121218;
+    --bg-dark: #050505;
+    --bg-sidebar: #0b0b0f;
+
+    --gold-primary: #D4AF37;
+    --gold-bright: #FFD700;
+    --gold-deep: #B8860B;
+    --gold-soft: rgba(212, 175, 55, 0.12);
+
+    --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #F2D479 40%, #B8860B 100%);
+    --gradient-gold-soft: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+    --gradient-accent: linear-gradient(135deg, #D4AF37 0%, #F2D479 50%, #B8860B 100%);
+    --gradient-1: linear-gradient(135deg, #D4AF37 0%, #c89b3c 100%);
+    --gradient-2: linear-gradient(135deg, #B8860B 0%, #D4AF37 100%);
+    --gradient-3: linear-gradient(135deg, #c89b3c 0%, #F2D479 100%);
+
+    --accent-performance: #c89b3c;
+    --accent-glow: rgba(212, 175, 55, 0.35);
+    --accent: #D4AF37;
+    --accent-green: #4ade80;
+
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8c2;
+    --text-muted: #7a7a85;
+    --text-gold: #E6BE8A;
+
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-gold: rgba(212, 175, 55, 0.25);
+    --border-gold-hover: rgba(212, 175, 55, 0.5);
+    --border: rgba(212, 175, 55, 0.15);
+
+    --glass-blur: blur(18px) saturate(160%);
+    --transition-smooth: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+
+    --shadow-gold-glow: 0 0 30px rgba(212, 175, 55, 0.15);
+    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            padding: 3rem;
+            border-radius: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.5rem;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .auth-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .error-message {
+            color: #f87171;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: #000;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    
+/* ═══════════════════════════════════════
+   GLOBAL DESIGN SYSTEM — FLOWFIT GOLD
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* ── Typography ─── */
+h1, h2, h3, h4, h5, h6,
+.hero-title, .section-title, .card-title,
+.stat-value, .logo, .greeting,
+.panel-title, .wm-title, .hero-text h1,
+.section-header h2, .pricing-card h3,
+.feature-card h3, .auth-header h1,
+.modal-header h2, .nav-title {
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.02em;
+}
+
+/* Biggest display text → Anton */
+.hero-text h1,
+.hero-title,
+.stat-number {
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 0.01em;
+}
+
+.logo {
+    font-family: 'Anton', sans-serif !important;
+    letter-spacing: 0.05em;
+    background: var(--gradient-gold) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* ── Sidebar ─── */
+.sidebar {
+    background: var(--bg-secondary) !important;
+    border-right: 1px solid var(--border-gold) !important;
+    width: 270px !important;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    border-radius: 10px !important;
+    transition: var(--transition-smooth) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background: var(--gold-soft) !important;
+    color: var(--gold-primary) !important;
+    border-left: 3px solid var(--gold-primary) !important;
+    padding-left: calc(1.25rem - 3px) !important;
+}
+
+.nav-link.active {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border-left: none !important;
+    padding-left: 1.25rem !important;
+}
+
+/* ── Cards ─── */
+.card, .stat-card, .chart-card, .panel-card,
+.program-card, .exercise-card, .feature-card,
+.pricing-card, .auth-card, .form-section,
+.week-block {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 16px !important;
+    backdrop-filter: blur(12px);
+    transition: var(--transition-smooth) !important;
+}
+
+.card:hover, .stat-card:hover, .program-card:hover,
+.exercise-card:hover, .feature-card:hover {
+    border-color: var(--border-gold-hover) !important;
+    box-shadow: var(--shadow-gold-glow), var(--shadow-card) !important;
+    transform: translateY(-4px) !important;
+}
+
+/* ── Stat card accent bars ─── */
+.stat-card::before {
+    background: var(--gradient-gold) !important;
+}
+
+/* ── Buttons ─── */
+.btn-primary, .btn-start, .btn-enroll, .btn-log,
+.btn-continue, .btn-enroll, .btn-start-session,
+.btn-continue, .logout-btn,
+button[class*="btn-enroll"],
+button[class*="btn-continue"] {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.btn-primary:hover, .btn-start:hover, .btn-enroll:hover,
+.btn-log:hover, .btn-continue:hover,
+.btn-start-session:hover {
+    box-shadow: 0 8px 30px var(--accent-glow) !important;
+    transform: translateY(-2px) !important;
+}
+
+.btn-details, .btn-save, .btn-ghost, .btn-close-wm,
+.close-btn, .back-btn {
+    border-color: var(--border-gold) !important;
+    color: var(--text-gold) !important;
+}
+
+.btn-details:hover, .btn-save:hover, .btn-ghost:hover {
+    border-color: var(--border-gold-hover) !important;
+    background: var(--gold-soft) !important;
+}
+
+/* ── Logout btn special ─── */
+.logout-btn {
+    background: rgba(212, 175, 55, 0.1) !important;
+    color: var(--gold-primary) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+.logout-btn:hover {
+    background: rgba(212, 175, 55, 0.2) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* ── Inputs ─── */
+.form-input, .form-select, .form-textarea,
+.search-bar input, .form-field input,
+.form-field select, .form-field textarea,
+input, select, textarea {
+    background: rgba(212, 175, 55, 0.04) !important;
+    border: 1px solid var(--border-gold) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 10px !important;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus,
+.search-bar input:focus, .form-field input:focus,
+.form-field select:focus, .form-field textarea:focus {
+    border-color: var(--gold-primary) !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
+    outline: none !important;
+}
+
+/* ── Progress bars ─── */
+.progress-fill, .week-progress-fill, .cat-bar-fill {
+    background: var(--gradient-gold) !important;
+}
+
+/* ── Badges / Tags / Chips ─── */
+.program-badge, .hero-badge, .preview-badge,
+.difficulty-badge, .section-label {
+    background: rgba(212, 175, 55, 0.15) !important;
+    color: var(--gold-primary) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+
+.premium-tag {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+}
+
+/* ── Gradient text helpers ─── */
+.gradient-text, .streak-number,
+[class*="gradient-text"] {
+    background: var(--gradient-gold) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* ── Active nav link accent ─── */
+.tab-btn.active, .time-btn.active {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    border-color: transparent !important;
+}
+
+/* ── Program header colors ─── */
+.program-header {
+    background: var(--gradient-gold-soft) !important;
+    border-bottom: 1px solid var(--border-gold) !important;
+}
+
+/* ── Achievement items ─── */
+.achievement-item.unlocked {
+    border-color: var(--border-gold) !important;
+    background: var(--gold-soft) !important;
+}
+
+.achievement-icon-wrap {
+    background: var(--gradient-gold) !important;
+}
+
+/* ── User avatar ─── */
+.user-avatar {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+}
+
+/* ── Loading modal fix ─── */
+#loadingModal, .loading-modal, [id*="loading"],
+[class*="loading-overlay"], [class*="loadingOverlay"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999 !important;
+    background: rgba(5, 5, 5, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* ── Modals ─── */
+.modal-content, .wmodal-box, .wm-body {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+
+/* ── Pricing featured card ─── */
+.pricing-card.featured {
+    border: 2px solid var(--gold-primary) !important;
+    box-shadow: 0 30px 80px rgba(212, 175, 55, 0.2) !important;
+}
+
+.pricing-badge {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+}
+
+/* ── Section icon ─── */
+.section-icon {
+    background: var(--gradient-gold-soft) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+
+/* ── Background animation orbs → gold ─── */
+.bg-animation::before {
+    background: radial-gradient(circle, rgba(212,175,55,0.6) 0%, transparent 70%) !important;
+}
+.bg-animation::after {
+    background: radial-gradient(circle, rgba(184,134,11,0.4) 0%, transparent 70%) !important;
+}
+
+/* ── Top nav ─── */
+nav, .top-nav {
+    background: rgba(5, 5, 5, 0.9) !important;
+    border-bottom: 1px solid var(--border-gold) !important;
+}
+
+/* ── Main content offset for sidebar ─── */
+.main-content {
+    margin-left: 270px;
+    width: calc(100% - 270px);
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.main {
+    margin-left: 260px !important;
+}
+
+/* ── Programs grid overflow fix ─── */
+.programs-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.exercise-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.achievements-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Contain all grid items */
+.program-card, .exercise-card, .achievement-item {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+}
+
+/* ── Nav hero section (index) ─── */
+nav .btn-primary {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3) !important;
+}
+
+/* ── Workout badge colors → gold palette ─── */
+.workout-badge { background: rgba(212,175,55,0.12) !important; color: var(--gold-primary) !important; }
+.workout-badge.cardio { background: rgba(212,175,55,0.1) !important; color: #E6BE8A !important; }
+.workout-badge.strength { background: rgba(184,134,11,0.15) !important; color: #D4AF37 !important; }
+.workout-badge.core { background: rgba(242,212,121,0.12) !important; color: #F2D479 !important; }
+.workout-badge.hiit { background: rgba(200,155,60,0.15) !important; color: #c89b3c !important; }
+
+/* ── Hero bg gradient overrides (program-detail, workout-session) ─── */
+.hero-bg {
+    background: linear-gradient(135deg, #1a1508 0%, #0b0b0f 100%) !important;
+}
+
+/* ── Achievement points badge ─── */
+.achievement-pts {
+    background: rgba(212, 175, 55, 0.15) !important;
+    color: var(--gold-primary) !important;
+}
+
+/* ════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+════════════════════════════════ */
+
+/* ── Tablet (max 1024px) ─── */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 240px !important;
+        width: calc(100% - 240px) !important;
+        padding: 1.5rem 2rem !important;
+    }
+    .sidebar { width: 240px !important; }
+    .main { margin-left: 240px !important; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .chart-grid { grid-template-columns: 1fr !important; }
+    .content-grid { grid-template-columns: 1fr !important; }
+    .hero-content { grid-template-columns: 1fr !important; }
+    .hero-text h1 { font-size: 3.5rem !important; }
+    .pricing-grid { grid-template-columns: 1fr !important; }
+    .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .body { grid-template-columns: 1fr !important; padding: 1.5rem !important; }
+}
+
+/* ── Mobile (max 768px) ─── */
+@media (max-width: 768px) {
+    html, body { overflow-x: hidden !important; }
+
+    .sidebar {
+        transform: translateX(-100%) !important;
+        z-index: 1000 !important;
+        width: 260px !important;
+    }
+    .sidebar.mobile-active { transform: translateX(0) !important; }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 1rem !important;
+    }
+    .main { margin-left: 0 !important; }
+
+    .dashboard-container { flex-direction: column; }
+
+    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1rem !important; }
+    .content-grid { grid-template-columns: 1fr !important; }
+    .chart-grid { grid-template-columns: 1fr !important; }
+    .streak-section { grid-template-columns: 1fr !important; }
+    .programs-grid { grid-template-columns: 1fr !important; }
+    .exercise-grid { grid-template-columns: 1fr !important; }
+    .achievements-grid { grid-template-columns: 1fr !important; }
+    .features-grid { grid-template-columns: 1fr !important; }
+    .pricing-grid { grid-template-columns: 1fr !important; }
+    .form-grid { grid-template-columns: 1fr !important; }
+    .form-row { grid-template-columns: 1fr !important; }
+    .hero-content { grid-template-columns: 1fr !important; gap: 2rem !important; }
+    .hero-text h1 { font-size: 2.5rem !important; }
+    .hero-title { font-size: 2rem !important; }
+    .section-header h2 { font-size: 2rem !important; }
+    .greeting { font-size: 1.5rem !important; margin-top: 3rem !important; }
+    .prog-ring-wrap { width: 100px; height: 100px; }
+    .hero-stats { flex-wrap: wrap !important; gap: 1rem !important; }
+    .hero-cta { flex-direction: column !important; }
+    nav { padding: 1rem 1.5rem !important; }
+    .nav-links { display: none !important; }
+    .body { padding: 1rem !important; }
+    .progress-panel { position: static !important; }
+    .stats-grid { grid-template-columns: 1fr 1fr !important; }
+    .controls { flex-direction: column !important; }
+    .search-bar { min-width: unset !important; width: 100% !important; }
+    .program-meta { grid-template-columns: repeat(2, 1fr) !important; }
+    .includes-grid { grid-template-columns: 1fr !important; }
+    .hero-content.workout { padding: 1.5rem !important; }
+    .video-section { margin: 1rem !important; }
+}
+
+/* ── Small mobile (max 480px) ─── */
+@media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr !important; }
+    .hero-text h1 { font-size: 2rem !important; }
+    .stat-value { font-size: 1.8rem !important; }
+    .auth-card { padding: 2rem 1.5rem !important; }
+    .modal-content { margin: 0.5rem !important; }
+    .program-meta { grid-template-columns: 1fr 1fr !important; }
+    .filter-tabs { flex-wrap: wrap; }
+    .tab-btn { padding: 0.7rem 1rem !important; font-size: 0.85rem !important; }
+}
+
+    
+/* ── Extended LoadingManager modal fix ─── */
+body > div[style*="position: fixed"],
+body > div[style*="position:fixed"] {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100vw !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999 !important;
+}
+
+/* Spinner / loading box inside modal */
+.loading-spinner, .loading-box, .loading-content,
+[class*="spinner"] {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 16px !important;
+    padding: 2rem 3rem !important;
+    text-align: center !important;
+    color: var(--gold-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    box-shadow: var(--shadow-gold-glow) !important;
+}
+
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <div class="auth-card">
+            <div class="logo">FlowFit</div>
+            
+            <div class="auth-header">
+                <h1>Welcome Back!</h1>
+                <p>Login to continue your fitness journey</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input 
+                        type="email" 
+                        class="form-input" 
+                        id="email"
+                        placeholder="your@email.com"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="password-toggle">
+                        <input 
+                            type="password" 
+                            class="form-input" 
+                            id="password"
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword()">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Login
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="register.html">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+        // Redirect if already logged in
+        if (isAuthenticated()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        const form = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // Hide previous errors
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+            
+            try {
+                const result = await AuthAPI.login(email, password);
+                
+                if (result.success) {
+                    Toast.success('Login successful!');
+                    
+                    // Redirect to saved page or dashboard
+                    const redirect = localStorage.getItem('redirectAfterLogin') || 'dashboard.html';
+                    localStorage.removeItem('redirectAfterLogin');
+                    
+                    setTimeout(() => {
+                        window.location.href = redirect;
+                    }, 500);
+                }
+            } catch (error) {
+                errorMessage.textContent = error.message || 'Login failed. Please check your credentials.';
+                errorMessage.classList.add('show');
+                Toast.error(error.message || 'Login failed');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
+        });
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+        }
+
+        // Handle Enter key on inputs
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
