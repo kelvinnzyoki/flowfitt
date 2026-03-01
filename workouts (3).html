@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workouts - FlowFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-accent: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --bg-dark: #0a0a0f;
+            --bg-card: #1a1a24;
+            --bg-sidebar: #0f0f16;
+            --text-primary: #ffffff;
+            --text-secondary: #a8a8b8;
+            --accent: #f5576c;
+            --border: rgba(255, 255, 255, 0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); padding: 2rem 1.5rem; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; }
+        .logo { font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 3rem; }
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item { margin-bottom: 0.5rem; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; color: var(--text-secondary); text-decoration: none; border-radius: 12px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .nav-link.active { background: var(--gradient-2); color: #fff; }
+        .nav-icon { font-size: 1.4rem; }
+        .user-profile { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 15px; margin-top: auto; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; }
+        .user-info h4 { font-weight: 700; font-size: 0.95rem; }
+        .user-info p { color: var(--text-secondary); font-size: 0.85rem; }
+        .main-content { margin-left: 280px; flex: 1; padding: 2rem 3rem; width: calc(100% - 280px); }
+        .header { margin-bottom: 2rem; }
+        .header h1 { font-family: 'Archivo Black', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        .header p { color: var(--text-secondary); font-size: 1.1rem; }
+        /* Dev banner — only shows when DB is empty */
+        .dev-banner { display: none; align-items: center; gap: 1rem; padding: 0.9rem 1.5rem; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); border-radius: 12px; color: #fbbf24; font-size: 0.9rem; margin-bottom: 2rem; }
+        .dev-banner.visible { display: flex; }
+        .dev-banner code { background: rgba(0,0,0,0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-family: monospace; }
+        .controls { display: flex; gap: 1.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
+        .search-bar { flex: 1; min-width: 300px; position: relative; }
+        .search-bar input { width: 100%; padding: 1rem 1.5rem 1rem 3.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 15px; color: var(--text-primary); font-size: 1rem; font-family: 'DM Sans', sans-serif; transition: all 0.3s ease; }
+        .search-bar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,87,108,0.1); }
+        .search-icon { position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--text-secondary); pointer-events: none; }
+        .filter-tabs { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .tab-btn { padding: 1rem 1.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; }
+        .tab-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+        .tab-btn.active { background: var(--gradient-2); border-color: transparent; color: #fff; }
+        /* Cards — keeps your original design */
+        .exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
+        .exercise-card { background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: all 0.4s ease; cursor: pointer; }
+        .exercise-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.1); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .exercise-image { width: 100%; height: 200px; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; }
+        .exercise-card:nth-child(3n+2) .exercise-image { background: var(--gradient-2); }
+        .exercise-card:nth-child(3n) .exercise-image { background: var(--gradient-3); }
+        .difficulty-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .difficulty-beginner { color: #4ade80; }
+        .difficulty-intermediate { color: #fbbf24; }
+        .difficulty-advanced { color: #f87171; }
+        .exercise-content { padding: 1.75rem; }
+        .exercise-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .exercise-meta { display: flex; gap: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .exercise-meta span { display: flex; align-items: center; gap: 0.4rem; }
+        .exercise-description { color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem; }
+        .exercise-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .tag { padding: 0.4rem 0.9rem; background: rgba(255,255,255,0.05); border-radius: 50px; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+        .exercise-actions { display: flex; gap: 1rem; }
+        .btn-action { flex: 1; padding: 0.9rem; border-radius: 12px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: 'DM Sans', sans-serif; }
+        .btn-start { background: var(--gradient-accent); color: #000; }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,87,108,0.3); }
+        .btn-save { background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-save:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+        /* Log Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center; padding: 2rem; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-card); border-radius: 25px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); }
+        .modal-header { padding: 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-family: 'Archivo Black', sans-serif; font-size: 1.8rem; }
+        .modal-header p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem; }
+        .close-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; flex-shrink: 0; }
+        .close-btn:hover { background: rgba(255,255,255,0.1); transform: rotate(90deg); }
+        .modal-body { padding: 2rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0; }
+        .form-field { margin-bottom: 1.25rem; }
+        .form-field label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem; color: var(--text-secondary); }
+        .form-field input, .form-field select, .form-field textarea { width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 1rem; }
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: none; border-color: var(--accent); }
+        .form-field textarea { resize: vertical; min-height: 70px; }
+        .form-field select option { background: #1a1a24; }
+        .modal-cta { display: flex; gap: 1rem; margin-top: 0.5rem; }
+        .btn-log { flex: 2; padding: 1rem; background: var(--gradient-accent); color: #000; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.3s; }
+        .btn-log:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,87,108,0.3); }
+        .btn-log:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-cancel { flex: 1; padding: 1rem; background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border); border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+        .empty-state { grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-secondary); font-size: 1.1rem; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; padding: 1.5rem; }
+            .exercise-grid { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+            .filter-tabs { overflow-x: auto; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="logo">FlowFit</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="workouts.html" class="nav-link active"><span class="nav-icon">💪</span><span>Workouts</span></a></li>
+            <li class="nav-item"><a href="programs.html" class="nav-link"><span class="nav-icon">📋</span><span>Programs</span></a></li>
+            <li class="nav-item"><a href="progress.html" class="nav-link"><span class="nav-icon">📈</span><span>Progress</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><span class="nav-icon">🏆</span><span>Achievements</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><span class="nav-icon">💳</span><span>Subscription</span></a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><span class="nav-icon">⚙️</span><span>Settings</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-avatar">?</div>
+            <div class="user-info"><h4>Loading...</h4><p>Member</p></div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Exercise Library</h1>
+            <p>Browse our comprehensive collection of home workouts</p>
+        </div>
+
+        <!--
+          DEV BANNER: Only visible when DB is empty.
+          In production after seeding, this is never shown.
+        -->
+        <div class="dev-banner" id="devBanner">
+            ⚠️ Database is empty — showing sample exercises.
+            Run <code>npx prisma db seed</code> to populate your real data,
+            then exercises will load from the database automatically.
+        </div>
+
+        <div class="controls">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search exercises...">
+            </div>
+            <div class="filter-tabs" id="filterTabs">
+                <button class="tab-btn active" data-filter="all">All</button>
+                <button class="tab-btn" data-filter="STRENGTH">Strength</button>
+                <button class="tab-btn" data-filter="CARDIO">Cardio</button>
+                <button class="tab-btn" data-filter="CORE">Core</button>
+                <button class="tab-btn" data-filter="HIIT">HIIT</button>
+                <button class="tab-btn" data-filter="FLEXIBILITY">Flexibility</button>
+            </div>
+        </div>
+
+        <div class="exercise-grid" id="exerciseGrid">
+            <div class="empty-state">⏳ Loading exercises...</div>
+        </div>
+    </main>
+</div>
+
+<!-- Log Workout Modal — replaces the old prompt() dialogs -->
+<div class="modal" id="logModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 id="modalTitle">Log Workout</h2>
+                <p id="modalSubtitle">Track your performance</p>
+            </div>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="modalExId">
+            <input type="hidden" id="modalCalPerMin">
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Duration (minutes) *</label>
+                    <input type="number" id="logDuration" min="1" max="300" placeholder="e.g. 30">
+                </div>
+                <div class="form-field">
+                    <label>Difficulty</label>
+                    <select id="logDifficulty">
+                        <option value="">Select...</option>
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Sets (optional)</label>
+                    <input type="number" id="logSets" min="1" placeholder="e.g. 3">
+                </div>
+                <div class="form-field">
+                    <label>Reps per set (optional)</label>
+                    <input type="number" id="logReps" min="1" placeholder="e.g. 15">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Heart Rate bpm (optional)</label>
+                    <input type="number" id="logHR" min="40" max="220" placeholder="e.g. 145">
+                </div>
+                <div class="form-field">
+                    <label>Calories (auto-estimated)</label>
+                    <input type="number" id="logCal" min="0" placeholder="Auto">
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Notes (optional)</label>
+                <textarea id="logNotes" placeholder="How did it feel? Any personal bests?"></textarea>
+            </div>
+            <div class="modal-cta">
+                <button class="btn-log" id="logBtn" onclick="submitLog()">Log Workout 🎯</button>
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+requireAuth();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FALLBACK DATA — exact mirror of seed.ts
+// Used ONLY when the API returns an empty array (DB not yet seeded).
+// Once you run `npx prisma db seed`, the API data is used and this is ignored.
+// IDs match seed.ts so logging still works even in fallback mode.
+// ─────────────────────────────────────────────────────────────────────────────
+const FALLBACK = [
+  // STRENGTH
+  { id:'ex-pushup', name:'Push-ups',          category:'STRENGTH',    caloriesPerMin:8,    difficulty:'BEGINNER',     icon:'💪', tags:['Upper Body','Chest','No Equipment'],    desc:'Classic upper body exercise targeting chest, shoulders, and triceps. Perfect for building strength.' },
+  { id:'ex-squat',  name:'Squats',            category:'STRENGTH',    caloriesPerMin:9,    difficulty:'BEGINNER',     icon:'🦵', tags:['Lower Body','Legs','No Equipment'],     desc:'Fundamental lower body movement for building leg strength, power, and mobility.' },
+  { id:'ex-lunge',  name:'Lunges',            category:'STRENGTH',    caloriesPerMin:7.5,  difficulty:'BEGINNER',     icon:'🚶', tags:['Lower Body','Balance'],                 desc:'Unilateral leg exercise that improves balance, coordination, and lower body strength.' },
+  { id:'ex-dips',   name:'Tricep Dips',       category:'STRENGTH',    caloriesPerMin:7,    difficulty:'INTERMEDIATE', icon:'💪', tags:['Upper Body','Triceps'],                 desc:'Bodyweight exercise targeting the triceps, chest, and anterior deltoids using a chair or bench.' },
+  { id:'ex-glute',  name:'Glute Bridges',     category:'STRENGTH',    caloriesPerMin:6,    difficulty:'BEGINNER',     icon:'🍑', tags:['Lower Body','Glutes','No Equipment'],   desc:'Hip extension exercise activating glutes and hamstrings. Drive hips to the ceiling.' },
+  { id:'ex-pike',   name:'Pike Push-ups',     category:'STRENGTH',    caloriesPerMin:8.5,  difficulty:'ADVANCED',     icon:'🔺', tags:['Shoulders','Advanced'],                 desc:'Advanced shoulder exercise. Form an inverted V and lower your head toward the floor.' },
+  // CARDIO
+  { id:'ex-burpee', name:'Burpees',           category:'CARDIO',      caloriesPerMin:12,   difficulty:'INTERMEDIATE', icon:'🏃', tags:['Full Body','Cardio','HIIT'],            desc:'High-intensity full-body exercise combining a squat, push-up, and jump. One of the best calorie burners.' },
+  { id:'ex-jjack',  name:'Jumping Jacks',     category:'CARDIO',      caloriesPerMin:8,    difficulty:'BEGINNER',     icon:'🤸', tags:['Cardio','Warm-up','No Equipment'],      desc:'Classic full-body cardio warm-up that elevates heart rate and improves coordination.' },
+  { id:'ex-hknees', name:'High Knees',        category:'CARDIO',      caloriesPerMin:10,   difficulty:'BEGINNER',     icon:'🏃', tags:['Cardio','Hip Flexors'],                 desc:'Running in place while driving knees up to hip level. Excellent for endurance.' },
+  { id:'ex-bkicks', name:'Butt Kicks',        category:'CARDIO',      caloriesPerMin:9,    difficulty:'BEGINNER',     icon:'🦵', tags:['Cardio','Hamstrings'],                  desc:'Jogging in place while kicking heels toward glutes. Improves hamstring flexibility.' },
+  // CORE
+  { id:'ex-plank',  name:'Plank',             category:'CORE',        caloriesPerMin:5,    difficulty:'BEGINNER',     icon:'🧘', tags:['Core','Abs','Stability'],               desc:'Isometric core exercise that builds endurance and stability throughout the entire body.' },
+  { id:'ex-mclimb', name:'Mountain Climbers', category:'CORE',        caloriesPerMin:11,   difficulty:'INTERMEDIATE', icon:'⛰️', tags:['Core','Cardio','HIIT'],                 desc:'Dynamic core and cardio exercise. From plank, alternate driving knees toward your chest at speed.' },
+  { id:'ex-crunch', name:'Crunches',          category:'CORE',        caloriesPerMin:5.5,  difficulty:'BEGINNER',     icon:'💫', tags:['Core','Abs','No Equipment'],            desc:'Classic abdominal exercise targeting the rectus abdominis. Lie on back, curl upper body upward.' },
+  { id:'ex-rtwist', name:'Russian Twists',    category:'CORE',        caloriesPerMin:6.5,  difficulty:'INTERMEDIATE', icon:'🌀', tags:['Core','Obliques','Rotation'],           desc:'Rotational core exercise targeting obliques. Sit with feet elevated, rotate side to side.' },
+  { id:'ex-lraise', name:'Leg Raises',        category:'CORE',        caloriesPerMin:5,    difficulty:'INTERMEDIATE', icon:'🦵', tags:['Core','Lower Abs'],                     desc:'Lower ab exercise. Raise straight legs to 90° then slowly lower without touching the floor.' },
+  // HIIT
+  { id:'ex-sqjmp',  name:'Jump Squats',       category:'HIIT',        caloriesPerMin:14,   difficulty:'INTERMEDIATE', icon:'⚡', tags:['HIIT','Plyometric','Legs'],             desc:'Explosive plyometric squat. Explode upward into a jump, land softly, repeat immediately.' },
+  { id:'ex-boxjmp', name:'Box Jumps',         category:'HIIT',        caloriesPerMin:13,   difficulty:'ADVANCED',     icon:'📦', tags:['HIIT','Plyometric','Power'],            desc:'Jump onto a sturdy platform to build explosive leg power. Step back down carefully.' },
+  { id:'ex-sprint', name:'Sprint Intervals',  category:'HIIT',        caloriesPerMin:16,   difficulty:'ADVANCED',     icon:'🏃', tags:['HIIT','Cardio','Endurance'],            desc:'Alternate max effort sprints with walking recovery. Massively effective for fat loss.' },
+  // FLEXIBILITY
+  { id:'ex-ddog',   name:'Downward Dog',      category:'FLEXIBILITY', caloriesPerMin:3.5,  difficulty:'BEGINNER',     icon:'🧘', tags:['Yoga','Stretch','Recovery'],            desc:'Foundational yoga pose stretching hamstrings, calves, and shoulders while strengthening arms.' },
+  { id:'ex-child',  name:"Child's Pose",      category:'FLEXIBILITY', caloriesPerMin:2,    difficulty:'BEGINNER',     icon:'🌿', tags:['Yoga','Recovery','Cool-down'],          desc:'Restorative pose gently stretching hips, thighs, and lower back. Perfect for cool-down.' },
+  { id:'ex-hipfx',  name:'Hip Flexor Stretch',category:'FLEXIBILITY', caloriesPerMin:2.5,  difficulty:'BEGINNER',     icon:'🧘', tags:['Stretch','Hips','Recovery'],            desc:'Kneeling lunge stretch opening up hip flexors that get tight from prolonged sitting.' },
+];
+
+let allExercises = [];
+let currentFilter = 'all';
+let isFallback = false;
+
+// ── Load exercises: real DB first, fallback if empty ────────────────────────
+async function loadExercises() {
+    try {
+        LoadingManager.show('Loading exercises...');
+        const res = await WorkoutsAPI.getExercises({ limit: 100 });
+
+        if (res.success && res.data && res.data.length > 0) {
+            allExercises = res.data;
+            isFallback = false;
+        } else {
+            // DB is empty — show fallback, show dev banner
+            allExercises = FALLBACK;
+            isFallback = true;
+            document.getElementById('devBanner').classList.add('visible');
+        }
+    } catch (err) {
+        // Network/API error — still show something useful
+        console.error('API error:', err);
+        allExercises = FALLBACK;
+        isFallback = true;
+        document.getElementById('devBanner').classList.add('visible');
+        Toast.warning('Could not reach server — showing sample data');
+    } finally {
+        LoadingManager.hide();
+        renderExercises(allExercises);
+    }
+}
+
+// ── Render — your original card design, driven by API or fallback data ───────
+function renderExercises(list) {
+    const grid = document.getElementById('exerciseGrid');
+    if (!list.length) {
+        grid.innerHTML = '<div class="empty-state">No exercises match your search.</div>';
+        return;
+    }
+
+    grid.innerHTML = list.map((ex, i) => {
+        // Fallback items have extra fields; API items need derivation
+        const icon   = ex.icon  || getCatIcon(ex.category);
+        const diff   = ex.difficulty || deriveLevel(ex.caloriesPerMin);
+        const tags   = ex.tags  || [ex.category];
+        const desc   = ex.desc  || ex.description || '';
+        const calTxt = ex.caloriesPerMin
+            ? `🔥 ~${Math.round(ex.caloriesPerMin * 10)} cal / 10 min`
+            : '';
+
+        return `
+        <div class="exercise-card">
+            <div class="exercise-image">
+                <span>${icon}</span>
+                <div class="difficulty-badge difficulty-${diff.toLowerCase()}">${diff}</div>
+            </div>
+            <div class="exercise-content">
+                <h3 class="exercise-title">${esc(ex.name)}</h3>
+                <div class="exercise-meta">
+                    <span>📂 ${ex.category}</span>
+                    ${calTxt ? `<span>${calTxt}</span>` : ''}
+                </div>
+                <p class="exercise-description">${esc(desc)}</p>
+                <div class="exercise-tags">
+                    ${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn-action btn-start"
+                        onclick="goToSession('${ex.id}','${escAttr(ex.name)}',${ex.caloriesPerMin||0},'${ex.category||''}')">
+                        Start Exercise
+                    </button>
+                    <button class="btn-action btn-save"
+                        onclick="openModal('${ex.id}','${escAttr(ex.name)}',${ex.caloriesPerMin||0},'${ex.category||''}')">
+                        Log Quick
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function getCatIcon(cat) {
+    return {STRENGTH:'💪',CARDIO:'🏃',CORE:'🔥',HIIT:'⚡',FLEXIBILITY:'🧘',YOGA:'🧘'}[(cat||'').toUpperCase()] || '💪';
+}
+function deriveLevel(cal) {
+    if (!cal) return 'Beginner';
+    if (cal >= 12) return 'Advanced';
+    if (cal >= 8)  return 'Intermediate';
+    return 'Beginner';
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s||'').replace(/'/g,"\\'"); }
+
+// ── Search ───────────────────────────────────────────────────────────────────
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    const q = e.target.value.trim();
+    if (!q) { applyFilter(allExercises); return; }
+    if (q.length < 2) return;
+
+    searchTimer = setTimeout(async () => {
+        if (isFallback) {
+            // Client-side search on fallback data
+            applyFilter(allExercises.filter(ex =>
+                ex.name.toLowerCase().includes(q.toLowerCase()) ||
+                (ex.desc || ex.description || '').toLowerCase().includes(q.toLowerCase()) ||
+                (ex.tags||[ex.category]).some(t => t.toLowerCase().includes(q.toLowerCase()))
+            ));
+        } else {
+            try {
+                const res = await WorkoutsAPI.searchExercises(q);
+                if (res.success) renderExercises(
+                    currentFilter === 'all' ? res.data
+                    : res.data.filter(ex => (ex.category||'').toUpperCase() === currentFilter)
+                );
+            } catch { /* silent */ }
+        }
+    }, 300);
+});
+
+// ── Category filter tabs ─────────────────────────────────────────────────────
+document.getElementById('filterTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    document.getElementById('searchInput').value = '';
+    applyFilter(allExercises);
+});
+
+function applyFilter(list) {
+    if (currentFilter === 'all') { renderExercises(list); return; }
+    renderExercises(list.filter(ex => (ex.category||'').toUpperCase() === currentFilter));
+}
+
+// ── Log Workout Modal ────────────────────────────────────────────────────────
+function openModal(id, name, calPerMin, category) {
+    document.getElementById('modalExId').value     = id;
+    document.getElementById('modalCalPerMin').value = calPerMin;
+    document.getElementById('modalTitle').textContent    = name;
+    document.getElementById('modalSubtitle').textContent = `${category} · ${calPerMin} cal/min`;
+    ['logDuration','logSets','logReps','logHR','logCal','logNotes']
+        .forEach(f => document.getElementById(f).value = '');
+    document.getElementById('logDifficulty').value = '';
+    document.getElementById('logModal').classList.add('active');
+    document.getElementById('logDuration').focus();
+}
+
+function closeModal() { document.getElementById('logModal').classList.remove('active'); }
+
+// Auto-estimate calories
+document.getElementById('logDuration').addEventListener('input', () => {
+    const min = parseInt(document.getElementById('logDuration').value) || 0;
+    const cpm = parseFloat(document.getElementById('modalCalPerMin').value) || 0;
+    const calField = document.getElementById('logCal');
+    if (min > 0 && cpm > 0 && !calField.dataset.edited) {
+        calField.value = Math.round(cpm * min);
+    }
+});
+document.getElementById('logCal').addEventListener('input', e => {
+    e.target.dataset.edited = e.target.value ? '1' : '';
+});
+
+async function submitLog() {
+    const duration = parseInt(document.getElementById('logDuration').value);
+    if (!duration || duration <= 0) { Toast.error('Please enter a duration'); return; }
+
+    const btn = document.getElementById('logBtn');
+    btn.disabled = true; btn.textContent = 'Logging...';
+
+    try {
+        await ProgressAPI.logWorkout({
+            exerciseId:    document.getElementById('modalExId').value,
+            duration,                                                          // minutes — matches backend
+            sets:          document.getElementById('logSets').value  || undefined,
+            reps:          document.getElementById('logReps').value  || undefined,
+            heartRate:     document.getElementById('logHR').value    || undefined,
+            caloriesBurned:document.getElementById('logCal').value   || undefined,
+            difficulty:    document.getElementById('logDifficulty').value || undefined,
+            notes:         document.getElementById('logNotes').value || undefined,
+        });
+        Toast.success('Workout logged! 🎉');
+        closeModal();
+    } catch (err) {
+        Toast.error(err.message || 'Failed to log workout');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Log Workout 🎯';
+    }
+}
+
+function openExercise(id, ex) {
+    // Store in sessionStorage so exercise.html can access without a round trip
+    try { sessionStorage.setItem('currentExercise', JSON.stringify(ex)); } catch {}
+    window.location.href = `exercise.html?id=${id}`;
+}
+
+function saveExercise(id, name) {
+    Toast.info(`Save feature coming soon for "${name}"`);
+}
+
+function goToSession(id, name, cal, category) {
+    window.location.href = `workout-session.html?id=${id}&name=${encodeURIComponent(name)}&cal=${cal}&category=${encodeURIComponent(category)}`;
+}
+
+document.getElementById('logModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('logModal')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.addEventListener('DOMContentLoaded', loadExercises);
+</script>
+</body>
+</html>
