@@ -6,7 +6,7 @@
     <title>FlowFit - Transform Your Body at Home</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -258,13 +258,19 @@
         }
 
         .hero-text p {
-            font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 2.5rem;
-            max-width: 500px;
-            animation: slideUp 0.8s ease-out 0.2s both;
-            text-shadow: 0 1px 12px rgba(0,0,0,0.4);
-            line-height: 1.7;
+    font-family: 'Plus Jakarta Sans', sans-serif; /* New Font */
+    font-size: 1.15rem; /* Slightly smaller than your current 1.3rem for better elegance */
+    font-weight: 400;
+    line-height: 1.8; /* Increased line height for better readability */
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2.5rem;
+    max-width: 550px;
+    letter-spacing: 0.01em; /* Subtle spacing for a high-end look */
+    
+    /* Text Shadow Fix: This helps legibility on the busy image background */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    
+    animation: slideUp 0.8s ease-out 0.2s both;
         }
 
         .hero-cta {
