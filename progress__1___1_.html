@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress - FlowFit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+    --bg-primary: #050505;
+    --bg-secondary: #0b0b0f;
+    --bg-card: rgba(18, 18, 22, 0.92);
+    --bg-elevated: #121218;
+    --bg-dark: #050505;
+    --bg-sidebar: #0b0b0f;
+
+    --gold-primary: #D4AF37;
+    --gold-bright: #FFD700;
+    --gold-deep: #B8860B;
+    --gold-soft: rgba(212, 175, 55, 0.12);
+
+    --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #F2D479 40%, #B8860B 100%);
+    --gradient-gold-soft: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+    --gradient-accent: linear-gradient(135deg, #D4AF37 0%, #F2D479 50%, #B8860B 100%);
+    --gradient-1: linear-gradient(135deg, #D4AF37 0%, #c89b3c 100%);
+    --gradient-2: linear-gradient(135deg, #B8860B 0%, #D4AF37 100%);
+    --gradient-3: linear-gradient(135deg, #c89b3c 0%, #F2D479 100%);
+
+    --accent-performance: #c89b3c;
+    --accent-glow: rgba(212, 175, 55, 0.35);
+    --accent: #D4AF37;
+    --accent-green: #4ade80;
+
+    --text-primary: #ffffff;
+    --text-secondary: #b8b8c2;
+    --text-muted: #7a7a85;
+    --text-gold: #E6BE8A;
+
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-gold: rgba(212, 175, 55, 0.25);
+    --border-gold-hover: rgba(212, 175, 55, 0.5);
+    --border: rgba(212, 175, 55, 0.15);
+
+    --glass-blur: blur(18px) saturate(160%);
+    --transition-smooth: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+
+    --shadow-gold-glow: 0 0 30px rgba(212, 175, 55, 0.15);
+    --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; }
+        .dashboard-container { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); padding: 2rem 1.5rem; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; }
+        .logo { font-family: 'Oswald', sans-serif; font-size: 1.8rem; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 3rem; }
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item { margin-bottom: 0.5rem; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; color: var(--text-secondary); text-decoration: none; border-radius: 12px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .nav-link.active { background: var(--gradient-2); color: #fff; }
+        .nav-icon { font-size: 1.4rem; }
+        .user-profile { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 15px; margin-top: auto; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; }
+        .user-info h4 { font-weight: 700; font-size: 0.95rem; }
+        .user-info p { color: var(--text-secondary); font-size: 0.85rem; }
+        .main-content { margin-left: 280px; flex: 1; padding: 2rem 3rem; width: calc(100% - 280px); }
+        .header { margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .header-left h1 { font-family: 'Oswald', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        .header-left p { color: var(--text-secondary); font-size: 1.1rem; }
+        /* FIX #19: time-btn buttons — period stored in data-period */
+        .time-filters { display: flex; gap: 0.5rem; background: var(--bg-card); padding: 0.5rem; border-radius: 12px; border: 1px solid var(--border); }
+        .time-btn { padding: 0.7rem 1.5rem; background: transparent; border: none; color: var(--text-secondary); font-weight: 600; cursor: pointer; border-radius: 8px; transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
+        .time-btn.active { background: var(--gradient-2); color: #fff; }
+        /* Stats Grid — FIX #15: data-stat attributes on stat-value elements */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+        .stat-card { background: var(--bg-card); padding: 2rem; border-radius: 20px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-1); }
+        .stat-card:nth-child(2)::before { background: var(--gradient-2); }
+        .stat-card:nth-child(3)::before { background: var(--gradient-3); }
+        .stat-card:nth-child(4)::before { background: var(--gradient-accent); }
+        .stat-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .stat-value { font-family: 'Oswald', sans-serif; font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .stat-label { color: var(--text-secondary); font-size: 0.95rem; }
+        /* Streak display */
+        .streak-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+        .streak-card { background: var(--bg-card); padding: 2rem; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
+        .streak-number { font-family: 'Oswald', sans-serif; font-size: 3.5rem; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem; }
+        .streak-label { color: var(--text-secondary); font-size: 1rem; }
+        /* Charts */
+        .chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-bottom: 3rem; }
+        .chart-card { background: var(--bg-card); padding: 2.5rem; border-radius: 20px; border: 1px solid var(--border); }
+        .chart-card.full-width { grid-column: 1 / -1; }
+        .chart-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+        .chart-title { font-size: 1.4rem; font-weight: 700; }
+        .chart-subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem; }
+        /* Category chart — FIX #18: proper CSS for generated bar HTML */
+        .category-chart-container { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+        .cat-bar-row { display: flex; align-items: center; gap: 1rem; }
+        .cat-bar-label { width: 100px; font-size: 0.9rem; color: var(--text-secondary); flex-shrink: 0; text-transform: capitalize; }
+        .cat-bar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .cat-bar-fill { height: 100%; background: var(--gradient-2); border-radius: 10px; transition: width 0.5s ease; }
+        .cat-bar-count { width: 40px; text-align: right; font-weight: 700; font-size: 0.9rem; color: var(--accent); }
+        /* History Table */
+        .table-scroll-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(212,175,55,0.3) transparent;
+        }
+        .table-scroll-wrap::-webkit-scrollbar { height: 5px; }
+        .table-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
+        .table-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
+        .history-table { width: 100%; min-width: 560px; border-collapse: collapse; }
+        .history-table thead { background: rgba(255,255,255,0.03); }
+        .history-table th, .history-table td { padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .history-table th { color: var(--text-secondary); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .history-table td { font-weight: 500; white-space: nowrap; }
+        .history-table td.workout-name { white-space: normal; min-width: 110px; word-break: break-word; }
+        .workout-name { font-weight: 700; font-size: 1rem; }
+        .workout-badge { display: inline-block; padding: 0.3rem 0.8rem; background: rgba(102,126,234,0.15); color: #667eea; border-radius: 50px; font-size: 0.78rem; font-weight: 600; }
+        .workout-badge.cardio  { background: rgba(245,87,108,0.15); color: #f5576c; }
+        .workout-badge.strength { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .workout-badge.core    { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .workout-badge.hiit    { background: rgba(79,172,254,0.15); color: #4facfe; }
+        /* FIX #17: Achievements grid */
+        .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .achievement-item { display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 15px; border: 1px solid var(--border); transition: all 0.3s; }
+        .achievement-item.unlocked { border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.05); }
+        .achievement-item.locked { opacity: 0.4; }
+        .achievement-icon-wrap { width: 50px; height: 50px; border-radius: 12px; background: var(--gradient-3); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .achievement-item.locked .achievement-icon-wrap { background: rgba(255,255,255,0.05); }
+        .achievement-name { font-weight: 700; margin-bottom: 0.2rem; }
+        .achievement-desc { color: var(--text-secondary); font-size: 0.85rem; }
+        .achievement-pts { display: inline-block; margin-top: 0.4rem; padding: 0.2rem 0.6rem; background: rgba(245,87,108,0.15); color: var(--accent); border-radius: 50px; font-size: 0.78rem; font-weight: 700; }
+        .empty-state { text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 1rem; }
+        @media (max-width: 1200px) { .chart-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; padding: 1.5rem; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .streak-section { grid-template-columns: 1fr 1fr; }
+            .history-table { font-size: 0.82rem; }
+            .history-table th, .history-table td { padding: 0.65rem 0.75rem; }
+            .table-scroll-wrap { border-radius: 8px; }
+        }
+    
+/* ═══════════════════════════════════════
+   GLOBAL DESIGN SYSTEM — FLOWFIT GOLD
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* ── Typography ─── */
+h1, h2, h3, h4, h5, h6,
+.hero-title, .section-title, .card-title,
+.stat-value, .logo, .greeting,
+.panel-title, .wm-title, .hero-text h1,
+.section-header h2, .pricing-card h3,
+.feature-card h3, .auth-header h1,
+.modal-header h2, .nav-title {
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.02em;
+}
+
+/* Biggest display text → Anton */
+.hero-text h1,
+.hero-title,
+.stat-number {
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 0.01em;
+}
+
+.logo {
+    font-family: 'Anton', sans-serif !important;
+    letter-spacing: 0.05em;
+    background: var(--gradient-gold) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* ── Sidebar ─── */
+.sidebar {
+    background: var(--bg-secondary) !important;
+    border-right: 1px solid var(--border-gold) !important;
+    width: 270px !important;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    border-radius: 10px !important;
+    transition: var(--transition-smooth) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background: var(--gold-soft) !important;
+    color: var(--gold-primary) !important;
+    border-left: 3px solid var(--gold-primary) !important;
+    padding-left: calc(1.25rem - 3px) !important;
+}
+
+.nav-link.active {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border-left: none !important;
+    padding-left: 1.25rem !important;
+}
+
+/* ── Cards ─── */
+.card, .stat-card, .chart-card, .panel-card,
+.program-card, .exercise-card, .feature-card,
+.pricing-card, .auth-card, .form-section,
+.week-block {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 16px !important;
+    backdrop-filter: blur(12px);
+    transition: var(--transition-smooth) !important;
+}
+
+.card:hover, .stat-card:hover, .program-card:hover,
+.exercise-card:hover, .feature-card:hover {
+    border-color: var(--border-gold-hover) !important;
+    box-shadow: var(--shadow-gold-glow), var(--shadow-card) !important;
+    transform: translateY(-4px) !important;
+}
+
+/* ── Stat card accent bars ─── */
+.stat-card::before {
+    background: var(--gradient-gold) !important;
+}
+
+/* ── Buttons ─── */
+.btn-primary, .btn-start, .btn-enroll, .btn-log,
+.btn-continue, .btn-enroll, .btn-start-session,
+.btn-continue, .logout-btn,
+button[class*="btn-enroll"],
+button[class*="btn-continue"] {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.btn-primary:hover, .btn-start:hover, .btn-enroll:hover,
+.btn-log:hover, .btn-continue:hover,
+.btn-start-session:hover {
+    box-shadow: 0 8px 30px var(--accent-glow) !important;
+    transform: translateY(-2px) !important;
+}
+
+.btn-details, .btn-save, .btn-ghost, .btn-close-wm,
+.close-btn, .back-btn {
+    border-color: var(--border-gold) !important;
+    color: var(--text-gold) !important;
+}
+
+.btn-details:hover, .btn-save:hover, .btn-ghost:hover {
+    border-color: var(--border-gold-hover) !important;
+    background: var(--gold-soft) !important;
+}
+
+/* ── Logout btn special ─── */
+.logout-btn {
+    background: rgba(212, 175, 55, 0.1) !important;
+    color: var(--gold-primary) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+.logout-btn:hover {
+    background: rgba(212, 175, 55, 0.2) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* ── Inputs ─── */
+.form-input, .form-select, .form-textarea,
+.search-bar input, .form-field input,
+.form-field select, .form-field textarea,
+input, select, textarea {
+    background: rgba(212, 175, 55, 0.04) !important;
+    border: 1px solid var(--border-gold) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 10px !important;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus,
+.search-bar input:focus, .form-field input:focus,
+.form-field select:focus, .form-field textarea:focus {
+    border-color: var(--gold-primary) !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
+    outline: none !important;
+}
+
+/* ── Progress bars ─── */
+.progress-fill, .week-progress-fill, .cat-bar-fill {
+    background: var(--gradient-gold) !important;
+}
+
+/* ── Badges / Tags / Chips ─── */
+.program-badge, .hero-badge, .preview-badge,
+.difficulty-badge, .section-label {
+    background: rgba(212, 175, 55, 0.15) !important;
+    color: var(--gold-primary) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+
+.premium-tag {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+}
+
+/* ── Gradient text helpers ─── */
+.gradient-text, .streak-number,
+[class*="gradient-text"] {
+    background: var(--gradient-gold) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* ── Active nav link accent ─── */
+.tab-btn.active, .time-btn.active {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    border-color: transparent !important;
+}
+
+/* ── Program header colors ─── */
+.program-header {
+    background: var(--gradient-gold-soft) !important;
+    border-bottom: 1px solid var(--border-gold) !important;
+}
+
+/* ── Achievement items ─── */
+.achievement-item.unlocked {
+    border-color: var(--border-gold) !important;
+    background: var(--gold-soft) !important;
+}
+
+.achievement-icon-wrap {
+    background: var(--gradient-gold) !important;
+}
+
+/* ── User avatar ─── */
+.user-avatar {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+}
+
+/* ── Loading modal fix ─── */
+#loadingModal, .loading-modal, [id*="loading"],
+[class*="loading-overlay"], [class*="loadingOverlay"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999 !important;
+    background: rgba(5, 5, 5, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* ── Modals ─── */
+.modal-content, .wmodal-box, .wm-body {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+
+/* ── Pricing featured card ─── */
+.pricing-card.featured {
+    border: 2px solid var(--gold-primary) !important;
+    box-shadow: 0 30px 80px rgba(212, 175, 55, 0.2) !important;
+}
+
+.pricing-badge {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+}
+
+/* ── Section icon ─── */
+.section-icon {
+    background: var(--gradient-gold-soft) !important;
+    border: 1px solid var(--border-gold) !important;
+}
+
+/* ── Background animation orbs → gold ─── */
+.bg-animation::before {
+    background: radial-gradient(circle, rgba(212,175,55,0.6) 0%, transparent 70%) !important;
+}
+.bg-animation::after {
+    background: radial-gradient(circle, rgba(184,134,11,0.4) 0%, transparent 70%) !important;
+}
+
+/* ── Top nav ─── */
+nav, .top-nav {
+    background: rgba(5, 5, 5, 0.9) !important;
+    border-bottom: 1px solid var(--border-gold) !important;
+}
+
+/* ── Main content offset for sidebar ─── */
+.main-content {
+    margin-left: 270px;
+    width: calc(100% - 270px);
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.main {
+    margin-left: 260px !important;
+}
+
+/* ── Programs grid overflow fix ─── */
+.programs-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.exercise-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+.achievements-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+    width: 100% !important;
+    overflow: hidden !important;
+}
+
+/* Contain all grid items */
+.program-card, .exercise-card, .achievement-item {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+}
+
+/* ── Nav hero section (index) ─── */
+nav .btn-primary {
+    background: var(--gradient-gold) !important;
+    color: #000 !important;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3) !important;
+}
+
+/* ── Workout badge colors → gold palette ─── */
+.workout-badge { background: rgba(212,175,55,0.12) !important; color: var(--gold-primary) !important; }
+.workout-badge.cardio { background: rgba(212,175,55,0.1) !important; color: #E6BE8A !important; }
+.workout-badge.strength { background: rgba(184,134,11,0.15) !important; color: #D4AF37 !important; }
+.workout-badge.core { background: rgba(242,212,121,0.12) !important; color: #F2D479 !important; }
+.workout-badge.hiit { background: rgba(200,155,60,0.15) !important; color: #c89b3c !important; }
+
+/* ── Hero bg gradient overrides (program-detail, workout-session) ─── */
+.hero-bg {
+    background: linear-gradient(135deg, #1a1508 0%, #0b0b0f 100%) !important;
+}
+
+/* ── Achievement points badge ─── */
+.achievement-pts {
+    background: rgba(212, 175, 55, 0.15) !important;
+    color: var(--gold-primary) !important;
+}
+
+/* ════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+════════════════════════════════ */
+
+/* ── Tablet (max 1024px) ─── */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 240px !important;
+        width: calc(100% - 240px) !important;
+        padding: 1.5rem 2rem !important;
+    }
+    .sidebar { width: 240px !important; }
+    .main { margin-left: 240px !important; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .chart-grid { grid-template-columns: 1fr !important; }
+    .content-grid { grid-template-columns: 1fr !important; }
+    .hero-content { grid-template-columns: 1fr !important; }
+    .hero-text h1 { font-size: 3.5rem !important; }
+    .pricing-grid { grid-template-columns: 1fr !important; }
+    .features-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .body { grid-template-columns: 1fr !important; padding: 1.5rem !important; }
+}
+
+/* ── Mobile (max 768px) ─── */
+@media (max-width: 768px) {
+    html, body { overflow-x: hidden !important; }
+
+    .sidebar {
+        transform: translateX(-100%) !important;
+        z-index: 1000 !important;
+        width: 260px !important;
+    }
+    .sidebar.mobile-active { transform: translateX(0) !important; }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 1rem !important;
+    }
+    .main { margin-left: 0 !important; }
+
+    .dashboard-container { flex-direction: column; }
+
+    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1rem !important; }
+    .content-grid { grid-template-columns: 1fr !important; }
+    .chart-grid { grid-template-columns: 1fr !important; }
+    .streak-section { grid-template-columns: 1fr !important; }
+    .programs-grid { grid-template-columns: 1fr !important; }
+    .exercise-grid { grid-template-columns: 1fr !important; }
+    .achievements-grid { grid-template-columns: 1fr !important; }
+    .features-grid { grid-template-columns: 1fr !important; }
+    .pricing-grid { grid-template-columns: 1fr !important; }
+    .form-grid { grid-template-columns: 1fr !important; }
+    .form-row { grid-template-columns: 1fr !important; }
+    .hero-content { grid-template-columns: 1fr !important; gap: 2rem !important; }
+    .hero-text h1 { font-size: 2.5rem !important; }
+    .hero-title { font-size: 2rem !important; }
+    .section-header h2 { font-size: 2rem !important; }
+    .greeting { font-size: 1.5rem !important; margin-top: 3rem !important; }
+    .prog-ring-wrap { width: 100px; height: 100px; }
+    .hero-stats { flex-wrap: wrap !important; gap: 1rem !important; }
+    .hero-cta { flex-direction: column !important; }
+    nav { padding: 1rem 1.5rem !important; }
+    .nav-links { display: none !important; }
+    .body { padding: 1rem !important; }
+    .progress-panel { position: static !important; }
+    .stats-grid { grid-template-columns: 1fr 1fr !important; }
+    .controls { flex-direction: column !important; }
+    .search-bar { min-width: unset !important; width: 100% !important; }
+    .program-meta { grid-template-columns: repeat(2, 1fr) !important; }
+    .includes-grid { grid-template-columns: 1fr !important; }
+    .hero-content.workout { padding: 1.5rem !important; }
+    .video-section { margin: 1rem !important; }
+}
+
+/* ── Small mobile (max 480px) ─── */
+@media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr !important; }
+    .hero-text h1 { font-size: 2rem !important; }
+    .stat-value { font-size: 1.8rem !important; }
+    .auth-card { padding: 2rem 1.5rem !important; }
+    .modal-content { margin: 0.5rem !important; }
+    .program-meta { grid-template-columns: 1fr 1fr !important; }
+    .filter-tabs { flex-wrap: wrap; }
+    .tab-btn { padding: 0.7rem 1rem !important; font-size: 0.85rem !important; }
+}
+
+    
+/* ── Extended LoadingManager modal fix ─── */
+body > div[style*="position: fixed"],
+body > div[style*="position:fixed"] {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100vw !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999 !important;
+}
+
+/* Spinner / loading box inside modal */
+.loading-spinner, .loading-box, .loading-content,
+[class*="spinner"] {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 16px !important;
+    padding: 2rem 3rem !important;
+    text-align: center !important;
+    color: var(--gold-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    box-shadow: var(--shadow-gold-glow) !important;
+}
+
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="logo">FlowFit</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a></li>
+            <li class="nav-item"><a href="workouts.html" class="nav-link"><span class="nav-icon">💪</span><span>Workouts</span></a></li>
+            <li class="nav-item"><a href="programs.html" class="nav-link"><span class="nav-icon">📋</span><span>Programs</span></a></li>
+            <li class="nav-item"><a href="progress.html" class="nav-link active"><span class="nav-icon">📈</span><span>Progress</span></a></li>
+        </ul>
+        <div class="user-profile">
+            <div class="user-avatar">?</div>
+            <div class="user-info"><h4>Loading...</h4><p>Member</p></div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <div class="header-left">
+                <h1>Your Progress</h1>
+                <p>Track your fitness journey and celebrate your wins</p>
+            </div>
+            <!-- FIX #19: data-period attributes + JS listener wires them up -->
+            <div class="time-filters">
+                <button class="time-btn" data-period="7d">7D</button>
+                <button class="time-btn active" data-period="30d">30D</button>
+                <button class="time-btn" data-period="90d">90D</button>
+            </div>
+        </div>
+
+        <!-- FIX #15: data-stat attributes on each stat-value so displayStats() can update them -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💪</div>
+                <div class="stat-value" data-stat="total-workouts">—</div>
+                <div class="stat-label">Workouts Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value" data-stat="total-duration">—</div>
+                <div class="stat-label">Total Time Trained</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-value" data-stat="total-calories">—</div>
+                <div class="stat-label">Calories Burned</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" data-stat="avg-duration">—</div>
+                <div class="stat-label">Avg. Workout Length</div>
+            </div>
+        </div>
+
+        <!-- FIX #20: Dedicated streak display with data-stat attributes -->
+        <div class="streak-section">
+            <div class="streak-card">
+                <div class="streak-number" data-stat="current-streak">—</div>
+                <div class="streak-label">🔥 Current Streak (days)</div>
+            </div>
+            <div class="streak-card">
+                <div class="streak-number" data-stat="longest-streak">—</div>
+                <div class="streak-label">🏆 Longest Streak (days)</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h3 class="chart-title">Workout Frequency</h3>
+                        <p class="chart-subtitle">Workouts per day in period</p>
+                    </div>
+                </div>
+                <!-- FIX #18: dedicated container with proper class; JS targets this -->
+                <div class="category-chart-container" id="frequencyChart">
+                    <p class="empty-state">Loading...</p>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <h3 class="chart-title">Category Breakdown</h3>
+                        <p class="chart-subtitle">Workouts by exercise type</p>
+                    </div>
+                </div>
+                <!-- FIX #18: dedicated container with proper class; JS targets this -->
+                <div class="category-chart-container" id="categoryChart">
+                    <p class="empty-state">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout History — FIX #16: column headers match JS-generated rows -->
+        <div class="chart-card full-width" style="margin-bottom: 3rem;">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Recent Workouts</h3>
+                    <p class="chart-subtitle">Your training history</p>
+                </div>
+            </div>
+            <div class="table-scroll-wrap">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <!-- FIX #16: headers now match JS-generated columns exactly -->
+                        <th>Date</th>
+                        <th>Exercise</th>
+                        <th>Category</th>
+                        <th>Duration</th>
+                        <th>Sets × Reps</th>
+                        <th>Calories</th>
+                    </tr>
+                </thead>
+                <!-- FIX #15: tbody with id for direct targeting — no more ambiguous selectors -->
+                <tbody id="historyTbody">
+                    <tr><td colspan="6" class="empty-state">Loading history...</td></tr>
+                </tbody>
+            </table>
+            </div><!-- /.table-scroll-wrap -->
+        </div>
+
+        <!-- FIX #17: Achievements section with .achievements-grid id -->
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">Achievements</h3>
+                    <p class="chart-subtitle">Your unlocked milestones</p>
+                </div>
+            </div>
+            <!-- FIX #17: this ID is targeted by displayAchievements() -->
+            <div class="achievements-grid" id="achievementsGrid">
+                <p class="empty-state">Loading achievements...</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- FIX #21: api.js loaded ONCE only -->
+<script src="api.js"></script>
+<script>
+requireAuth();
+
+let currentPeriod = '30d';
+
+async function loadProgress() {
+    try {
+        LoadingManager.show('Loading progress...');
+
+        const [statsRes, historyRes, streakRes, achievementsRes] = await Promise.all([
+            ProgressAPI.getStats(currentPeriod),
+            ProgressAPI.getWorkoutHistory(30),
+            ProgressAPI.getStreaks(),
+            ProgressAPI.getAchievements(),
+        ]);
+
+        if (statsRes.success && statsRes.data)             displayStats(statsRes.data);
+        if (historyRes.success && historyRes.data)         displayHistory(historyRes.data);
+        if (streakRes.success && streakRes.data)           displayStreak(streakRes.data);
+        if (achievementsRes.success && achievementsRes.data) displayAchievements(achievementsRes.data);
+
+    } catch (error) {
+        Toast.error('Failed to load progress data');
+        console.error(error);
+    } finally {
+        LoadingManager.hide();
+    }
+}
+
+// FIX #15: updateStatCard uses data-stat attribute — which now EXISTS in the HTML
+function updateStatCard(dataAttr, value) {
+    const el = document.querySelector(`[data-stat="${dataAttr}"]`);
+    if (el) el.textContent = value;
+}
+
+function displayStats(stats) {
+    updateStatCard('total-workouts', stats.totalWorkouts || 0);
+    // FIX #3/#16: formatDuration takes minutes; totalDuration from API is minutes
+    updateStatCard('total-duration',  formatDuration(stats.totalDuration || 0));
+    updateStatCard('total-calories',  Math.round(stats.totalCalories || 0).toLocaleString());
+    updateStatCard('avg-duration',    formatDuration(stats.avgDuration || 0));
+
+    // Render frequency chart (workouts per day grouped by week)
+    if (stats.byDate) renderFrequencyChart(stats.byDate);
+    if (stats.byCategory) renderCategoryChart(stats.byCategory);
+}
+
+// FIX #18: render into #frequencyChart with CSS-matching HTML
+function renderFrequencyChart(byDate) {
+    const container = document.getElementById('frequencyChart');
+    if (!byDate || Object.keys(byDate).length === 0) {
+        container.innerHTML = '<p class="empty-state">No workout data for this period.</p>';
+        return;
+    }
+    // Group dates by week number for a compact weekly view
+    const sorted = Object.entries(byDate).sort(([a],[b]) => a.localeCompare(b));
+    const max = Math.max(...sorted.map(([,v]) => v), 1);
+    container.innerHTML = sorted.slice(-14).map(([date, count]) => `
+        <div class="cat-bar-row">
+            <span class="cat-bar-label">${date.slice(5)}</span>
+            <div class="cat-bar-track">
+                <div class="cat-bar-fill" style="width:${(count/max*100).toFixed(0)}%; background:var(--gradient-3);"></div>
+            </div>
+            <span class="cat-bar-count">${count}</span>
+        </div>
+    `).join('');
+}
+
+// FIX #18: render into #categoryChart with CSS-matching HTML (cat-bar-row etc.)
+function renderCategoryChart(byCategory) {
+    const container = document.getElementById('categoryChart');
+    if (!byCategory || Object.keys(byCategory).length === 0) {
+        container.innerHTML = '<p class="empty-state">No workout data for this period.</p>';
+        return;
+    }
+    const total = Object.values(byCategory).reduce((s, v) => s + v, 0);
+    const max   = Math.max(...Object.values(byCategory), 1);
+    container.innerHTML = Object.entries(byCategory)
+        .sort(([,a],[,b]) => b - a)
+        .map(([cat, count]) => `
+            <div class="cat-bar-row">
+                <span class="cat-bar-label">${cat.toLowerCase()}</span>
+                <div class="cat-bar-track">
+                    <div class="cat-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></div>
+                </div>
+                <span class="cat-bar-count">${count}</span>
+            </div>
+        `).join('');
+}
+
+// FIX #16: column order matches table headers (Date | Exercise | Category | Duration | Sets×Reps | Calories)
+function displayHistory(history) {
+    const tbody = document.getElementById('historyTbody');
+    if (!history || history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No workout history yet. Start logging workouts!</td></tr>';
+        return;
+    }
+    const catClass = (cat) => {
+        const c = (cat || '').toLowerCase();
+        if (c.includes('cardio')) return 'cardio';
+        if (c.includes('strength')) return 'strength';
+        if (c.includes('core')) return 'core';
+        if (c.includes('hiit')) return 'hiit';
+        return '';
+    };
+    tbody.innerHTML = history.map(log => {
+        const cat = log.exercise?.category || '—';
+        const setsReps = (log.sets && log.reps) ? `${log.sets} × ${log.reps}` : (log.sets ? `${log.sets} sets` : '—');
+        return `
+        <tr>
+            <td>${formatDate(log.date)}</td>
+            <td class="workout-name">${escHtml(log.exercise?.name || '—')}</td>
+            <td><span class="workout-badge ${catClass(cat)}">${cat}</span></td>
+            <td>${formatDuration(log.duration)}</td>  <!-- FIX #16: log.duration is minutes -->
+            <td>${setsReps}</td>
+            <td>${log.caloriesBurned ? Math.round(log.caloriesBurned) + ' kcal' : '—'}</td>
+        </tr>`;
+    }).join('');
+}
+
+// FIX #20: streak targets data-stat="current-streak" and data-stat="longest-streak" which now EXIST
+function displayStreak(streak) {
+    updateStatCard('current-streak', streak.currentStreak || 0);
+    updateStatCard('longest-streak', streak.longestStreak || 0);
+}
+
+// FIX #17: targets #achievementsGrid which now EXISTS in the HTML
+function displayAchievements(achievements) {
+    const grid = document.getElementById('achievementsGrid');
+    if (!achievements || achievements.length === 0) {
+        grid.innerHTML = '<p class="empty-state">Complete workouts to unlock achievements!</p>';
+        return;
+    }
+    grid.innerHTML = achievements.map(a => `
+        <div class="achievement-item ${a.unlocked ? 'unlocked' : 'locked'}">
+            <div class="achievement-icon-wrap">${a.unlocked ? (a.icon || '🏆') : '🔒'}</div>
+            <div>
+                <div class="achievement-name">${escHtml(a.name)}</div>
+                <div class="achievement-desc">${escHtml(a.description)}</div>
+                <span class="achievement-pts">${a.points} pts</span>
+                ${a.unlocked && a.unlockedAt ? `<div style="color:var(--text-secondary);font-size:0.78rem;margin-top:0.3rem;">Unlocked ${formatDate(a.unlockedAt)}</div>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+// FIX #19: wire up time-period buttons
+document.querySelector('.time-filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.time-btn');
+    if (!btn) return;
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPeriod = btn.dataset.period;
+    loadProgress();
+});
+
+function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) await AuthAPI.logout();
+}
+
+document.addEventListener('DOMContentLoaded', loadProgress);
+</script>
+</body>
+</html>
