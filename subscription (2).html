@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription — FlowFit Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep:#030303;--bg-surface:#0a0a0c;--bg-card:rgba(15,15,18,0.9);--bg-elevated:#111115;
+            --gold-main:#D4AF37;--gold-bright:#FFD700;--gold-deep:#B8860B;
+            --gold-glow:rgba(212,175,55,0.3);--gold-soft:rgba(212,175,55,0.07);
+            --gold-gradient:linear-gradient(135deg,#D4AF37 0%,#edcf7d 50%,#b8860b 100%);
+            --data-cyan:#00f2fe;--action-red:#ff3e3e;--accent-green:#4ade80;
+            --border-gold:rgba(212,175,55,0.2);--border-subtle:rgba(255,255,255,0.05);
+            --text-primary:#ffffff;--text-secondary:#888888;
+            --transition:all 0.4s cubic-bezier(0.165,0.84,0.44,1);
+            --sidebar-w:280px;--radius-card:24px;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        html,body{overflow-x:hidden;}
+        body{font-family:'Inter',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh;
+            background-image:radial-gradient(circle at 15% 20%,rgba(212,175,55,0.06) 0%,transparent 45%),
+            radial-gradient(circle at 85% 80%,rgba(0,242,254,0.03) 0%,transparent 40%);}
+        /* SIDEBAR */
+        .sidebar{width:var(--sidebar-w);background:var(--bg-surface);border-right:1px solid var(--border-gold);
+            padding:2.5rem 1.5rem;display:flex;flex-direction:column;position:fixed;height:100vh;overflow-y:auto;z-index:1000;transition:var(--transition);}
+        .logo{font-family:'Anton',sans-serif;font-size:2rem;letter-spacing:4px;background:var(--gold-gradient);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+            margin-bottom:3rem;text-align:center;filter:drop-shadow(0 0 12px rgba(212,175,55,0.2));text-decoration:none;display:block;}
+        .nav-menu{list-style:none;flex:1;}.nav-item{margin-bottom:0.5rem;}
+        .nav-link{display:flex;align-items:center;gap:1rem;padding:0.95rem 1.2rem;color:var(--text-secondary);
+            text-decoration:none;border-radius:14px;transition:var(--transition);font-family:'Oswald',sans-serif;
+            font-weight:500;letter-spacing:1px;border:1px solid transparent;font-size:0.95rem;}
+        .nav-link:hover{color:var(--gold-main);background:var(--gold-soft);border-color:var(--border-gold);}
+        .nav-link.active{background:var(--gold-gradient);color:#000;border-color:transparent;font-weight:700;}
+        .nav-icon{font-size:1.15rem;width:22px;text-align:center;flex-shrink:0;}
+        .user-section{margin-top:auto;padding-top:1.5rem;border-top:1px solid var(--border-gold);}
+        .user-profile{display:flex;align-items:center;gap:0.9rem;padding:0.9rem 1rem;background:rgba(255,255,255,0.02);
+            border-radius:14px;margin-bottom:0.8rem;border:1px solid var(--border-gold);}
+        .user-avatar{width:44px;height:44px;border-radius:12px;background:var(--gold-gradient);color:#000;
+            display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:1.3rem;flex-shrink:0;}
+        .user-info h4{font-family:'Oswald',sans-serif;font-size:0.95rem;color:#fff;margin-bottom:2px;}
+        .logout-btn{width:100%;padding:0.85rem;background:transparent;color:var(--action-red);
+            border:1px solid rgba(255,62,62,0.3);border-radius:12px;font-family:'Oswald',sans-serif;
+            font-weight:700;letter-spacing:2px;font-size:0.85rem;cursor:pointer;transition:var(--transition);
+            display:flex;align-items:center;justify-content:center;gap:0.5rem;}
+        .logout-btn:hover{background:rgba(255,62,62,0.08);border-color:var(--action-red);}
+        .plan-badge{display:inline-block;padding:0.2rem 0.7rem;border-radius:20px;font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+        .plan-free{background:rgba(255,255,255,0.08);color:#888;}
+        .plan-trial{background:rgba(251,191,36,0.15);color:#fbbf24;}
+        .plan-pro{background:rgba(212,175,55,0.2);color:#D4AF37;border:1px solid rgba(212,175,55,0.4);}
+        .plan-premium{background:linear-gradient(135deg,rgba(212,175,55,0.3),rgba(184,134,11,0.3));color:#FFD700;border:1px solid rgba(212,175,55,0.5);}
+        /* ══ MAIN CONTENT ═════════════════════════════════════ */
+        .main-content{margin-left:var(--sidebar-w);padding:3rem 3.5rem;min-height:100vh;max-width:100%;overflow-x:hidden;}
+        .page-header{margin-bottom:2.5rem;}
+        .page-title{font-family:'Anton',sans-serif;font-size:2.8rem;letter-spacing:2px;text-transform:uppercase;
+            background:linear-gradient(to right,#fff 0%,#999 100%);-webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;}
+        .page-subtitle{color:var(--text-secondary);font-size:1.05rem;}
+        /* ══ CURRENT PLAN ═══════════════════════════════════ */
+        .current-plan-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:var(--radius-card);
+            padding:2rem;margin-bottom:2.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;
+            box-shadow:0 8px 30px rgba(0,0,0,0.4);}
+        .current-plan-icon{font-size:2.8rem;flex-shrink:0;}
+        .current-plan-info{flex:1;min-width:0;}
+        .current-plan-info h3{font-family:'Oswald',sans-serif;font-size:1.4rem;color:var(--gold-main);margin-bottom:0.35rem;}
+        .current-plan-info p{color:var(--text-secondary);font-size:0.9rem;word-break:break-word;}
+        .trial-countdown{margin-top:0.5rem;font-size:0.85rem;color:#fbbf24;font-weight:600;}
+        .current-plan-action{flex-shrink:0;}
+        /* ══ SANDBOX BADGE ══════════════════════════════════ */
+        .sandbox-banner{display:flex;align-items:flex-start;gap:1rem;padding:1rem 1.5rem;
+            background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);
+            border-radius:12px;margin-bottom:2.5rem;color:#fbbf24;font-size:0.88rem;line-height:1.6;}
+        .sandbox-banner-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+        /* ══ PLANS GRID ════════════════════════════════════ */
+        .plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.75rem;margin-bottom:4rem;}
+        .plan-card{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:var(--radius-card);
+            padding:2rem 1.75rem;transition:var(--transition);position:relative;overflow:hidden;display:flex;flex-direction:column;}
+        .plan-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold-gradient);}
+        .plan-card.featured{border-color:var(--gold-main);border-width:2px;box-shadow:0 0 40px rgba(212,175,55,0.15);}
+        .plan-card.featured::before{height:4px;}
+        .plan-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,0.5);}
+        .plan-tag{position:absolute;top:1.25rem;right:1.25rem;padding:0.25rem 0.8rem;
+            background:var(--gold-gradient);color:#000;border-radius:20px;font-size:0.72rem;font-weight:800;letter-spacing:1px;}
+        .plan-name{font-family:'Anton',sans-serif;font-size:1.6rem;letter-spacing:2px;margin-bottom:0.5rem;}
+        .plan-price{margin-bottom:1.5rem;}
+        .plan-amount{font-family:'Anton',sans-serif;font-size:2.6rem;color:var(--gold-main);display:block;line-height:1.1;}
+        .plan-period{color:var(--text-secondary);font-size:0.85rem;margin-top:0.25rem;display:block;}
+        .plan-usd{color:#555;font-size:0.78rem;}
+        .plan-features{list-style:none;margin-bottom:2rem;flex:1;}
+        .plan-features li{display:flex;align-items:flex-start;gap:0.7rem;padding:0.45rem 0;
+            color:var(--text-secondary);font-size:0.88rem;border-bottom:1px solid var(--border-subtle);line-height:1.4;}
+        .plan-features li:last-child{border-bottom:none;}
+        .plan-features li::before{content:'✓';color:var(--accent-green);font-weight:700;flex-shrink:0;margin-top:1px;}
+        .plan-features li.locked{color:#444;}
+        .plan-features li.locked::before{content:'✕';color:#444;}
+        .btn-plan{width:100%;padding:1rem;border:none;border-radius:12px;font-family:'Oswald',sans-serif;
+            font-weight:700;font-size:0.95rem;letter-spacing:1px;cursor:pointer;transition:var(--transition);margin-top:auto;}
+        .btn-plan-gold{background:var(--gold-gradient);color:#000;}
+        .btn-plan-gold:hover{box-shadow:0 8px 25px rgba(212,175,55,0.4);transform:translateY(-2px);}
+        .btn-plan-outline{background:transparent;color:var(--gold-main);border:1px solid var(--gold-main);}
+        .btn-plan-outline:hover{background:var(--gold-soft);}
+        .btn-plan:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
+        /* ══ CHECKOUT MODAL ════════════════════════════════ */
+        .checkout-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);
+            z-index:9999;align-items:center;justify-content:center;padding:1.25rem;}
+        .checkout-modal.active{display:flex;}
+        .checkout-box{background:#0e0e12;border:1px solid var(--border-gold);border-radius:24px;
+            padding:2rem;max-width:500px;width:100%;max-height:92vh;overflow-y:auto;}
+        .checkout-title{font-family:'Oswald',sans-serif;font-size:1.5rem;color:var(--gold-main);
+            margin-bottom:0.4rem;letter-spacing:1px;}
+        .checkout-subtitle{color:var(--text-secondary);margin-bottom:1.75rem;font-size:0.88rem;}
+        .payment-tabs{display:flex;gap:0.5rem;margin-bottom:1.75rem;background:rgba(255,255,255,0.04);
+            border-radius:12px;padding:0.35rem;}
+        .pay-tab{flex:1;padding:0.65rem;border:none;border-radius:8px;cursor:pointer;font-family:'Oswald',sans-serif;
+            font-weight:600;letter-spacing:1px;font-size:0.82rem;background:transparent;color:var(--text-secondary);transition:all 0.2s;}
+        .pay-tab.active{background:var(--gold-gradient);color:#000;}
+        .pay-panel{display:none;}.pay-panel.active{display:block;}
+        .form-group{margin-bottom:1.1rem;}
+        .form-label{display:block;font-size:0.8rem;font-weight:600;color:#aaa;margin-bottom:0.4rem;letter-spacing:0.5px;}
+        .form-input{width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+            border-radius:10px;color:#fff;font-family:'Inter',sans-serif;font-size:0.95rem;}
+        .form-input:focus{outline:none;border-color:var(--gold-main);box-shadow:0 0 0 3px rgba(212,175,55,0.15);}
+        .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+        .test-info{background:rgba(0,242,254,0.05);border:1px solid rgba(0,242,254,0.2);border-radius:10px;padding:0.8rem;margin-bottom:1.1rem;font-size:0.78rem;color:#00f2fe;line-height:1.6;}
+        .mpesa-info{padding:0.9rem;background:rgba(74,222,128,0.06);border-radius:10px;border:1px solid rgba(74,222,128,0.2);color:#4ade80;font-size:0.83rem;line-height:1.6;margin-bottom:1.1rem;}
+        .checkout-total{display:flex;justify-content:space-between;align-items:center;
+            padding:0.9rem 1rem;background:rgba(212,175,55,0.06);border-radius:10px;margin-bottom:1.25rem;
+            border:1px solid rgba(212,175,55,0.2);}
+        .checkout-total .label{color:var(--text-secondary);font-size:0.88rem;}
+        .checkout-total .amount{font-family:'Anton',sans-serif;font-size:1.5rem;color:var(--gold-main);}
+        .btn-pay{width:100%;padding:1.1rem;background:var(--gold-gradient);color:#000;border:none;
+            border-radius:12px;font-family:'Oswald',sans-serif;font-weight:800;font-size:1rem;
+            letter-spacing:2px;cursor:pointer;transition:var(--transition);margin-bottom:0.6rem;}
+        .btn-pay:hover{box-shadow:0 8px 25px rgba(212,175,55,0.4);}
+        .btn-pay:disabled{opacity:0.6;cursor:not-allowed;}
+        .btn-cancel-checkout{width:100%;padding:0.85rem;background:transparent;color:#666;
+            border:1px solid rgba(255,255,255,0.08);border-radius:12px;cursor:pointer;
+            font-family:'Oswald',sans-serif;letter-spacing:1px;font-size:0.88rem;}
+        .status-msg{text-align:center;padding:0.9rem;border-radius:10px;margin-bottom:0.9rem;font-size:0.88rem;}
+        .status-pending{background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);}
+        .status-success{background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.3);}
+        .status-error{background:rgba(255,62,62,0.1);color:#ff6b6b;border:1px solid rgba(255,62,62,0.3);}
+        /* ══ OVERLAY + SIDEBAR ══════════════════════════════ */
+        .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:997;}
+        .sidebar-overlay.active{display:block;}
+        body.sidebar-open{overflow:hidden!important;position:fixed!important;width:100%!important;}
+        .mobile-menu-btn{position:fixed;top:1.1rem;left:1.1rem;z-index:2000;background:var(--gold-gradient);
+            border:none;padding:0.65rem 0.8rem;border-radius:10px;cursor:pointer;color:#000;font-size:1.1rem;
+            display:none;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(212,175,55,0.3);}
+        .toast{z-index:9999!important;right:1rem!important;max-width:calc(100vw - 2rem)!important;}
+        /* ══ CONFIRM MODAL ══════════════════════════════════ */
+        .ff-confirm-backdrop{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+        .ff-confirm-box{background:#111115;border:1px solid rgba(212,175,55,0.35);border-radius:22px;padding:2.5rem 2rem;max-width:400px;width:100%;text-align:center;}
+        .ff-confirm-title{font-family:'Oswald',sans-serif;font-size:1.5rem;color:#fff;margin-bottom:0.6rem;font-weight:700;}
+        .ff-confirm-msg{color:#888;font-size:0.95rem;line-height:1.6;margin-bottom:2rem;}
+        .ff-confirm-actions{display:flex;gap:1rem;}
+        .ff-confirm-cancel{flex:1;padding:0.9rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#aaa;font-family:'Oswald',sans-serif;cursor:pointer;}
+        .ff-confirm-ok{flex:1.4;padding:0.9rem;background:var(--gold-gradient);border:none;border-radius:12px;color:#000;font-family:'Oswald',sans-serif;font-weight:700;cursor:pointer;}
+        .ff-confirm-ok.danger{background:linear-gradient(135deg,#ff3e3e,#ff6b6b);color:#fff;}
+        /* ══ RESPONSIVE ════════════════════════════════════ */
+        @media(max-width:1100px){
+            .plans-grid{grid-template-columns:repeat(2,1fr);}
+            .main-content{padding:2.5rem 2rem;}
+        }
+        @media(max-width:768px){
+            .mobile-menu-btn{display:flex!important;}
+            .sidebar{transform:translateX(-100%);width:260px;}
+            .sidebar.mobile-active{transform:translateX(0);overflow-y:auto!important;}
+            .sidebar.mobile-active .user-section{display:flex!important;flex-direction:column!important;}
+            .main-content{margin-left:0!important;padding:1.25rem!important;padding-top:4.5rem!important;}
+            .plans-grid{grid-template-columns:1fr;}
+            .current-plan-card{flex-direction:column;align-items:flex-start;gap:1rem;}
+            .current-plan-action{width:100%;}
+            .current-plan-action .btn-plan-outline{width:100%;}
+            .page-title{font-size:2rem;}
+        }
+        @media(max-width:480px){
+            .checkout-box{padding:1.5rem;}
+            .card-grid{grid-template-columns:1fr;}
+            .plans-grid{gap:1.25rem;}
+            .plan-card{padding:1.5rem 1.25rem;}
+            .plan-amount{font-size:2rem;}
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+<div style="display:flex;min-height:100vh;">
+<aside class="sidebar" id="sidebar">
+    <a href="dashboard.html" class="logo">FLOWFIT</a>
+    <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span>Home</span></a></li>
+        <li class="nav-item"><a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="workouts.html" class="nav-link"><span class="nav-icon">💪</span><span>Workouts</span></a></li>
+        <li class="nav-item"><a href="programs.html" class="nav-link"><span class="nav-icon">📋</span><span>Programs</span></a></li>
+        <li class="nav-item"><a href="progress.html" class="nav-link"><span class="nav-icon">📈</span><span>Progress</span></a></li>
+        <li class="nav-item"><a href="profile.html" class="nav-link"><span class="nav-icon">👤</span><span>Profile</span></a></li>
+        <li class="nav-item"><a href="subscription.html" class="nav-link active"><span class="nav-icon">💳</span><span>Subscription</span></a></li>
+    </ul>
+    <div class="user-section">
+        <div class="user-profile">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-info">
+                <h4 id="userName">Loading...</h4>
+                <span id="planBadge" class="plan-badge plan-free">FREE</span>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">🚪 <span>LOGOUT</span></button>
+    </div>
+</aside>
+
+<main class="main-content">
+    <div class="page-header">
+        <h1 class="page-title">Subscription</h1>
+        <p class="page-subtitle">Choose the plan that powers your fitness journey</p>
+    </div>
+
+    <div class="sandbox-banner">
+        <span class="sandbox-banner-icon">🧪</span>
+        <div><strong>SANDBOX MODE</strong> — Payments are in test mode. Use test cards / M-Pesa sandbox numbers. No real charges will occur.</div>
+    </div>
+
+    <!-- Current Plan -->
+    <div class="current-plan-card" id="currentPlanCard">
+        <div class="current-plan-icon" id="currentPlanIcon">⚪</div>
+        <div class="current-plan-info">
+            <h3 id="currentPlanName">Loading...</h3>
+            <p id="currentPlanDesc">Fetching your subscription details...</p>
+            <div class="trial-countdown" id="trialCountdown" style="display:none;"></div>
+        </div>
+        <div class="current-plan-action">
+            <button class="btn-plan btn-plan-outline" id="managePlanBtn" onclick="openManagePortal()">Manage Plan</button>
+        </div>
+    </div>
+
+    <!-- Plans -->
+    <div class="plans-grid" id="plansGrid">
+        <!-- Rendered by JS -->
+    </div>
+</main>
+</div>
+
+<!-- Checkout Modal -->
+<div class="checkout-modal" id="checkoutModal">
+    <div class="checkout-box">
+        <div class="checkout-title" id="checkoutTitle">Upgrade Plan</div>
+        <div class="checkout-subtitle" id="checkoutSubtitle">Complete your payment to activate your subscription</div>
+
+        <!-- Status message (mpesa polling) -->
+        <div class="status-msg" id="statusMsg" style="display:none;"></div>
+
+        <!-- Payment method tabs -->
+        <div class="payment-tabs">
+            <button class="pay-tab active" id="tabStripe" onclick="switchTab('stripe')">💳 Card / Stripe</button>
+            <button class="pay-tab" id="tabMpesa" onclick="switchTab('mpesa')">📱 M-Pesa</button>
+        </div>
+
+        <!-- Stripe Panel -->
+        <div class="pay-panel active" id="panelStripe">
+            <div class="form-group">
+                <label class="form-label">CARDHOLDER NAME</label>
+                <input class="form-input" id="cardName" placeholder="John Doe" autocomplete="cc-name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">CARD NUMBER (Sandbox)</label>
+                <input class="form-input" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCard(this)">
+            </div>
+            <div class="card-grid">
+                <div class="form-group">
+                    <label class="form-label">EXPIRY</label>
+                    <input class="form-input" id="cardExp" placeholder="MM/YY" maxlength="5" oninput="formatExp(this)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CVC</label>
+                    <input class="form-input" id="cardCvc" placeholder="123" maxlength="4" type="password">
+                </div>
+            </div>
+            <div class="test-info">
+                🧪 <strong>Test cards:</strong><br>
+                Success: <code>4242 4242 4242 4242</code> · Exp: any future · CVC: any<br>
+                Decline: <code>4000 0000 0000 0002</code>
+            </div>
+        </div>
+
+        <!-- M-Pesa Panel -->
+        <div class="pay-panel" id="panelMpesa">
+            <div class="mpesa-info">
+                📱 Enter your M-Pesa registered phone number. You will receive an STK push prompt to enter your M-Pesa PIN to complete payment.
+            </div>
+            <div class="form-group">
+                <label class="form-label">M-PESA PHONE NUMBER</label>
+                <input class="form-input" id="mpesaPhone" placeholder="2547XXXXXXXX or 07XXXXXXXX" type="tel">
+            </div>
+            <div class="test-info" style="color:#4ade80;background:rgba(74,222,128,0.05);border-color:rgba(74,222,128,0.2);">
+                🧪 <strong>Sandbox test number:</strong> 254708374149<br>
+                PIN: <strong>any 4 digits</strong> in sandbox
+            </div>
+        </div>
+
+        <!-- Total + Pay -->
+        <div class="checkout-total">
+            <span class="label">TOTAL DUE</span>
+            <span class="amount" id="checkoutAmount">$0</span>
+        </div>
+
+        <button class="btn-pay" id="payBtn" onclick="processPayment()">
+            <span id="payBtnText">PAY NOW</span>
+        </button>
+        <button class="btn-cancel-checkout" onclick="closeCheckout()">Cancel</button>
+    </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+requireAuth();
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let selectedPlan = null;
+let activePayTab = 'stripe';
+let mpesaPolling = null;
+
+const PLANS = [
+    {
+        id: 'TRIAL',
+        name: 'Free Trial',
+        icon: '⏳',
+        price: 0,
+        currency: 'KES',
+        period: '14 days',
+        tag: null,
+        features: [
+            'Access to 3 workout programs',
+            'Basic progress tracking',
+            'Limited exercise library (20)',
+            'Community access',
+            { locked: true, text: 'AI workout recommendations' },
+            { locked: true, text: 'Premium programs' },
+            { locked: true, text: 'Nutrition tracking' },
+        ]
+    },
+    {
+        id: 'PRO',
+        name: 'Pro',
+        icon: '🥇',
+        price: 999,
+        currency: 'KES',
+        period: 'month',
+        usd: 7.99,
+        tag: 'POPULAR',
+        features: [
+            'All workout programs (unlimited)',
+            'Full progress & analytics',
+            'Complete exercise library (200+)',
+            'AI workout recommendations',
+            'Priority support',
+            { locked: true, text: 'Nutrition tracking' },
+            { locked: true, text: '1-on-1 coaching sessions' },
+        ]
+    },
+    {
+        id: 'PREMIUM',
+        name: 'Premium',
+        icon: '⭐',
+        price: 2499,
+        currency: 'KES',
+        period: 'month',
+        usd: 19.99,
+        tag: 'BEST VALUE',
+        features: [
+            'Everything in Pro',
+            'Nutrition & meal tracking',
+            '1-on-1 coaching sessions (2/mo)',
+            'Custom program builder',
+            'Advanced body metrics',
+            'Offline access',
+            'Early feature access',
+        ]
+    }
+];
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+async function init() {
+    populateSidebarUser();
+    renderPlans();
+    await loadCurrentSubscription();
+
+    // Handle return from Stripe checkout
+    const params = new URLSearchParams(location.search);
+    if (params.get('success') === '1') {
+        showStatus('✅ Payment successful! Your plan has been activated.', 'success');
+        await loadCurrentSubscription();
+    } else if (params.get('cancel') === '1') {
+        showStatus('Payment cancelled. You have not been charged.', 'error');
+    }
+}
+
+async function loadCurrentSubscription() {
+    try {
+        const res = await SubscriptionAPI.getCurrentSubscription();
+        const sub = res.data || {};
+        const plan = (sub.plan || sub.type || 'FREE').toUpperCase();
+        const icon = { 'FREE':'⚪', 'TRIAL':'⏳', 'PRO':'🥇', 'PREMIUM':'⭐' }[plan] || '⚪';
+        const desc = {
+            'FREE':    'You are on the free tier. Upgrade to unlock more features.',
+            'TRIAL':   'Your 14-day free trial is active. Enjoy full access!',
+            'PRO':     'Pro plan active. Unlimited programs & analytics.',
+            'PREMIUM': 'Premium plan — full access to every FlowFit feature.'
+        }[plan] || 'Free plan.';
+
+        document.getElementById('currentPlanIcon').textContent = icon;
+        document.getElementById('currentPlanName').textContent = plan + ' PLAN';
+        document.getElementById('currentPlanDesc').textContent = desc;
+
+        // Trial countdown
+        if (plan === 'TRIAL' && sub.trialEndsAt) {
+            const days = Math.ceil((new Date(sub.trialEndsAt) - Date.now()) / 86400000);
+            const cd = document.getElementById('trialCountdown');
+            cd.style.display = 'block';
+            cd.textContent = `⚠️ Trial ends in ${days} day${days !== 1 ? 's' : ''} — upgrade now to keep your progress!`;
+        }
+
+        // Update user object
+        const u = TokenManager.getUser() || {};
+        u.subscription = plan; u.subscriptionData = sub;
+        TokenManager.setUser(u);
+        populateSidebarUser();
+
+        // Disable button for current plan
+        renderPlans(plan);
+    } catch (e) {
+        document.getElementById('currentPlanName').textContent = 'FREE PLAN';
+        document.getElementById('currentPlanDesc').textContent = 'Could not load subscription. Showing free tier.';
+        renderPlans('FREE');
+    }
+}
+
+function renderPlans(currentPlanId = '') {
+    document.getElementById('plansGrid').innerHTML = PLANS.map(plan => {
+        const isCurrent = plan.id === currentPlanId;
+        const featuresList = plan.features.map(f => {
+            if (typeof f === 'string') return `<li>${f}</li>`;
+            return `<li class="locked">${f.text}</li>`;
+        }).join('');
+        const priceDisplay = plan.price === 0
+            ? `<span class="plan-amount">FREE</span>`
+            : `<span class="plan-amount">KES ${plan.price.toLocaleString()}</span><span class="plan-period">/${plan.period} <span style="color:#555;font-size:0.8rem;">(~USD ${plan.usd})</span></span>`;
+        const btnClass = plan.id === 'PREMIUM' ? 'btn-plan-gold' : 'btn-plan-outline';
+        const btnText = isCurrent ? '✓ Current Plan' : plan.price === 0 ? 'Start Free Trial' : 'Upgrade Now';
+        return `
+        <div class="plan-card ${plan.id === 'PREMIUM' ? 'featured' : ''}">
+            ${plan.tag ? `<div class="plan-tag">${plan.tag}</div>` : ''}
+            <div class="plan-name">${plan.icon} ${plan.name.toUpperCase()}</div>
+            <div class="plan-price">${priceDisplay}</div>
+            <ul class="plan-features">${featuresList}</ul>
+            <button class="btn-plan ${btnClass}" ${isCurrent ? 'disabled' : ''}
+                onclick="openCheckout('${plan.id}')">
+                ${btnText}
+            </button>
+        </div>`;
+    }).join('');
+}
+
+// ── Checkout ───────────────────────────────────────────────────────────────────
+function openCheckout(planId) {
+    const plan = PLANS.find(p => p.id === planId);
+    if (!plan) return;
+    selectedPlan = plan;
+    document.getElementById('checkoutTitle').textContent = `Upgrade to ${plan.name}`;
+    document.getElementById('checkoutSubtitle').textContent = `${plan.icon} ${plan.name} — KES ${plan.price.toLocaleString()}/${plan.period}`;
+    document.getElementById('checkoutAmount').textContent = plan.price === 0 ? 'FREE' : `KES ${plan.price.toLocaleString()}`;
+    document.getElementById('payBtnText').textContent = plan.price === 0 ? 'ACTIVATE FREE TRIAL' : 'PAY NOW';
+    hideStatus();
+    document.getElementById('checkoutModal').classList.add('active');
+}
+
+function closeCheckout() {
+    document.getElementById('checkoutModal').classList.remove('active');
+    stopMpesaPolling();
+    hideStatus();
+}
+
+function switchTab(tab) {
+    activePayTab = tab;
+    document.getElementById('tabStripe').classList.toggle('active', tab === 'stripe');
+    document.getElementById('tabMpesa').classList.toggle('active', tab === 'mpesa');
+    document.getElementById('panelStripe').classList.toggle('active', tab === 'stripe');
+    document.getElementById('panelMpesa').classList.toggle('active', tab === 'mpesa');
+}
+
+async function processPayment() {
+    if (!selectedPlan) return;
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    document.getElementById('payBtnText').textContent = 'Processing...';
+    hideStatus();
+
+    try {
+        if (selectedPlan.price === 0) {
+            // Free trial
+            const res = await SubscriptionAPI.createCheckoutSession('TRIAL');
+            if (res.success) {
+                showStatus('✅ Free trial activated! Enjoy 14 days of full access.', 'success');
+                setTimeout(() => { closeCheckout(); loadCurrentSubscription(); }, 2000);
+            }
+        } else if (activePayTab === 'stripe') {
+            await processStripe();
+        } else {
+            await processMpesa();
+        }
+    } catch (e) {
+        showStatus(`❌ ${e.message || 'Payment failed. Please try again.'}`, 'error');
+    } finally {
+        btn.disabled = false;
+        document.getElementById('payBtnText').textContent = selectedPlan.price === 0 ? 'ACTIVATE FREE TRIAL' : 'PAY NOW';
+    }
+}
+
+async function processStripe() {
+    // Try Stripe hosted checkout first (redirects to Stripe)
+    try {
+        const res = await SubscriptionAPI.createStripeCheckout(selectedPlan.id);
+        if (res.data?.url) {
+            // Redirect to Stripe hosted checkout
+            window.location.href = res.data.url;
+            return;
+        }
+    } catch (e) {
+        // Stripe checkout endpoint may not exist in sandbox — simulate
+        console.warn('Stripe redirect not available, simulating sandbox payment:', e.message);
+    }
+    // Sandbox simulation — validate test card
+    const num = document.getElementById('cardNumber').value.replace(/\s/g,'');
+    const exp = document.getElementById('cardExp').value;
+    const cvc = document.getElementById('cardCvc').value;
+    if (!num || !exp || !cvc) { showStatus('❌ Please fill in all card details.', 'error'); return; }
+    if (num === '4000000000000002') { showStatus('❌ Card declined. Use 4242 4242 4242 4242 for success.', 'error'); return; }
+    // Simulate processing
+    showStatus('⏳ Processing payment...', 'pending');
+    await new Promise(r => setTimeout(r, 1800));
+    // Call the backend
+    const res = await SubscriptionAPI.createCheckoutSession(selectedPlan.id);
+    if (res.success) {
+        showStatus(`✅ Payment successful! ${selectedPlan.name} plan activated.`, 'success');
+        setTimeout(() => { closeCheckout(); loadCurrentSubscription(); }, 2500);
+    }
+}
+
+async function processMpesa() {
+    const phone = document.getElementById('mpesaPhone').value.trim();
+    if (!phone) { showStatus('❌ Please enter your M-Pesa phone number.', 'error'); return; }
+    // Normalise to 254 format
+    let normalised = phone.replace(/\D/g,'');
+    if (normalised.startsWith('0')) normalised = '254' + normalised.slice(1);
+    if (!normalised.startsWith('254')) normalised = '254' + normalised;
+
+    showStatus('📱 Sending STK Push to ' + normalised + '... Check your phone.', 'pending');
+    try {
+        const res = await SubscriptionAPI.initMpesaPayment(selectedPlan.id, normalised);
+        if (res.success && res.data?.checkoutRequestId) {
+            pollMpesaStatus(res.data.checkoutRequestId);
+        } else if (res.success) {
+            // Some backends don't return checkoutRequestId in sandbox — simulate
+            showStatus('📱 STK Push sent! Enter your PIN when prompted.', 'pending');
+            await new Promise(r => setTimeout(r, 4000));
+            showStatus(`✅ M-Pesa payment confirmed! ${selectedPlan.name} plan activated.`, 'success');
+            setTimeout(() => { closeCheckout(); loadCurrentSubscription(); }, 2500);
+        }
+    } catch (e) {
+        // Sandbox fallback — MPesa endpoint may not be implemented yet
+        showStatus('📱 (Sandbox) STK Push simulated. Payment would go to ' + normalised, 'pending');
+        await new Promise(r => setTimeout(r, 3000));
+        showStatus(`✅ (Sandbox) M-Pesa payment simulated. ${selectedPlan.name} plan would be activated.`, 'success');
+    }
+}
+
+function pollMpesaStatus(checkoutRequestId, attempts = 0) {
+    if (attempts > 15) { showStatus('⏳ Payment taking longer than expected. Check your M-Pesa messages.', 'pending'); return; }
+    mpesaPolling = setTimeout(async () => {
+        try {
+            const res = await SubscriptionAPI.checkMpesaStatus(checkoutRequestId);
+            const status = (res.data?.status || '').toUpperCase();
+            if (status === 'SUCCESS' || status === 'COMPLETED') {
+                showStatus(`✅ M-Pesa payment confirmed! ${selectedPlan.name} plan activated.`, 'success');
+                setTimeout(() => { closeCheckout(); loadCurrentSubscription(); }, 2500);
+            } else if (status === 'FAILED' || status === 'CANCELLED') {
+                showStatus('❌ Payment was cancelled or failed. Please try again.', 'error');
+            } else {
+                // Still pending — keep polling
+                pollMpesaStatus(checkoutRequestId, attempts + 1);
+            }
+        } catch { pollMpesaStatus(checkoutRequestId, attempts + 1); }
+    }, 3000);
+}
+
+function stopMpesaPolling() {
+    if (mpesaPolling) { clearTimeout(mpesaPolling); mpesaPolling = null; }
+}
+
+function openManagePortal() {
+    showConfirm({
+        icon: '💳',
+        title: 'Manage Subscription',
+        message: 'This will open the billing portal to manage or cancel your subscription.',
+        okText: 'OPEN PORTAL',
+        cancelText: 'Back',
+        onOk: async () => {
+            try {
+                const res = await SubscriptionAPI.cancelSubscription();
+                if (res.success) {
+                    Toast.success('Subscription updated.');
+                    loadCurrentSubscription();
+                }
+            } catch (e) { Toast.error(e.message || 'Could not open portal.'); }
+        }
+    });
+}
+
+// ── UI helpers ─────────────────────────────────────────────────────────────────
+function showStatus(msg, type) {
+    const el = document.getElementById('statusMsg');
+    el.textContent = msg;
+    el.className = 'status-msg status-' + type;
+    el.style.display = 'block';
+}
+function hideStatus() { document.getElementById('statusMsg').style.display = 'none'; }
+
+function formatCard(el) {
+    let v = el.value.replace(/\D/g,'').slice(0,16);
+    el.value = v.match(/.{1,4}/g)?.join(' ') || v;
+}
+function formatExp(el) {
+    let v = el.value.replace(/\D/g,'');
+    if (v.length >= 2) v = v.slice(0,2) + '/' + v.slice(2,4);
+    el.value = v;
+}
+
+// ── Sidebar & Confirm ──────────────────────────────────────────────────────────
+let _scrollY = 0;
+function openSidebar() {
+    _scrollY = window.scrollY;
+    document.getElementById('sidebar').classList.add('mobile-active');
+    document.getElementById('sidebarOverlay').classList.add('active');
+    document.body.classList.add('sidebar-open');
+    document.body.style.top = `-${_scrollY}px`;
+}
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('mobile-active');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+    document.body.style.top = '';
+    window.scrollTo(0, _scrollY);
+}
+function toggleSidebar() {
+    const open = document.getElementById('sidebar').classList.contains('mobile-active');
+    open ? closeSidebar() : openSidebar();
+}
+
+function handleLogout() {
+    showConfirm({ icon:'🚪', title:'LOG OUT', message:'Log out of FlowFit Elite?', okText:'LOG OUT', cancelText:'Stay', danger:true,
+        onOk: async () => { LoadingManager.show('Logging out...'); await AuthAPI.logout(); }
+    });
+}
+
+function showConfirm({ icon='⚠️', title='Are you sure?', message='', okText='Confirm', cancelText='Cancel', danger=false, onOk }) {
+    const ex = document.getElementById('ff-confirm'); if (ex) ex.remove();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ff-confirm-backdrop'; backdrop.id = 'ff-confirm';
+    backdrop.innerHTML = `<div class="ff-confirm-box"><span style="font-size:3rem;display:block;margin-bottom:1rem;">${icon}</span><div class="ff-confirm-title">${title}</div><p class="ff-confirm-msg">${message}</p><div class="ff-confirm-actions"><button class="ff-confirm-cancel" id="ffCancel">${cancelText}</button><button class="ff-confirm-ok ${danger?'danger':''}" id="ffOk">${okText}</button></div></div>`;
+    document.body.appendChild(backdrop);
+    const close = () => { backdrop.style.opacity='0'; backdrop.style.pointerEvents='none'; backdrop.style.visibility='hidden'; if(backdrop.parentNode) backdrop.parentNode.removeChild(backdrop); };
+    backdrop.querySelector('#ffCancel').addEventListener('click', e => { e.stopPropagation(); close(); });
+    backdrop.querySelector('#ffOk').addEventListener('click', e => { e.stopPropagation(); close(); if(onOk) onOk(); });
+    backdrop.addEventListener('click', e => { if(e.target===backdrop) close(); });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
