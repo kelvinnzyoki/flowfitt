@@ -1141,25 +1141,8 @@ function loadUserInfo() {
     populateSidebarUser();
 }
 
-function handleLogout() {
-    // Use AuthAPI.logout() from api.js — clears accessToken/refreshToken correctly
-    LoadingManager.show('Logging out...');
-    AuthAPI.logout();
-}
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    loadUserInfo();
-    loadAll();
-});
-
-
-
-
-
-
 /* ── FLOWFIT SIDEBAR JS ─────────────────────────────────────────────── */
-(function () {
+    (function () {
     'use strict';
     var _savedY = 0;
     function openSidebar() {
@@ -1190,6 +1173,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSidebar();});
     window.openSidebar=openSidebar; window.closeSidebar=closeSidebar; window.toggleSidebar=toggleSidebar;
 }());
+
+function handleLogout() {
+    // Use AuthAPI.logout() from api.js — clears accessToken/refreshToken correctly
+    LoadingManager.show('Logging out...');
+    AuthAPI.logout();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    loadUserInfo();
+    loadAll();
+});
+
+
+
+
+
+
+
+
 
 </script>
 
