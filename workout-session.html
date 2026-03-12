@@ -1928,7 +1928,7 @@ async function submitLog() {
         // If launched from a program, go back
         if (FROM_PROG && FROM_ENR) {
             setTimeout(() => {
-                window.location.href = `program-detail__1_.html?id=${FROM_PROG}&enrollment=${FROM_ENR}`;
+                window.location.href = `program-detail.html?id=${FROM_PROG}&enrollment=${FROM_ENR}`;
             }, 1500);
         }
     } catch(err) {
@@ -1942,7 +1942,7 @@ async function submitLog() {
 // ── Navigation ────────────────────────────────────────────────────────────────
 function goBack() {
     if (FROM_PROG) {
-        window.location.href = `program-detail__1_.html?id=${FROM_PROG}&enrollment=${FROM_ENR || ''}`;
+        window.location.href = `program-detail.html?id=${FROM_PROG}&enrollment=${FROM_ENR || ''}`;
     } else if (document.referrer) {
         history.back();
     } else {
