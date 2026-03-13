@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progress - FlowFit</title>
+    <title>Workouts - FlowFit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -61,86 +61,75 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; }
         .dashboard-container { display: flex; min-height: 100vh; }
         .main-content { margin-left: 280px; flex: 1; padding: 2rem 3rem; width: calc(100% - 280px); }
-        .header { margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .header-left h1 { font-family: 'Oswald', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
-        .header-left p { color: var(--text-secondary); font-size: 1.1rem; }
-        /* FIX #19: time-btn buttons — period stored in data-period */
-        .time-filters { display: flex; gap: 0.5rem; background: var(--bg-card); padding: 0.5rem; border-radius: 12px; border: 1px solid var(--border); }
-        .time-btn { padding: 0.7rem 1.5rem; background: transparent; border: none; color: var(--text-secondary); font-weight: 600; cursor: pointer; border-radius: 8px; transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
-        .time-btn.active { background: var(--gradient-2); color: #fff; }
-        /* Stats Grid — FIX #15: data-stat attributes on stat-value elements */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
-        .stat-card { background: var(--bg-card); padding: 2rem; border-radius: 20px; border: 1px solid var(--border); position: relative; overflow: hidden; }
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-1); }
-        .stat-card:nth-child(2)::before { background: var(--gradient-2); }
-        .stat-card:nth-child(3)::before { background: var(--gradient-3); }
-        .stat-card:nth-child(4)::before { background: var(--gradient-accent); }
-        .stat-icon { font-size: 2rem; margin-bottom: 1rem; }
-        .stat-value { font-family: 'Oswald', sans-serif; font-size: 2.2rem; margin-bottom: 0.5rem; }
-        .stat-label { color: var(--text-secondary); font-size: 0.95rem; }
-        /* Streak display */
-        .streak-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
-        .streak-card { background: var(--bg-card); padding: 2rem; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
-        .streak-number { font-family: 'Oswald', sans-serif; font-size: 3.5rem; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem; }
-        .streak-label { color: var(--text-secondary); font-size: 1rem; }
-        /* Charts */
-        .chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-bottom: 3rem; }
-        .chart-card { background: var(--bg-card); padding: 2.5rem; border-radius: 20px; border: 1px solid var(--border); }
-        .chart-card.full-width { grid-column: 1 / -1; }
-        .chart-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-        .chart-title { font-size: 1.4rem; font-weight: 700; }
-        .chart-subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem; }
-        /* Category chart — FIX #18: proper CSS for generated bar HTML */
-        .category-chart-container { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
-        .cat-bar-row { display: flex; align-items: center; gap: 1rem; }
-        .cat-bar-label { width: 100px; font-size: 0.9rem; color: var(--text-secondary); flex-shrink: 0; text-transform: capitalize; }
-        .cat-bar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        .cat-bar-fill { height: 100%; background: var(--gradient-2); border-radius: 10px; transition: width 0.5s ease; }
-        .cat-bar-count { width: 40px; text-align: right; font-weight: 700; font-size: 0.9rem; color: var(--accent); }
-        /* History Table */
-        .table-scroll-wrap {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 12px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(212,175,55,0.3) transparent;
-        }
-        .table-scroll-wrap::-webkit-scrollbar { height: 5px; }
-        .table-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
-        .table-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
-        .history-table { width: 100%; min-width: 560px; border-collapse: collapse; }
-        .history-table thead { background: rgba(255,255,255,0.03); }
-        .history-table th, .history-table td { padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-        .history-table th { color: var(--text-secondary); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
-        .history-table td { font-weight: 500; white-space: nowrap; }
-        .history-table td.workout-name { white-space: normal; min-width: 110px; word-break: break-word; }
-        .workout-name { font-weight: 700; font-size: 1rem; }
-        .workout-badge { display: inline-block; padding: 0.3rem 0.8rem; background: rgba(102,126,234,0.15); color: #667eea; border-radius: 50px; font-size: 0.78rem; font-weight: 600; }
-        .workout-badge.cardio  { background: rgba(245,87,108,0.15); color: #f5576c; }
-        .workout-badge.strength { background: rgba(74,222,128,0.15); color: #4ade80; }
-        .workout-badge.core    { background: rgba(251,191,36,0.15); color: #fbbf24; }
-        .workout-badge.hiit    { background: rgba(79,172,254,0.15); color: #4facfe; }
-        /* FIX #17: Achievements grid */
-        .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
-        .achievement-item { display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem; background: rgba(255,255,255,0.03); border-radius: 15px; border: 1px solid var(--border); transition: all 0.3s; }
-        .achievement-item.unlocked { border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.05); }
-        .achievement-item.locked { opacity: 0.4; }
-        .achievement-icon-wrap { width: 50px; height: 50px; border-radius: 12px; background: var(--gradient-3); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
-        .achievement-item.locked .achievement-icon-wrap { background: rgba(255,255,255,0.05); }
-        .achievement-name { font-weight: 700; margin-bottom: 0.2rem; }
-        .achievement-desc { color: var(--text-secondary); font-size: 0.85rem; }
-        .achievement-pts { display: inline-block; margin-top: 0.4rem; padding: 0.2rem 0.6rem; background: rgba(245,87,108,0.15); color: var(--accent); border-radius: 50px; font-size: 0.78rem; font-weight: 700; }
-        .empty-state { text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 1rem; }
-        @media (max-width: 1200px) { .chart-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .header { margin-bottom: 2rem; }
+        .header h1 { font-family: 'Oswald', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        .header p { color: var(--text-secondary); font-size: 1.1rem; }
+        /* Dev banner — only shows when DB is empty */
+        .dev-banner { display: none; align-items: center; gap: 1rem; padding: 0.9rem 1.5rem; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); border-radius: 12px; color: #fbbf24; font-size: 0.9rem; margin-bottom: 2rem; }
+        .dev-banner.visible { display: flex; }
+        .dev-banner code { background: rgba(0,0,0,0.3); padding: 0.2rem 0.5rem; border-radius: 6px; font-family: monospace; }
+        .controls { display: flex; gap: 1.5rem; margin-bottom: 3rem; flex-wrap: wrap; }
+        .search-bar { flex: 1; min-width: 300px; position: relative; }
+        .search-bar input { width: 100%; padding: 1rem 1.5rem 1rem 3.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 15px; color: var(--text-primary); font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        .search-bar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,87,108,0.1); }
+        .search-icon { position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--text-secondary); pointer-events: none; }
+        .filter-tabs { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .tab-btn { padding: 1rem 1.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text-secondary); font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif; font-size: 0.95rem; }
+        .tab-btn:hover { border-color: var(--accent); color: var(--text-primary); }
+        .tab-btn.active { background: var(--gradient-2); border-color: transparent; color: #fff; }
+        /* Cards — keeps your original design */
+        .exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
+        .exercise-card { background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: all 0.4s ease; cursor: pointer; }
+        .exercise-card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.1); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .exercise-image { width: 100%; height: 200px; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; }
+        .exercise-card:nth-child(3n+2) .exercise-image { background: var(--gradient-2); }
+        .exercise-card:nth-child(3n) .exercise-image { background: var(--gradient-3); }
+        .difficulty-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .difficulty-beginner { color: #4ade80; }
+        .difficulty-intermediate { color: #fbbf24; }
+        .difficulty-advanced { color: #f87171; }
+        .exercise-content { padding: 1.75rem; }
+        .exercise-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .exercise-meta { display: flex; gap: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .exercise-meta span { display: flex; align-items: center; gap: 0.4rem; }
+        .exercise-description { color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem; }
+        .exercise-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .tag { padding: 0.4rem 0.9rem; background: rgba(255,255,255,0.05); border-radius: 50px; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+        .exercise-actions { display: flex; gap: 1rem; }
+        .btn-action { flex: 1; padding: 0.9rem; border-radius: 12px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif; }
+        .btn-start { background: var(--gradient-accent); color: #000; }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,87,108,0.3); }
+        .btn-save { background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-save:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+        /* Log Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center; padding: 2rem; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-card); border-radius: 25px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); }
+        .modal-header { padding: 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-family: 'Oswald', sans-serif; font-size: 1.8rem; }
+        .modal-header p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.3rem; }
+        .close-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; flex-shrink: 0; }
+        .close-btn:hover { background: rgba(255,255,255,0.1); transform: rotate(90deg); }
+        .modal-body { padding: 2rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0; }
+        .form-field { margin-bottom: 1.25rem; }
+        .form-field label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.88rem; color: var(--text-secondary); }
+        .form-field input, .form-field select, .form-field textarea { width: 100%; padding: 0.9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 1rem; }
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: none; border-color: var(--accent); }
+        .form-field textarea { resize: vertical; min-height: 70px; }
+        .form-field select option { background: #1a1a24; }
+        .modal-cta { display: flex; gap: 1rem; margin-top: 0.5rem; }
+        .btn-log { flex: 2; padding: 1rem; background: var(--gradient-accent); color: #000; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.3s; }
+        .btn-log:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(245,87,108,0.3); }
+        .btn-log:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-cancel { flex: 1; padding: 1rem; background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border); border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .empty-state { grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-secondary); font-size: 1.1rem; }
         @media (max-width: 768px) {
             .main-content { margin-left: 0; width: 100%; padding: 1.5rem; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .streak-section { grid-template-columns: 1fr 1fr; }
-            .history-table { font-size: 0.82rem; }
-            .history-table th, .history-table td { padding: 0.65rem 0.75rem; }
-            .table-scroll-wrap { border-radius: 8px; }
+            .exercise-grid { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+            .filter-tabs { overflow-x: auto; }
+            .form-row { grid-template-columns: 1fr; }
         }
     
 /* ═══════════════════════════════════════
@@ -254,7 +243,7 @@ input, select, textarea {
 
 /* ── Badges / Tags / Chips ─── */
 .program-badge, .hero-badge, .preview-badge,
-.difficulty-badge, .section-label {
+.section-label {
     background: rgba(212, 175, 55, 0.15) !important;
     color: var(--gold-primary) !important;
     border: 1px solid var(--border-gold) !important;
@@ -642,7 +631,7 @@ select,textarea {
 }
 
 /* ── BADGES / CHIPS ──────────────────────────────── */
-.program-badge,.hero-badge,.difficulty-badge,
+.program-badge,.hero-badge,
 .section-label,.preview-badge {
     background:rgba(212,175,55,0.1)!important;
     color:var(--gold-main)!important;
@@ -876,117 +865,21 @@ nav,.top-nav {
 }
 
     
-/* ── ACHIEVEMENT UNLOCK TOAST ────────────────────────────── */
-.achievement-toast {
-    position: fixed; right: 24px; z-index: 99998;
-    display: flex; align-items: center; gap: 1rem;
-    background: #111115;
-    border: 1px solid rgba(212,175,55,0.5);
-    border-radius: 18px;
-    padding: 1.1rem 1.5rem;
-    min-width: 300px; max-width: 380px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(212,175,55,0.15);
-    transform: translateX(420px);
-    transition: transform 0.45s cubic-bezier(0.165,0.84,0.44,1);
+/* ── DIFFICULTY BADGE — visible on gold gradient ─── */
+.difficulty-badge {
+    position: absolute !important; top: 0.85rem !important; right: 0.85rem !important;
+    padding: 0.3rem 0.85rem !important;
+    background: rgba(3,3,3,0.82) !important;
+    border-radius: 50px !important;
+    font-size: 0.72rem !important; font-weight: 800 !important;
+    text-transform: uppercase !important; letter-spacing: 1.5px !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    backdrop-filter: blur(6px) !important;
+    color: #ffffff !important;
 }
-.achievement-toast.ach-toast-show { transform: translateX(0); }
-.ach-toast-icon {
-    font-size: 2.5rem;
-    filter: drop-shadow(0 0 10px rgba(212,175,55,0.5));
-    flex-shrink: 0;
-}
-.ach-toast-body { flex: 1; }
-.ach-toast-label {
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.7rem; letter-spacing: 3px;
-    color: var(--gold-main); margin-bottom: 2px;
-}
-.ach-toast-name {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.1rem; font-weight: 700;
-    color: #fff; margin-bottom: 2px;
-}
-.ach-toast-pts {
-    font-size: 0.8rem;
-    color: var(--gold-main);
-    font-weight: 700;
-}
-/* ── NEWLY UNLOCKED PULSE ─────────────────────────────────── */
-@keyframes goldPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); }
-    50%       { box-shadow: 0 0 0 8px rgba(212,175,55,0); }
-}
-.achievement-item.newly-unlocked {
-    animation: goldPulse 1.5s ease 3;
-    border-color: var(--gold-main) !important;
-}
-
-
-/* ── CUSTOM CONFIRM MODAL ──────────────────────────── */
-.ff-confirm-backdrop {
-    position: fixed; inset: 0; z-index: 99999;
-    background: rgba(0,0,0,0.82);
-    display: flex; align-items: center; justify-content: center;
-    padding: 1.5rem;
-}
-@keyframes ffSlideUp {
-    from { transform: translateY(24px) scale(0.96); opacity: 0; }
-    to   { transform: translateY(0) scale(1); opacity: 1; }
-}
-.ff-confirm-box {
-    background: #111115;
-    border: 1px solid rgba(212,175,55,0.35);
-    border-radius: 22px;
-    padding: 2.5rem 2rem 2rem;
-    max-width: 400px; width: 100%;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 40px rgba(212,175,55,0.08);
-    animation: ffSlideUp 0.22s cubic-bezier(0.165,0.84,0.44,1);
-    text-align: center;
-}
-.ff-confirm-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
-.ff-confirm-title {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.5rem; font-weight: 700;
-    letter-spacing: 1px; color: #fff; margin-bottom: 0.6rem;
-}
-.ff-confirm-msg { color: #888; font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; }
-.ff-confirm-actions { display: flex; gap: 1rem; }
-.ff-confirm-cancel {
-    flex: 1; padding: 0.9rem;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px; color: #aaa;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.9rem; font-weight: 600; letter-spacing: 1px;
-    cursor: pointer; transition: background 0.2s;
-}
-.ff-confirm-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.ff-confirm-ok {
-    flex: 1.4; padding: 0.9rem;
-    background: linear-gradient(135deg,#D4AF37 0%,#edcf7d 50%,#b8860b 100%);
-    border: none; border-radius: 12px; color: #000;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.9rem; font-weight: 700; letter-spacing: 1px;
-    cursor: pointer; transition: all 0.2s;
-}
-.ff-confirm-ok:hover { box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
-.ff-confirm-ok.danger { background: linear-gradient(135deg,#ff3e3e,#ff6b6b); }
-.ff-confirm-ok.danger:hover { box-shadow: 0 6px 20px rgba(255,62,62,0.4); }
-
-/* ── SIDEBAR OVERLAY ───────────────────────────────── */
-/* Sidebar sits above overlay */
-/* Prevent body scroll on mobile */
-/* ── LIVE CHART.JS CHARTS ──────────────────────────── */
-.chart-canvas-wrap {
-    position: relative; width: 100%; min-height: 220px;
-    margin-top: 1.2rem;
-}
-.chart-empty-state {
-    display: flex; align-items: center; justify-content: center;
-    height: 160px; color: var(--text-secondary);
-    font-family: 'Oswald', sans-serif; letter-spacing: 3px;
-    font-size: 0.8rem; text-align: center;
-}
+.difficulty-badge.difficulty-beginner     { color: #4ade80 !important; border-color: rgba(74,222,128,0.5) !important; }
+.difficulty-badge.difficulty-intermediate { color: #fbbf24 !important; border-color: rgba(251,191,36,0.5) !important; }
+.difficulty-badge.difficulty-advanced     { color: #f87171 !important; border-color: rgba(248,113,113,0.5) !important; }
 
 
 
@@ -1273,7 +1166,6 @@ body.sidebar-open main {
 </style>
 </head>
 <body>
-
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
 <div class="dashboard-container">
@@ -1284,9 +1176,9 @@ body.sidebar-open main {
             <ul class="nav-menu">
         <li class="nav-item"><a href="index.html" class="nav-link"><span class="nav-icon">🏠</span><span>Home</span></a></li>
         <li class="nav-item"><a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a></li>
-        <li class="nav-item"><a href="workouts.html" class="nav-link"><span class="nav-icon">💪</span><span>Workouts</span></a></li>
+        <li class="nav-item"><a href="workouts.html" class="nav-link active"><span class="nav-icon">💪</span><span>Workouts</span></a></li>
         <li class="nav-item"><a href="programs.html" class="nav-link"><span class="nav-icon">📋</span><span>Programs</span></a></li>
-        <li class="nav-item"><a href="progress.html" class="nav-link active"><span class="nav-icon">📈</span><span>Progress</span></a></li>
+        <li class="nav-item"><a href="progress.html" class="nav-link"><span class="nav-icon">📈</span><span>Progress</span></a></li>
         <li class="nav-item"><a href="profile.html" class="nav-link"><span class="nav-icon">👤</span><span>Profile</span></a></li>
         <li class="nav-item"><a href="subscription.html" class="nav-link"><span class="nav-icon">💳</span><span>Subscription</span></a></li>
             </ul>
@@ -1309,594 +1201,459 @@ body.sidebar-open main {
 
     <main class="main-content">
         <div class="header">
-            <div class="header-left">
-                <h1>Your Progress</h1>
-                <p>Track your fitness journey and celebrate your wins</p>
+            <h1>Exercise Library</h1>
+            <p>Browse our comprehensive collection of home workouts</p>
+        </div>
+        <!-- Plan usage banner -->
+        <div id="planBanner" style="display:none;align-items:center;gap:.75rem;padding:.85rem 1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;font-size:.88rem;color:var(--text-secondary);margin-bottom:1.75rem"></div>
+
+        <!--
+          DEV BANNER: Only visible when DB is empty.
+          In production after seeding, this is never shown.
+        -->
+        <div class="dev-banner" id="devBanner">
+            ⚠️ Database is empty — showing sample exercises.
+            Run <code>npx prisma db seed</code> to populate your real data,
+            then exercises will load from the database automatically.
+        </div>
+
+        <div class="controls">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search exercises...">
             </div>
-            <!-- FIX #19: data-period attributes + JS listener wires them up -->
-            <div class="time-filters">
-                <button class="time-btn active" data-period="7d">7D</button>
-                <button class="time-btn" data-period="30d">30D</button>
-                <button class="time-btn" data-period="90d">90D</button>
+            <div class="filter-tabs" id="filterTabs">
+                <button class="tab-btn active" data-filter="all">All</button>
+                <button class="tab-btn" data-filter="STRENGTH">Strength</button>
+                <button class="tab-btn" data-filter="CARDIO">Cardio</button>
+                <button class="tab-btn" data-filter="CORE">Core</button>
+                <button class="tab-btn" data-filter="HIIT">HIIT</button>
+                <button class="tab-btn" data-filter="FLEXIBILITY">Flexibility</button>
             </div>
         </div>
 
-        <!-- FIX #15: data-stat attributes on each stat-value so displayStats() can update them -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">💪</div>
-                <div class="stat-value" data-stat="total-workouts">—</div>
-                <div class="stat-label">Workouts Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⏱️</div>
-                <div class="stat-value" data-stat="total-duration">—</div>
-                <div class="stat-label">Total Time Trained</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">🔥</div>
-                <div class="stat-value" data-stat="total-calories">—</div>
-                <div class="stat-label">Calories Burned</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">📊</div>
-                <div class="stat-value" data-stat="avg-duration">—</div>
-                <div class="stat-label">Avg. Workout Length</div>
-            </div>
-        </div>
-
-        <!-- FIX #20: Dedicated streak display with data-stat attributes -->
-        <div class="streak-section">
-            <div class="streak-card">
-                <div class="streak-number" data-stat="current-streak">—</div>
-                <div class="streak-label">🔥 Current Streak (days)</div>
-            </div>
-            <div class="streak-card">
-                <div class="streak-number" data-stat="longest-streak">—</div>
-                <div class="streak-label">🏆 Longest Streak (days)</div>
-            </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="chart-grid">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Workout Frequency</h3>
-                        <p class="chart-subtitle">Workouts per day in period</p>
-                    </div>
-                </div>
-                <!-- FIX #18: dedicated container with proper class; JS targets this -->
-                <div class="chart-canvas-wrap" id="frequencyChart" style="min-height:200px;"></div>
-            </div>
-            <div class="chart-card">
-                <div class="chart-header">
-                    <div>
-                        <h3 class="chart-title">Category Breakdown</h3>
-                        <p class="chart-subtitle">Workouts by exercise type</p>
-                    </div>
-                </div>
-                <!-- FIX #18: dedicated container with proper class; JS targets this -->
-                <div class="chart-canvas-wrap" id="categoryChart" style="min-height:220px;"></div>
-            </div>
-        </div>
-
-        <!-- Workout History — FIX #16: column headers match JS-generated rows -->
-        <div class="chart-card full-width" style="margin-bottom: 3rem;">
-            <div class="chart-header">
-                <div>
-                    <h3 class="chart-title">Recent Workouts</h3>
-                    <p class="chart-subtitle">Your training history</p>
-                </div>
-            </div>
-            <div class="table-scroll-wrap">
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <!-- FIX #16: headers now match JS-generated columns exactly -->
-                        <th>Date</th>
-                        <th>Exercise</th>
-                        <th>Category</th>
-                        <th>Duration</th>
-                        <th>Sets × Reps</th>
-                        <th>Calories</th>
-                    </tr>
-                </thead>
-                <!-- FIX #15: tbody with id for direct targeting — no more ambiguous selectors -->
-                <tbody id="historyTbody">
-                    <tr><td colspan="6" class="empty-state">Loading history...</td></tr>
-                </tbody>
-            </table>
-            </div><!-- /.table-scroll-wrap -->
-        </div>
-
-
-        <!-- Live Trend Chart -->
-        <div class="chart-card full-width" style="margin-bottom:3rem;">
-            <div class="chart-header">
-                <div>
-                    <h3 class="chart-title">Progress Trend</h3>
-                    <p class="chart-subtitle">Calories burned &amp; duration over time</p>
-                </div>
-                <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;background:rgba(255,255,255,0.03);padding:0.45rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.07);">
-                    <span style="display:flex;align-items:center;gap:7px;font-size:0.78rem;color:#D4AF37;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.5px;">
-                        <span style="width:22px;height:3px;border-radius:2px;background:linear-gradient(90deg,#D4AF37,#edcf7d);flex-shrink:0;display:inline-block;"></span>CALORIES
-                    </span>
-                    <span style="display:flex;align-items:center;gap:7px;font-size:0.78rem;color:#00f2fe;font-weight:700;font-family:'Oswald',sans-serif;letter-spacing:0.5px;">
-                        <span style="width:22px;height:3px;border-radius:2px;background:linear-gradient(90deg,#00f2fe,#4facfe);flex-shrink:0;display:inline-block;"></span>DURATION
-                    </span>
-                </div>
-            </div>
-            <div class="chart-canvas-wrap" id="trendChart" style="min-height:240px;"></div>
-        </div>
-
-        <!-- Achievements section -->
-        <div class="chart-card full-width">
-            <div class="chart-header">
-                <div>
-                    <h3 class="chart-title">Achievements</h3>
-                    <p class="chart-subtitle">Your unlocked milestones</p>
-                </div>
-            </div>
-            <!-- FIX #17: this ID is targeted by displayAchievements() -->
-            <div class="achievements-grid" id="achievementsGrid">
-                <p class="empty-state">Loading achievements...</p>
+        <div class="exercise-grid" id="exerciseGrid">
+            <div class="empty-state" id="gridStatusMsg" style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--text-secondary);">
+                <div style="font-size:2rem;margin-bottom:0.75rem;">⏳</div>
+                <div style="font-family:'Oswald',sans-serif;letter-spacing:2px;font-size:0.9rem;">LOADING EXERCISES...</div>
             </div>
         </div>
     </main>
 </div>
 
-<!-- FIX #21: api.js loaded ONCE only -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Log Workout Modal — replaces the old prompt() dialogs -->
+<div class="modal" id="logModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 id="modalTitle">Log Workout</h2>
+                <p id="modalSubtitle">Track your performance</p>
+            </div>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="modalExId">
+            <input type="hidden" id="modalCalPerMin">
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Duration (minutes) *</label>
+                    <input type="number" id="logDuration" min="1" max="300" placeholder="e.g. 30">
+                </div>
+                <div class="form-field">
+                    <label>Difficulty</label>
+                    <select id="logDifficulty">
+                        <option value="">Select...</option>
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Sets (optional)</label>
+                    <input type="number" id="logSets" min="1" placeholder="e.g. 3">
+                </div>
+                <div class="form-field">
+                    <label>Reps per set (optional)</label>
+                    <input type="number" id="logReps" min="1" placeholder="e.g. 15">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Heart Rate bpm (optional)</label>
+                    <input type="number" id="logHR" min="40" max="220" placeholder="e.g. 145">
+                </div>
+                <div class="form-field">
+                    <label>Calories (auto-estimated)</label>
+                    <input type="number" id="logCal" min="0" placeholder="Auto">
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Notes (optional)</label>
+                <textarea id="logNotes" placeholder="How did it feel? Any personal bests?"></textarea>
+            </div>
+            <div class="modal-cta">
+                <button class="btn-log" id="logBtn" onclick="submitLog()">Log Workout 🎯</button>
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="api.js"></script>
 <script>
 requireAuth();
 
-let currentPeriod = '7d';
-let progressPlan = null;
+// ─────────────────────────────────────────────────────────────────────────────
+// FALLBACK DATA — exact mirror of seed.ts
+// Used ONLY when the API returns an empty array (DB not yet seeded).
+// Once you run `npx prisma db seed`, the API data is used and this is ignored.
+// IDs match seed.ts so logging still works even in fallback mode.
+// ─────────────────────────────────────────────────────────────────────────────
+const FALLBACK = [
+  // STRENGTH
+  { id:'ex-pushup', name:'Push-ups',          category:'STRENGTH',    caloriesPerMin:8,    difficulty:'BEGINNER',     icon:'💪', tags:['Upper Body','Chest','No Equipment'],    desc:'Classic upper body exercise targeting chest, shoulders, and triceps. Perfect for building strength.' },
+  { id:'ex-squat',  name:'Squats',            category:'STRENGTH',    caloriesPerMin:9,    difficulty:'BEGINNER',     icon:'🦵', tags:['Lower Body','Legs','No Equipment'],     desc:'Fundamental lower body movement for building leg strength, power, and mobility.' },
+  { id:'ex-lunge',  name:'Lunges',            category:'STRENGTH',    caloriesPerMin:7.5,  difficulty:'BEGINNER',     icon:'🚶', tags:['Lower Body','Balance'],                 desc:'Unilateral leg exercise that improves balance, coordination, and lower body strength.' },
+  { id:'ex-dips',   name:'Tricep Dips',       category:'STRENGTH',    caloriesPerMin:7,    difficulty:'INTERMEDIATE', icon:'💪', tags:['Upper Body','Triceps'],                 desc:'Bodyweight exercise targeting the triceps, chest, and anterior deltoids using a chair or bench.' },
+  { id:'ex-glute',  name:'Glute Bridges',     category:'STRENGTH',    caloriesPerMin:6,    difficulty:'BEGINNER',     icon:'🍑', tags:['Lower Body','Glutes','No Equipment'],   desc:'Hip extension exercise activating glutes and hamstrings. Drive hips to the ceiling.' },
+  { id:'ex-pike',   name:'Pike Push-ups',     category:'STRENGTH',    caloriesPerMin:8.5,  difficulty:'ADVANCED',     icon:'🔺', tags:['Shoulders','Advanced'],                 desc:'Advanced shoulder exercise. Form an inverted V and lower your head toward the floor.' },
+  // CARDIO
+  { id:'ex-burpee', name:'Burpees',           category:'CARDIO',      caloriesPerMin:12,   difficulty:'INTERMEDIATE', icon:'🏃', tags:['Full Body','Cardio','HIIT'],            desc:'High-intensity full-body exercise combining a squat, push-up, and jump. One of the best calorie burners.' },
+  { id:'ex-jjack',  name:'Jumping Jacks',     category:'CARDIO',      caloriesPerMin:8,    difficulty:'BEGINNER',     icon:'🤸', tags:['Cardio','Warm-up','No Equipment'],      desc:'Classic full-body cardio warm-up that elevates heart rate and improves coordination.' },
+  { id:'ex-hknees', name:'High Knees',        category:'CARDIO',      caloriesPerMin:10,   difficulty:'BEGINNER',     icon:'🏃', tags:['Cardio','Hip Flexors'],                 desc:'Running in place while driving knees up to hip level. Excellent for endurance.' },
+  { id:'ex-bkicks', name:'Butt Kicks',        category:'CARDIO',      caloriesPerMin:9,    difficulty:'BEGINNER',     icon:'🦵', tags:['Cardio','Hamstrings'],                  desc:'Jogging in place while kicking heels toward glutes. Improves hamstring flexibility.' },
+  // CORE
+  { id:'ex-plank',  name:'Plank',             category:'CORE',        caloriesPerMin:5,    difficulty:'BEGINNER',     icon:'🧘', tags:['Core','Abs','Stability'],               desc:'Isometric core exercise that builds endurance and stability throughout the entire body.' },
+  { id:'ex-mclimb', name:'Mountain Climbers', category:'CORE',        caloriesPerMin:11,   difficulty:'INTERMEDIATE', icon:'⛰️', tags:['Core','Cardio','HIIT'],                 desc:'Dynamic core and cardio exercise. From plank, alternate driving knees toward your chest at speed.' },
+  { id:'ex-crunch', name:'Crunches',          category:'CORE',        caloriesPerMin:5.5,  difficulty:'BEGINNER',     icon:'💫', tags:['Core','Abs','No Equipment'],            desc:'Classic abdominal exercise targeting the rectus abdominis. Lie on back, curl upper body upward.' },
+  { id:'ex-rtwist', name:'Russian Twists',    category:'CORE',        caloriesPerMin:6.5,  difficulty:'INTERMEDIATE', icon:'🌀', tags:['Core','Obliques','Rotation'],           desc:'Rotational core exercise targeting obliques. Sit with feet elevated, rotate side to side.' },
+  { id:'ex-lraise', name:'Leg Raises',        category:'CORE',        caloriesPerMin:5,    difficulty:'INTERMEDIATE', icon:'🦵', tags:['Core','Lower Abs'],                     desc:'Lower ab exercise. Raise straight legs to 90° then slowly lower without touching the floor.' },
+  // HIIT
+  { id:'ex-sqjmp',  name:'Jump Squats',       category:'HIIT',        caloriesPerMin:14,   difficulty:'INTERMEDIATE', icon:'⚡', tags:['HIIT','Plyometric','Legs'],             desc:'Explosive plyometric squat. Explode upward into a jump, land softly, repeat immediately.' },
+  { id:'ex-boxjmp', name:'Box Jumps',         category:'HIIT',        caloriesPerMin:13,   difficulty:'ADVANCED',     icon:'📦', tags:['HIIT','Plyometric','Power'],            desc:'Jump onto a sturdy platform to build explosive leg power. Step back down carefully.' },
+  { id:'ex-sprint', name:'Sprint Intervals',  category:'HIIT',        caloriesPerMin:16,   difficulty:'ADVANCED',     icon:'🏃', tags:['HIIT','Cardio','Endurance'],            desc:'Alternate max effort sprints with walking recovery. Massively effective for fat loss.' },
+  // FLEXIBILITY
+  { id:'ex-ddog',   name:'Downward Dog',      category:'FLEXIBILITY', caloriesPerMin:3.5,  difficulty:'BEGINNER',     icon:'🧘', tags:['Yoga','Stretch','Recovery'],            desc:'Foundational yoga pose stretching hamstrings, calves, and shoulders while strengthening arms.' },
+  { id:'ex-child',  name:"Child's Pose",      category:'FLEXIBILITY', caloriesPerMin:2,    difficulty:'BEGINNER',     icon:'🌿', tags:['Yoga','Recovery','Cool-down'],          desc:'Restorative pose gently stretching hips, thighs, and lower back. Perfect for cool-down.' },
+  { id:'ex-hipfx',  name:'Hip Flexor Stretch',category:'FLEXIBILITY', caloriesPerMin:2.5,  difficulty:'BEGINNER',     icon:'🧘', tags:['Stretch','Hips','Recovery'],            desc:'Kneeling lunge stretch opening up hip flexors that get tight from prolonged sitting.' },
+];
 
-async function loadProgress() {
-    populateSidebarUser();
-    // Fetch plan for gating advanced analytics
-    const { plan } = await fetchActivePlan();
-    progressPlan = plan;
-    const hasAdvanced = plan?.hasAdvancedAnalytics || plan?.slug === 'pro' || plan?.slug === 'elite';
-    // Gate chart section for free users
-    const chartSectionEl = document.getElementById('trendChart')?.closest('section') || document.getElementById('trendChart')?.parentElement;
-    if (!hasAdvanced && chartSectionEl) {
-        chartSectionEl.style.position = 'relative';
-        chartSectionEl.style.overflow = 'hidden';
-        const gate = document.createElement('div');
-        gate.id = 'chartGate';
-        gate.style.cssText = 'position:absolute;inset:0;background:rgba(3,3,3,0.88);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;z-index:10;border-radius:inherit;text-align:center;padding:1.5rem';
-        gate.innerHTML = `
-            <span style="font-size:2rem">📊</span>
-            <strong style="font-family:'Oswald',sans-serif;font-size:1.2rem;letter-spacing:1px">ADVANCED ANALYTICS</strong>
-            <p style="color:#888;font-size:.85rem;max-width:260px;line-height:1.5">Trend charts and detailed performance analysis are available on <strong style="color:#D4AF37">Pro & Elite</strong> plans.</p>
-            <a href="subscription.html" style="padding:.65rem 1.4rem;background:linear-gradient(135deg,#D4AF37,#b8860b);color:#000;font-weight:800;font-family:'Oswald',sans-serif;letter-spacing:2px;border-radius:10px;text-decoration:none;font-size:.85rem">⚡ UPGRADE TO PRO</a>`;
-        chartSectionEl.appendChild(gate);
+let allExercises = [];
+let currentFilter = 'all';
+let isFallback = false;
+let currentPlan = null;   // set by initPlanGating()
+let monthlyLogCount = 0;  // workouts logged this month
+
+// ── Plan gating ───────────────────────────────────────────────────────────────
+async function initPlanGating() {
+    const { plan, sub } = await fetchActivePlan();
+    currentPlan = plan;
+
+    // Fetch monthly workout count for free users
+    const isFree = !plan || plan.slug === 'free';
+    if (isFree) {
+        try {
+            const statsRes = await ProgressAPI.getStats('30d');
+            const s = statsRes?.data?.stats || statsRes?.data || {};
+            monthlyLogCount = s.totalWorkouts ?? s.workoutCount ?? 0;
+        } catch {}
     }
+
+    renderPlanBanner(plan, sub);
+    await updatePlanBadge();
+}
+
+function renderPlanBanner(plan, sub) {
+    const banner = document.getElementById('planBanner');
+    if (!banner) return;
+    const slug = plan?.slug || 'free';
+    if (slug === 'free') {
+        const remaining = Math.max(0, 10 - monthlyLogCount);
+        banner.style.display = 'flex';
+        banner.innerHTML = `
+            <span>🏃 <strong>${remaining} workout${remaining !== 1 ? 's' : ''}</strong> remaining this month on <strong>Free</strong></span>
+            <a href="subscription.html" style="margin-left:auto;padding:.35rem .9rem;background:linear-gradient(135deg,#D4AF37,#b8860b);color:#000;border-radius:8px;font-weight:700;font-size:.8rem;text-decoration:none;white-space:nowrap">⚡ UPGRADE</a>`;
+        if (remaining === 0) {
+            banner.style.background = 'rgba(248,113,113,0.12)';
+            banner.style.borderColor = 'rgba(248,113,113,0.3)';
+        }
+    } else {
+        const label = slug === 'elite' ? '👑 Elite' : '⚡ Pro';
+        const trialNote = sub?.status === 'TRIALING' ? ' — Trial Active' : '';
+        banner.style.display = 'flex';
+        banner.innerHTML = `<span>${label}<strong style="color:#D4AF37">${trialNote}</strong> · Unlimited workouts</span>`;
+        banner.style.background = 'rgba(212,175,55,0.07)';
+        banner.style.borderColor = 'rgba(212,175,55,0.2)';
+    }
+}
+
+function canLogWorkout() {
+    if (!currentPlan || currentPlan.slug !== 'free') return true;
+    const limit = currentPlan.maxWorkoutsPerMonth ?? 10;
+    return monthlyLogCount < limit;
+}
+
+// ── Load exercises: real DB first, fallback if empty/error ──────────────────
+async function loadExercises() {
+    // Show grid loading text immediately (already in HTML as default)
+    // Safety timer: if EVERYTHING fails and finally never runs, still render after 10s
+    const safetyTimer = setTimeout(() => {
+        if (!allExercises.length) {
+            allExercises = FALLBACK;
+            isFallback = true;
+            document.getElementById('devBanner').classList.add('visible');
+            renderExercises(allExercises);
+            LoadingManager.hide();
+        }
+    }, 10000);
+
     try {
-        LoadingManager.show('Loading progress...');
+        const res = await WorkoutsAPI.getExercises({ limit: 100 });
 
-        const [statsRes, historyRes, streakRes, achievementsRes] = await Promise.all([
-            ProgressAPI.getStats(currentPeriod),
-            ProgressAPI.getWorkoutHistory(30),
-            ProgressAPI.getStreaks(),
-            ProgressAPI.getAchievements(),
-        ]);
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+            // ✅ Real data from DB
+            allExercises = res.data;
+            isFallback   = false;
 
-        if (statsRes.success && statsRes.data)             displayStats(statsRes.data?.stats || statsRes.data);
-        if (historyRes.success && historyRes.data) {
-            // Normalise: backend may return { logs:[...] }, { workouts:[...] }, or flat array
-            const _hist = Array.isArray(historyRes.data) ? historyRes.data
-                        : Array.isArray(historyRes.data?.logs) ? historyRes.data.logs
-                        : Array.isArray(historyRes.data?.workouts) ? historyRes.data.workouts
-                        : Array.isArray(historyRes.data?.history) ? historyRes.data.history
-                        : [];
-            displayHistory(_hist);
-            renderTrendChart(_hist);
-        }
-        if (streakRes.success && streakRes.data)           displayStreak(streakRes.data);
-        // Handle all API response shapes: array, {achievements:[...]}, etc.
-        const _achRaw = achievementsRes.success
-            ? (Array.isArray(achievementsRes.data) ? achievementsRes.data
-               : achievementsRes.data?.achievements || achievementsRes.achievements || [])
-            : [];
-        if (_achRaw.length) {
-            notifyNewAchievements(_achRaw);
-            displayAchievements(_achRaw);
+        } else if (res && res.success && Array.isArray(res.data) && res.data.length === 0) {
+            // DB seeded but empty, or truly empty
+            allExercises = FALLBACK;
+            isFallback   = true;
+            document.getElementById('devBanner').classList.add('visible');
+
         } else {
-            document.getElementById('achievementsGrid').innerHTML =
-                '<p class="chart-empty-state">COMPLETE WORKOUTS TO UNLOCK ACHIEVEMENTS</p>';
+            // success:false or unexpected shape
+            console.warn('[loadExercises] Unexpected API response:', res);
+            allExercises = FALLBACK;
+            isFallback   = true;
+            document.getElementById('devBanner').classList.add('visible');
         }
 
-    } catch (error) {
-        Toast.error('Failed to load progress data');
-        console.error(error);
+    } catch (err) {
+        console.error('[loadExercises] Error:', err);
+        allExercises = FALLBACK;
+        isFallback   = true;
+        document.getElementById('devBanner').classList.add('visible');
+
+        if (err.message && err.message.includes('timed out')) {
+            Toast.warning('Server took too long to respond — showing sample data');
+        } else if (err.message && (err.message.includes('401') || err.message.includes('expired'))) {
+            Toast.error('Session expired. Please log in again.');
+        } else if (err.message && err.message.toLowerCase().includes('network')) {
+            Toast.error('No connection to server — showing sample data');
+        } else {
+            Toast.warning('Could not reach server — showing sample data');
+        }
+
     } finally {
+        clearTimeout(safetyTimer);
         LoadingManager.hide();
+        // ✅ renderExercises ALWAYS fires here — guaranteed
+        renderExercises(allExercises);
     }
 }
 
-// FIX #15: updateStatCard uses data-stat attribute — which now EXISTS in the HTML
-function updateStatCard(dataAttr, value) {
-    const el = document.querySelector(`[data-stat="${dataAttr}"]`);
-    if (el) el.textContent = value;
-}
-
-function displayStats(stats) {
-    updateStatCard('total-workouts', stats.totalWorkouts || 0);
-    // FIX #3/#16: formatDuration takes minutes; totalDuration from API is minutes
-    updateStatCard('total-duration',  formatDuration(stats.totalDuration || 0));
-    updateStatCard('total-calories',  Math.round(stats.totalCalories || 0).toLocaleString());
-    updateStatCard('avg-duration',    formatDuration(stats.avgDuration || 0));
-
-    // Render frequency chart (workouts per day grouped by week)
-    if (stats.byDate) renderFrequencyChart(stats.byDate);
-    if (stats.byCategory) renderCategoryChart(stats.byCategory);
-}
-
-// renderFrequencyChart → replaced by Chart.js version below
-
-// renderCategoryChart → replaced by Chart.js version below
-
-// FIX #16: column order matches table headers (Date | Exercise | Category | Duration | Sets×Reps | Calories)
-function displayHistory(history) {
-    const tbody = document.getElementById('historyTbody');
-    if (!history || history.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No workout history yet. Start logging workouts!</td></tr>';
+// ── Render — your original card design, driven by API or fallback data ───────
+function renderExercises(list) {
+    const grid = document.getElementById('exerciseGrid');
+    if (!list.length) {
+        grid.innerHTML = '<div class="empty-state">No exercises match your search.</div>';
         return;
     }
-    const catClass = (cat) => {
-        const c = (cat || '').toLowerCase();
-        if (c.includes('cardio')) return 'cardio';
-        if (c.includes('strength')) return 'strength';
-        if (c.includes('core')) return 'core';
-        if (c.includes('hiit')) return 'hiit';
-        return '';
-    };
-    tbody.innerHTML = history.map(log => {
-        const cat = log.exercise?.category || '—';
-        const setsReps = (log.sets && log.reps) ? `${log.sets} × ${log.reps}` : (log.sets ? `${log.sets} sets` : '—');
-        return `
-        <tr>
-            <td>${formatDate(log.date)}</td>
-            <td class="workout-name">${escHtml(log.exercise?.name || '—')}</td>
-            <td><span class="workout-badge ${catClass(cat)}">${cat}</span></td>
-            <td>${formatDuration(log.duration)}</td>  <!-- FIX #16: log.duration is minutes -->
-            <td>${setsReps}</td>
-            <td>${log.caloriesBurned ? Math.round(log.caloriesBurned) + ' kcal' : '—'}</td>
-        </tr>`;
-    }).join('');
-}
 
-// FIX #20: streak targets data-stat="current-streak" and data-stat="longest-streak" which now EXIST
-function displayStreak(streak) {
-    updateStatCard('current-streak', streak.currentStreak || 0);
-    updateStatCard('longest-streak', streak.longestStreak || 0);
-}
+    grid.innerHTML = list.map((ex, i) => {
+        // Fallback items have extra fields; API items need derivation
+        const icon   = ex.icon  || getCatIcon(ex.category);
+        const diff   = ex.difficulty || deriveLevel(ex.caloriesPerMin);
+        const tags   = ex.tags  || [ex.category];
+        const desc   = ex.desc  || ex.description || '';
+        const calTxt = ex.caloriesPerMin
+            ? `🔥 ~${Math.round(ex.caloriesPerMin * 10)} cal / 10 min`
+            : '';
 
-// FIX #17: targets #achievementsGrid which now EXISTS in the HTML
-function displayAchievements(achievements) {
-    const grid = document.getElementById('achievementsGrid');
-    if (!achievements || achievements.length === 0) {
-        grid.innerHTML = '<p class="empty-state">Complete workouts to unlock achievements!</p>';
-        return;
-    }
-    const known = new Set(getKnownUnlocked());
-    const sorted = [...achievements].sort((a, b) => {
-        if (a.unlocked && !b.unlocked) return -1;
-        if (!a.unlocked && b.unlocked) return 1;
-        if (a.unlocked && b.unlocked) return new Date(b.unlockedAt) - new Date(a.unlockedAt);
-        return (a.points || 0) - (b.points || 0);
-    });
-    grid.innerHTML = sorted.map(a => {
-        const _ul = a.unlocked || a.isUnlocked || a.earned || false;
-        const isNew = _ul && !known.has(a.id);
         return `
-        <div class="achievement-item ${_ul ? 'unlocked' : 'locked'} ${isNew ? 'newly-unlocked' : ''}">
-            <div class="achievement-icon-wrap">${_ul ? (a.icon || '🏆') : '🔒'}</div>
-            <div style="flex:1;min-width:0;">
-                <div class="achievement-name">${escHtml(a.name || a.title || 'Achievement')}</div>
-                <div class="achievement-desc">${escHtml(a.description)}</div>
-                <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;flex-wrap:wrap;">
-                    <span class="achievement-pts">${a.points} pts</span>
-                    ${_ul && (a.unlockedAt || a.earnedAt)
-                        ? `<span style="color:var(--text-secondary);font-size:0.75rem;">· Unlocked ${formatDate(a.unlockedAt||a.earnedAt)}</span>`
-                        : ''}
-                    ${!a.unlocked && a.requirement
-                        ? `<span style="color:var(--text-secondary);font-size:0.75rem;">· ${escHtml(a.requirement)}</span>`
-                        : ''}
+        <div class="exercise-card">
+            <div class="exercise-image">
+                <span>${icon}</span>
+                <div class="difficulty-badge difficulty-${diff.toLowerCase()}">${diff}</div>
+            </div>
+            <div class="exercise-content">
+                <h3 class="exercise-title">${esc(ex.name)}</h3>
+                <div class="exercise-meta">
+                    <span>📂 ${ex.category}</span>
+                    ${calTxt ? `<span>${calTxt}</span>` : ''}
+                </div>
+                <p class="exercise-description">${esc(desc)}</p>
+                <div class="exercise-tags">
+                    ${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn-action btn-start"
+                        onclick="goToSession('${ex.id}','${escAttr(ex.name)}',${ex.caloriesPerMin||0},'${ex.category||''}')">
+                        Start Exercise
+                    </button>
+                    <button class="btn-action btn-save"
+                        onclick="openModal('${ex.id}','${escAttr(ex.name)}',${ex.caloriesPerMin||0},'${ex.category||''}')">
+                        Log Quick
+                    </button>
                 </div>
             </div>
         </div>`;
     }).join('');
 }
 
-// FIX #19: wire up time-period buttons
-document.querySelector('.time-filters').addEventListener('click', (e) => {
-    const btn = e.target.closest('.time-btn');
+function getCatIcon(cat) {
+    return {STRENGTH:'💪',CARDIO:'🏃',CORE:'🔥',HIIT:'⚡',FLEXIBILITY:'🧘',YOGA:'🧘'}[(cat||'').toUpperCase()] || '💪';
+}
+function deriveLevel(cal) {
+    if (!cal) return 'Beginner';
+    if (cal >= 12) return 'Advanced';
+    if (cal >= 8)  return 'Intermediate';
+    return 'Beginner';
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s||'').replace(/'/g,"\\'"); }
+
+// ── Search ───────────────────────────────────────────────────────────────────
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    const q = e.target.value.trim();
+    if (!q) { applyFilter(allExercises); return; }
+    if (q.length < 2) return;
+
+    searchTimer = setTimeout(async () => {
+        if (isFallback) {
+            // Client-side search on fallback data
+            applyFilter(allExercises.filter(ex =>
+                ex.name.toLowerCase().includes(q.toLowerCase()) ||
+                (ex.desc || ex.description || '').toLowerCase().includes(q.toLowerCase()) ||
+                (ex.tags||[ex.category]).some(t => t.toLowerCase().includes(q.toLowerCase()))
+            ));
+        } else {
+            try {
+                const res = await WorkoutsAPI.searchExercises(q);
+                if (res.success) renderExercises(
+                    currentFilter === 'all' ? res.data
+                    : res.data.filter(ex => (ex.category||'').toUpperCase() === currentFilter)
+                );
+            } catch { /* silent */ }
+        }
+    }, 300);
+});
+
+// ── Category filter tabs ─────────────────────────────────────────────────────
+document.getElementById('filterTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
     if (!btn) return;
-    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    currentPeriod = btn.dataset.period;
-    loadProgress();
+    currentFilter = btn.dataset.filter;
+    document.getElementById('searchInput').value = '';
+    applyFilter(allExercises);
 });
 
-function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function applyFilter(list) {
+    if (currentFilter === 'all') { renderExercises(list); return; }
+    renderExercises(list.filter(ex => (ex.category||'').toUpperCase() === currentFilter));
 }
 
-function handleLogout() {
-    showConfirm({
-        icon: '🚪',
-        title: 'LOG OUT',
-        message: 'Are you sure you want to log out of FlowFit Elite?',
-        okText: 'LOG OUT',
-        cancelText: 'Stay',
-        danger: true,
-        onOk: async () => {
-            LoadingManager.show('Logging out...');
-            await AuthAPI.logout();
-        }
-    });
+// ── Log Workout Modal ────────────────────────────────────────────────────────
+function openModal(id, name, calPerMin, category) {
+    if (!canLogWorkout()) {
+        showUpgradePrompt('Unlimited Workouts', 'pro');
+        return;
+    }
+    document.getElementById('modalExId').value     = id;
+    document.getElementById('modalCalPerMin').value = calPerMin;
+    document.getElementById('modalTitle').textContent    = name;
+    document.getElementById('modalSubtitle').textContent = `${category} · ${calPerMin} cal/min`;
+    ['logDuration','logSets','logReps','logHR','logCal','logNotes']
+        .forEach(f => document.getElementById(f).value = '');
+    document.getElementById('logDifficulty').value = '';
+    document.getElementById('logModal').classList.add('active');
+    document.getElementById('logDuration').focus();
 }
 
-document.addEventListener('DOMContentLoaded', () => { populateSidebarUser(); updatePlanBadge(); loadProgress(); });
+function closeModal() { document.getElementById('logModal').classList.remove('active'); }
 
+// Auto-estimate calories
+document.getElementById('logDuration').addEventListener('input', () => {
+    const min = parseInt(document.getElementById('logDuration').value) || 0;
+    const cpm = parseFloat(document.getElementById('modalCalPerMin').value) || 0;
+    const calField = document.getElementById('logCal');
+    if (min > 0 && cpm > 0 && !calField.dataset.edited) {
+        calField.value = Math.round(cpm * min);
+    }
+});
+document.getElementById('logCal').addEventListener('input', e => {
+    e.target.dataset.edited = e.target.value ? '1' : '';
+});
 
-/* ══════════════════════════════════════════════════════
-   LIVE ACHIEVEMENT ENGINE
-   - Fetches after page load & on window focus (re-visit)
-   - Detects newly unlocked vs previously known
-   - Shows toast notification for each new unlock
-   - Syncs dashboard medal count via localStorage
-   ══════════════════════════════════════════════════════ */
+async function submitLog() {
+    const duration = parseInt(document.getElementById('logDuration').value);
+    if (!duration || duration <= 0) { Toast.error('Please enter a duration'); return; }
 
-const ACHIEVEMENT_STORE_KEY = 'ff_unlocked_achievements';
+    const btn = document.getElementById('logBtn');
+    btn.disabled = true; btn.textContent = 'Logging...';
 
-function getKnownUnlocked() {
-    try { return JSON.parse(localStorage.getItem(ACHIEVEMENT_STORE_KEY) || '[]'); }
-    catch { return []; }
-}
-
-function saveKnownUnlocked(ids) {
-    localStorage.setItem(ACHIEVEMENT_STORE_KEY, JSON.stringify(ids));
-}
-
-function notifyNewAchievements(allAchievements) {
-    const known   = new Set(getKnownUnlocked());
-    const freshly = allAchievements.filter(a => (a.unlocked||a.isUnlocked||a.earned) && !known.has(a.id));
-
-    freshly.forEach((a, i) => {
-        setTimeout(() => {
-            showAchievementToast(a);
-        }, i * 700); // stagger if multiple at once
-    });
-
-    // Update stored set
-    const nowUnlocked = allAchievements.filter(a => a.unlocked||a.isUnlocked||a.earned).map(a => a.id);
-    saveKnownUnlocked(nowUnlocked);
-
-    // Broadcast to dashboard via localStorage event
-    localStorage.setItem('ff_achievement_update', Date.now().toString());
-
-    return freshly.length;
-}
-
-function showAchievementToast(achievement) {
-    const existing = document.querySelectorAll('.achievement-toast');
-    const offset   = existing.length * 80;
-
-    const el = document.createElement('div');
-    el.className = 'achievement-toast';
-    el.style.bottom = `${24 + offset}px`;
-    el.innerHTML = `
-        <div class="ach-toast-icon">${achievement.icon || '🏆'}</div>
-        <div class="ach-toast-body">
-            <div class="ach-toast-label">ACHIEVEMENT UNLOCKED</div>
-            <div class="ach-toast-name">${achievement.name}</div>
-            <div class="ach-toast-pts">+${achievement.points} pts</div>
-        </div>`;
-    document.body.appendChild(el);
-
-    requestAnimationFrame(() => el.classList.add('ach-toast-show'));
-
-    setTimeout(() => {
-        el.classList.remove('ach-toast-show');
-        setTimeout(() => el.remove(), 400);
-    }, 4500);
-}
-
-async function refreshAchievements(silent = false) {
     try {
-        const res = await ProgressAPI.getAchievements();
-        if (!res.success || !res.data) return;
-
-        const achievements = res.data;
-        if (!silent) {
-            notifyNewAchievements(achievements);
-        }
-        displayAchievements(achievements);
-    } catch (e) {
-        console.error('Achievement refresh error:', e);
+        await ProgressAPI.logWorkout({
+            exerciseId:    document.getElementById('modalExId').value,
+            duration,                                                          // minutes — matches backend
+            sets:          document.getElementById('logSets').value  || undefined,
+            reps:          document.getElementById('logReps').value  || undefined,
+            heartRate:     document.getElementById('logHR').value    || undefined,
+            caloriesBurned:document.getElementById('logCal').value   || undefined,
+            difficulty:    document.getElementById('logDifficulty').value || undefined,
+            notes:         document.getElementById('logNotes').value || undefined,
+        });
+        Toast.success('Workout logged! 🎉');
+        monthlyLogCount++;
+        renderPlanBanner(currentPlan, null);
+        closeModal();
+    } catch (err) {
+        Toast.error(err.message || 'Failed to log workout');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Log Workout 🎯';
     }
 }
 
-// Re-check achievements whenever user returns to the tab
-// (handles case where they logged a workout in another tab/page)
-let _lastFocusCheck = 0;
-window.addEventListener('focus', () => {
-    const now = Date.now();
-    if (now - _lastFocusCheck > 30000) { // throttle: max once per 30s
-        _lastFocusCheck = now;
-        refreshAchievements(false);
-    }
-});
+function openExercise(id, ex) {
+    // Store in sessionStorage so exercise.html can access without a round trip
+    try { sessionStorage.setItem('currentExercise', JSON.stringify(ex)); } catch {}
+    window.location.href = `exercise.html?id=${id}`;
+}
 
-// Also listen for storage events from other pages (workouts page triggers this)
-window.addEventListener('storage', (e) => {
-    if (e.key === 'ff_achievement_update') {
-        refreshAchievements(false);
-    }
-});
+function saveExercise(id, name) {
+    Toast.info(`Save feature coming soon for "${name}"`);
+}
 
-
-
-
-
-
-/* ── CHART.JS LIVE CHARTS ────────────────────────── */
-const CHART_DEFAULTS = {
-    color: { grid: 'rgba(255,255,255,0.05)', tick: '#666', border: 'rgba(255,255,255,0.08)' },
-    tooltip: {
-        backgroundColor: '#0e0e12',
-        borderColor: 'rgba(212,175,55,0.35)',
-        borderWidth: 1,
-        titleColor: '#D4AF37',
-        bodyColor: '#ccc',
-        padding: 10,
-    }
-};
-
-let _freqChart = null, _catChart = null, _trendChart = null;
-
-function renderFrequencyChart(byDate) {
-    const wrap = document.getElementById('frequencyChart');
-    if (!wrap) return;
-    if (!byDate || !Object.keys(byDate).length) {
-        wrap.innerHTML = '<div class="chart-empty-state">NO WORKOUT DATA FOR THIS PERIOD</div>';
+function goToSession(id, name, cal, category) {
+    if (!canLogWorkout()) {
+        showUpgradePrompt('Unlimited Workouts', 'pro');
         return;
     }
-    wrap.innerHTML = '<canvas></canvas>';
-    const canvas = wrap.querySelector('canvas');
-    const sorted = Object.entries(byDate).sort(([a],[b])=>a.localeCompare(b)).slice(-21);
-    const labels = sorted.map(([d])=>{
-        const dt=new Date(d+'T00:00:00');
-        return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    });
-    const data = sorted.map(([,v])=>v);
-    if (_freqChart) { _freqChart.destroy(); _freqChart=null; }
-    _freqChart = new Chart(canvas, {
-        type: 'bar',
-        data: {
-            labels,
-            datasets:[{
-                label:'Workouts', data,
-                backgroundColor:'rgba(212,175,55,0.45)',
-                borderColor:'rgba(212,175,55,0.9)',
-                borderWidth:2, borderRadius:7, borderSkipped:false,
-                hoverBackgroundColor:'rgba(212,175,55,0.7)',
-            }]
-        },
-        options:{
-            responsive:true, maintainAspectRatio:false,
-            plugins:{
-                legend:{display:false},
-                tooltip:{ ...CHART_DEFAULTS.tooltip,
-                    callbacks:{label:c=>` ${c.parsed.y} workout${c.parsed.y!==1?'s':''}`}
-                }
-            },
-            scales:{
-                x:{ grid:{color:CHART_DEFAULTS.color.grid}, ticks:{color:CHART_DEFAULTS.color.tick,font:{size:10}}, border:{color:CHART_DEFAULTS.color.border} },
-                y:{ beginAtZero:true, grid:{color:CHART_DEFAULTS.color.grid}, ticks:{color:CHART_DEFAULTS.color.tick,font:{size:10},stepSize:1,precision:0}, border:{color:CHART_DEFAULTS.color.border} }
-            },
-            animation:{duration:700, easing:'easeOutQuart'}
-        }
-    });
+    window.location.href = `workout-session.html?id=${id}&name=${encodeURIComponent(name)}&cal=${cal}&category=${encodeURIComponent(category)}`;
 }
 
-const CAT_PALETTE = {
-    STRENGTH:   {bg:'rgba(212,175,55,0.65)',  border:'rgba(212,175,55,1)'},
-    CARDIO:     {bg:'rgba(0,242,254,0.55)',    border:'rgba(0,242,254,1)'},
-    CORE:       {bg:'rgba(74,222,128,0.55)',   border:'rgba(74,222,128,1)'},
-    HIIT:       {bg:'rgba(255,62,62,0.55)',    border:'rgba(255,62,62,1)'},
-    FLEXIBILITY:{bg:'rgba(167,139,250,0.55)', border:'rgba(167,139,250,1)'},
-};
-function renderCategoryChart(byCategory) {
-    const wrap = document.getElementById('categoryChart');
-    if (!wrap) return;
-    if (!byCategory || !Object.keys(byCategory).length) {
-        wrap.innerHTML = '<div class="chart-empty-state">NO CATEGORY DATA YET</div>';
-        return;
-    }
-    wrap.innerHTML = '<canvas></canvas>';
-    const canvas = wrap.querySelector('canvas');
-    const entries = Object.entries(byCategory).sort(([,a],[,b])=>b-a);
-    const labels  = entries.map(([k])=>k.charAt(0)+k.slice(1).toLowerCase());
-    const data    = entries.map(([,v])=>v);
-    const bgs     = entries.map(([k])=>(CAT_PALETTE[k]||CAT_PALETTE.STRENGTH).bg);
-    const borders = entries.map(([k])=>(CAT_PALETTE[k]||CAT_PALETTE.STRENGTH).border);
-    if (_catChart) { _catChart.destroy(); _catChart=null; }
-    _catChart = new Chart(canvas, {
-        type:'doughnut',
-        data:{ labels, datasets:[{data, backgroundColor:bgs, borderColor:borders, borderWidth:2, hoverOffset:10}]},
-        options:{
-            responsive:true, maintainAspectRatio:false, cutout:'62%',
-            plugins:{
-                legend:{position:'bottom', labels:{color:'#999',font:{size:11},padding:14,usePointStyle:true,pointStyleWidth:10}},
-                tooltip:{ ...CHART_DEFAULTS.tooltip,
-                    callbacks:{label:c=>` ${c.parsed} workout${c.parsed!==1?'s':''}`}
-                }
-            },
-            animation:{animateRotate:true, duration:800, easing:'easeOutQuart'}
-        }
-    });
-}
+document.getElementById('logModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('logModal')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-function renderTrendChart(history) {
-    const wrap = document.getElementById('trendChart');
-    if (!wrap || !history || !history.length) return;
-    wrap.innerHTML = '<canvas></canvas>';
-    const canvas = wrap.querySelector('canvas');
-    const sorted = [...history].sort((a,b)=>new Date(a.date||a.createdAt||0)-new Date(b.date||b.createdAt||0)).slice(-28);
-    const labels = sorted.map(l => {
-        const raw = l.date || l.createdAt || l.completedAt || '';
-        // Full ISO strings already have T/Z — don't append again (causes Invalid Date)
-        const d = (raw.includes('T') || raw.includes('Z'))
-            ? new Date(raw)
-            : new Date(raw + 'T12:00:00Z');  // noon UTC avoids DST midnight shift
-        return isNaN(d) ? '\u2014' : d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
-    });
-    const cals = sorted.map(l=>Math.round(l.caloriesBurned||0));
-    const mins = sorted.map(l=>l.duration||0);
-    if (_trendChart) { _trendChart.destroy(); _trendChart=null; }
-    _trendChart = new Chart(canvas, {
-        type:'line',
-        data:{ labels,
-            datasets:[
-                { label:'Calories', data:cals, borderColor:'#D4AF37', backgroundColor:'rgba(212,175,55,0.08)',
-                  borderWidth:2.5, pointBackgroundColor:'#D4AF37', pointRadius:3, pointHoverRadius:5,
-                  tension:0.4, fill:true, yAxisID:'yCal' },
-                { label:'Duration (min)', data:mins, borderColor:'#00f2fe', backgroundColor:'rgba(0,242,254,0.06)',
-                  borderWidth:2.5, pointBackgroundColor:'#00f2fe', pointRadius:3, pointHoverRadius:5,
-                  tension:0.4, fill:true, yAxisID:'yMin' }
-            ]
-        },
-        options:{
-            responsive:true, maintainAspectRatio:false,
-            interaction:{mode:'index', intersect:false},
-            plugins:{
-                legend:{display:false},
-                tooltip:{...CHART_DEFAULTS.tooltip}
-            },
-            scales:{
-                x:{ grid:{color:CHART_DEFAULTS.color.grid}, ticks:{color:CHART_DEFAULTS.color.tick,font:{size:10},maxTicksLimit:8}, border:{color:CHART_DEFAULTS.color.border} },
-                yCal:{ type:'linear', position:'left', beginAtZero:true,
-                    title: { display: true, text: 'Calories (kcal)', color: '#D4AF37', font: { size: 11, weight: '600' } },
-                    grid:{color:CHART_DEFAULTS.color.grid},
-                    ticks:{color:'#D4AF37',font:{size:10}},
-                    border:{color:'rgba(212,175,55,0.2)'} },
-                yMin:{ type:'linear', position:'right', beginAtZero:true,
-                    grid:{drawOnChartArea:false},
-                    ticks:{color:'#00f2fe',font:{size:10}},
-                    border:{color:'rgba(0,242,254,0.2)'} }
-            },
-            animation:{duration:900, easing:'easeOutQuart'}
-        }
-    });
-}
+// Fire on DOMContentLoaded — populateSidebarUser first, then fetch exercises
+document.addEventListener('DOMContentLoaded', () => {
+    populateSidebarUser();
+    // Small delay so api.js tokens are confirmed ready (esp. on mobile)
+    setTimeout(() => {
+        initPlanGating();
+        loadExercises();
+    }, 50);
+});
 
 
 function showConfirm({ icon = '⚠️', title = 'Are you sure?', message = '', okText = 'Confirm', cancelText = 'Cancel', danger = false, onOk }) {
@@ -1927,6 +1684,14 @@ function showConfirm({ icon = '⚠️', title = 'Are you sure?', message = '', o
     backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
     document.addEventListener('keydown', function esc(e) {
         if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+}
+function handleLogout() {
+    showConfirm({
+        icon: '🚪', title: 'LOG OUT',
+        message: 'Are you sure you want to log out of FlowFit Elite?',
+        okText: 'LOG OUT', cancelText: 'Stay', danger: true,
+        onOk: async () => { LoadingManager.show('Logging out...'); await AuthAPI.logout(); }
     });
 }
 
