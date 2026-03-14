@@ -560,7 +560,8 @@ function updateNavigation() {
 }
 
 // FIX #9/#14: Populate sidebar user info from real stored user — call on every dashboard page
-function populateSidebarUser() {
+const SidebarUser = {
+    populateSidebarUser() {
     const user = TokenManager.getUser();
     if (!user) return;
     const name = user.name || user.email || 'User';
@@ -617,6 +618,7 @@ async _refreshBadgeFromAPI() {
         }
     } catch (_) { /* silent — badge stays as token value */ }
 }
+};
 
 async function handleLogout() {
     // FIX: removed browser confirm() — each page overrides this with its own
