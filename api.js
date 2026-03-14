@@ -598,7 +598,7 @@ async _refreshBadgeFromAPI() {
             ? (TokenManager.getAccessToken?.() || TokenManager.getToken?.() || '')
             : '';
         if (!token) return;
-        const res = await fetch(API_BASE + '/subscriptions/current', {
+        const res = await fetch(API_CONFIG.baseURL + '/subscriptions/current', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         if (!res.ok) return;
