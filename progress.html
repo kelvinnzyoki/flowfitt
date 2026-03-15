@@ -1556,13 +1556,26 @@ body.sidebar-open .sidebar {
 </div>
 
 <!-- FIX #21: api.js loaded ONCE only -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="api.js"></script>
 <script>
 var _LM = {
     show: function(msg) { try { if (typeof LoadingManager !== 'undefined') LoadingManager.show(msg); } catch(_) {} },
     hide: function()    { try { if (typeof LoadingManager !== 'undefined') LoadingManager.hide();    } catch(_) {} }
 };
+
+
+// ── CHART.JS SAFETY GUARD (prevents the #1 crash) ──
+if (typeof Chart === 'undefined') {
+    console.warn('Chart.js failed to load — charts disabled');
+    window.renderFrequencyChart = () => {};
+    window.renderCategoryChart = () => {};
+    window.renderTrendChart = () => {};
+}
+
+    
 
 try { requireAuth(); } catch(e) { console.warn("requireAuth:", e); }
 
@@ -1571,7 +1584,14 @@ let progressPlan = null;
 
 async function loadProgress() {
     try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
-    try { if (typeof LoadingManager !== 'undefined') _LM.show('Loading progress...'); } catch(_) {}
+    try { if (typeof LoadingManager !== 'undefined') _LM.show('Loading progress...');
+        
+        setTimeout(() => {
+        _LM.hide();
+        console.warn('Loader force-hidden after 15s safety timeout');
+    }, 15000);
+        
+        } catch(_) {}
     const _safetyTimer = setTimeout(function() {
         _LM.hide();
     }, 12000);
@@ -1760,6 +1780,9 @@ document.querySelector('.time-filters').addEventListener('click', (e) => {
     document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentPeriod = btn.dataset.period;
+
+    // Extra loader safety
+setTimeout(() => { _LM.hide(); }, 15000);
     loadProgress();
 });
 
@@ -1913,6 +1936,11 @@ const CHART_DEFAULTS = {
 let _freqChart = null, _catChart = null, _trendChart = null;
 
 function renderFrequencyChart(byDate) {
+    if (typeof Chart === 'undefined') {
+        const wrap = document.getElementById('frequencyChart');
+        if (wrap) wrap.innerHTML = '<div class="chart-empty-state">Charts require internet connection</div>';
+        return;
+    }
     const wrap = document.getElementById('frequencyChart');
     if (!wrap) return;
     if (!byDate || !Object.keys(byDate).length) {
@@ -1965,6 +1993,11 @@ const CAT_PALETTE = {
     FLEXIBILITY:{bg:'rgba(167,139,250,0.55)', border:'rgba(167,139,250,1)'},
 };
 function renderCategoryChart(byCategory) {
+    if (typeof Chart === 'undefined') {
+        const wrap = document.getElementById('categoryChart');
+        if (wrap) wrap.innerHTML = '<div class="chart-empty-state">Charts require internet connection</div>';
+        return;
+    }
     const wrap = document.getElementById('categoryChart');
     if (!wrap) return;
     if (!byCategory || !Object.keys(byCategory).length) {
@@ -1996,6 +2029,12 @@ function renderCategoryChart(byCategory) {
 }
 
 function renderTrendChart(history) {
+
+    if (typeof Chart === 'undefined') {
+        const wrap = document.getElementById('trendChart');
+        if (wrap) wrap.innerHTML = '<div class="chart-empty-state">Charts require internet connection</div>';
+        return;
+    }
     const wrap = document.getElementById('trendChart');
     if (!wrap || !history || !history.length) return;
     wrap.innerHTML = '<canvas></canvas>';
