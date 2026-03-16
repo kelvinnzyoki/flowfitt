@@ -1676,21 +1676,25 @@ function initLazyCharts() {
     if (lazyInitDone) return;
     lazyInitDone = true;
     
-    const observer = new IntersectionObserver((entries) => {
+    
+const observer = new IntersectionObserver((entries) => {
 
-        if (entries[0].isIntersecting && !chartsRendered) {
+    if (entries[0].isIntersecting && !chartsRendered) {
 
-            chartsRendered = true;   // ⭐ VERY IMPORTANT
+        chartsRendered = true;
 
-            
-            renderAllCharts();
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                renderAllCharts();
+            }, 120);
+        });
 
-            observer.disconnect();
-        }
+        observer.disconnect();
+    }
 
-    }, { threshold: 0.15 });
+}, { threshold: 0.15 });
 
-    const target =
+        const target =
         document.getElementById('trendChart')?.closest('.chart-card');
 
     if (target) observer.observe(target);
@@ -1698,7 +1702,7 @@ function initLazyCharts() {
 
 function renderAllCharts() {
     const trend = document.getElementById('trendChart');
-trend.innerHTML = '';     // ⭐ prevent stacking canvases
+
     if (typeof Chart === 'undefined') return;
     
     const stats = _cachedStats || {};
@@ -1836,6 +1840,7 @@ document.getElementById("sidebarLogoutBtn")
 document.addEventListener('DOMContentLoaded', function() {
     try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
     try { if (typeof updatePlanBadge    === 'function') updatePlanBadge();    } catch(_) {}
+    if (chartsRendered) return;
     loadProgress();
     // Logout button
     var _lb = document.getElementById('sidebarLogoutBtn');
@@ -1942,7 +1947,7 @@ function renderFrequencyChart(byDate) {
         data:{ labels:labels, datasets:[{ label:'Workouts', data:data,
             backgroundColor:'rgba(212,175,55,0.45)', borderColor:'rgba(212,175,55,0.9)',
             borderWidth:2, borderRadius:7, borderSkipped:false, hoverBackgroundColor:'rgba(212,175,55,0.7)' }] },
-        options:{ responsive:true, maintainAspectRatio:false,
+        options:{ responsive:true, maintainAspectRatio:false, resizeDelay: 200,
             plugins:{ legend:{display:false}, tooltip:{...CHART_DEFAULTS.tooltip,
                 callbacks:{label:function(c){ return ' '+c.parsed.y+' workout'+(c.parsed.y!==1?'s':''); }}}},
             scales:{
@@ -1979,7 +1984,7 @@ function renderCategoryChart(byCategory) {
     _catChart = new Chart(canvas, {
         type:'doughnut',
         data:{ labels:labels, datasets:[{ data:data, backgroundColor:bgs, borderColor:borders, borderWidth:2, hoverOffset:10 }] },
-        options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
+        options:{ responsive:true, maintainAspectRatio:false, resizeDelay: 200, cutout:'62%',
             plugins:{ legend:{position:'bottom',labels:{color:'#999',font:{size:11},padding:14,usePointStyle:true,pointStyleWidth:10}},
                       tooltip:{...CHART_DEFAULTS.tooltip, callbacks:{label:function(c){ return ' '+c.parsed+' workout'+(c.parsed!==1?'s':''); }}}},
             animation:{animateRotate:true,duration:800,easing:'easeOutQuart'} }
@@ -2014,7 +2019,7 @@ function renderTrendChart(history) {
               borderWidth:2.5, pointBackgroundColor:'#00f2fe', pointRadius:3, pointHoverRadius:5,
               tension:0.4, fill:true, yAxisID:'yMin' }
         ]},
-        options:{ responsive:true, maintainAspectRatio:false,
+        options:{ responsive:true, maintainAspectRatio:false, resizeDelay: 200,
             interaction:{mode:'index',intersect:false},
             plugins:{ legend:{display:false}, tooltip:{...CHART_DEFAULTS.tooltip} },
             scales:{
