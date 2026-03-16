@@ -1685,9 +1685,19 @@ async function loadProgress() {
         }
 
         // Render charts directly — data already cached, no observer needed
-        chartsRendered = false;
-        renderAllCharts();
-        chartsRendered = true;
+        if (!chartsRendered) {
+            chartsRendered = true;
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    renderAllCharts();
+                    observer.disconnect();
+                }
+            }, { threshold: 0.1, rootMargin: "100px" });
+
+            const chartSection = document.getElementById('trendChart')?.parentElement ||
+                                 document.querySelector('.chart-card.full-width:last-child');
+            if (chartSection) observer.observe(chartSection);
+                   }
 
     } catch (error) {
         console.error('loadProgress error:', error);
@@ -1709,17 +1719,24 @@ function initLazyCharts() {
 }
 
 function renderAllCharts() {
-    // Use data already fetched by loadProgress — no extra API calls, no hang
     if (typeof Chart === 'undefined') return;
     const stats = _cachedStats || {};
     const hist  = _cachedHist  || [];
-    if (stats.byDate     && Object.keys(stats.byDate).length)
-        try { renderFrequencyChart(stats.byDate);     } catch(e){ console.warn('freq chart:', e); }
-    if (stats.byCategory && Object.keys(stats.byCategory).length)
-        try { renderCategoryChart(stats.byCategory);  } catch(e){ console.warn('cat chart:', e); }
-    if (hist.length)
-        try { renderTrendChart(hist);                 } catch(e){ console.warn('trend chart:', e); }
-}
+
+    // Render one chart per frame so UI never freezes
+    requestAnimationFrame(() => {
+        if (stats.byDate && Object.keys(stats.byDate).length)
+            renderFrequencyChart(stats.byDate);
+    });
+    requestAnimationFrame(() => {
+        if (stats.byCategory && Object.keys(stats.byCategory).length)
+            renderCategoryChart(stats.byCategory);
+    });
+    requestAnimationFrame(() => {
+        if (hist.length)
+            renderTrendChart(hist);
+    });
+        }
 
 function updateStatCard(attr, value) {
     var el = document.querySelector('[data-stat="' + attr + '"]');
