@@ -107,11 +107,14 @@ async function apiRequest(endpoint, options = {}) {
     const url = `${API_CONFIG.baseURL}${endpoint}`;
     const headers = { 'Content-Type': 'application/json', ...options.headers };
     const token = TokenManager.getAccessToken();
+    if (token && url.startsWith(API_CONFIG.baseURL))
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const controller = new AbortController();
     const _timer = setTimeout(() => controller.abort(), API_CONFIG.timeout || 15000);
     const config = { ...options, headers, signal: controller.signal };
     try {
+
+        if (!window.location.pathname.includes('login.html')) { window.location.href = 'login.html'; }
         let response = await fetch(url, config);
         clearTimeout(_timer);
         if (response.status === 401 && token) {
@@ -254,14 +257,14 @@ const WorkoutsAPI = {
         return res;
     },
     searchExercises: async (query) => {
-        try {
+        
             const r = await apiRequest(`/exercises/search?q=${encodeURIComponent(query)}`);
             if (r && r.success) {
                 if (Array.isArray(r.data?.exercises)) r.data = r.data.exercises;
                 else if (!Array.isArray(r.data))      r.data = [];
                 return r;
             }
-        } catch {}
+        
         const r2 = await apiRequest(`/exercises?search=${encodeURIComponent(query)}&limit=50`);
         if (r2 && r2.success) {
             if (Array.isArray(r2.data?.exercises)) r2.data = r2.data.exercises;
