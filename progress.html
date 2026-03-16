@@ -1674,12 +1674,7 @@ async function loadProgress() {
 /* ── LAZY CHARTS (data already in memory) ───────────────────────────── */
 function initLazyCharts() {
     const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && !chartsRendered) {
-            
-            chartsRendered = true;
-            renderAllCharts();           // uses _cachedStats / _cachedHist
-            observer.disconnect();
-        }
+        
 
         if (entries[0].isIntersecting) {
     _LM.hide();
