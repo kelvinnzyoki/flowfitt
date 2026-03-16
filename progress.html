@@ -1561,46 +1561,41 @@ body.sidebar-open .sidebar {
 <script>
 /* ── Safe wrappers ── */
 var _LM = {
-    show: function(msg) { try { if (typeof LoadingManager !== 'undefined') LoadingManager.show(msg); } catch(_) {} },
-    hide: function()    { try { if (typeof LoadingManager !== 'undefined') LoadingManager.hide();    } catch(_) {} }
+    show: function(msg){ try{ if(typeof LoadingManager!=='undefined') LoadingManager.show(msg); }catch(_){} },
+    hide: function(){ try{ if(typeof LoadingManager!=='undefined') LoadingManager.hide(); }catch(_){} }
 };
 
-/* Inline fallbacks for api.js helpers — used if api.js loads late */
-function formatDuration(mins) {
-    if (typeof window._apiFmtDur === 'function') return window._apiFmtDur(mins);
-    var m = Math.round(mins || 0);
-    if (m < 60) return m + ' min';
-    return Math.floor(m/60) + 'h ' + (m%60) + 'm';
+/* Inline fallbacks */
+function formatDuration(mins){ 
+    var m=Math.round(mins||0); 
+    return m<60 ? m+' min' : Math.floor(m/60)+'h '+(m%60)+'m';
 }
-function escHtml(str) {
-    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function formatDate(raw) {
-    if (!raw) return '—';
-    try {
-        var d = new Date(raw);
-        return isNaN(d) ? '—' : d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    } catch(e) { return '—'; }
+function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatDate(raw){ 
+    if(!raw) return '—'; 
+    try{ var d=new Date(raw); return isNaN(d)?'—':d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){return '—';}
 }
 
-try { requireAuth(); } catch(e) { console.warn('requireAuth:', e); }
+try { requireAuth(); } catch(e){ console.warn('requireAuth:', e); }
 
 let currentPeriod = '7d';
 let progressPlan  = null;
+let chartsRendered = false;   // ← prevents re-rendering
 
+
+    
 async function loadProgress() {
-    // Always hide loader — no matter what path exits this function
-    let _safetyTimer = setTimeout(function() { _LM.hide(); }, 12000);
+    let safetyTimer = setTimeout(() => _LM.hide(), 15000);
     try {
         try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
         _LM.show('Loading progress...');
 
-        // Plan fetch — fully isolated, never crashes the page
+        // Plan + gate
         let plan = null;
         try {
             if (typeof fetchActivePlan === 'function') {
-                const _pr = await fetchActivePlan();
-                plan = _pr && (_pr.plan || _pr) || null;
+                const pr = await fetchActivePlan();
+                plan = pr?.plan || pr;
             }
         } catch(_) {}
         progressPlan = plan;
@@ -1631,37 +1626,8 @@ async function loadProgress() {
             return;
         }
 
-        // Fetch all data in parallel
-        const [statsRes, historyRes, streakRes, achievementsRes] = await Promise.all([
-            ProgressAPI.getStats(currentPeriod).catch(function() { return null; }),
-            ProgressAPI.getWorkoutHistory(5).catch(function()     { return null; }),
-            ProgressAPI.getStreaks().catch(function()             { return null; }),
-            ProgressAPI.getAchievements().catch(function()        { return null; }),
-        ]);
-
-        // Stats + charts
-        if (statsRes && statsRes.success && statsRes.data) {
-            try { displayStats(statsRes.data.stats || statsRes.data); } catch(e) { console.warn('displayStats', e); }
-        }
-
-        // History (latest 5)
-        if (historyRes && historyRes.success && historyRes.data) {
-            const raw = historyRes.data;
-            const _hist = Array.isArray(raw) ? raw
-                        : Array.isArray(raw.logs) ? raw.logs
-                        : Array.isArray(raw.workouts) ? raw.workouts
-                        : Array.isArray(raw.history) ? raw.history : [];
-            try { displayHistory(_hist.slice(0, 5)); } catch(e) { console.warn('displayHistory', e); }
-            // Only render trend chart if data exists AND Chart.js loaded
-            if (_hist.length > 0) {
-                try { renderTrendChart(_hist); } catch(e) { console.warn('renderTrendChart', e); }
-            }
-        }
-
-        // Streak
-        if (streakRes && streakRes.success && streakRes.data) {
-            try { displayStreak(streakRes.data); } catch(e) { console.warn('displayStreak', e); }
-        }
+        
+        
 
         // Achievements — only display if server says unlocked:true
         const _achRaw = (achievementsRes && achievementsRes.success)
@@ -1679,6 +1645,32 @@ async function loadProgress() {
             }
         }
 
+        // Fetch all data in parallel
+        const [statsRes, historyRes, streakRes, achRes] = await Promise.all([
+            ProgressAPI.getStats(currentPeriod).catch(()=>null),
+            ProgressAPI.getWorkoutHistory(5).catch(()=>null),
+            ProgressAPI.getStreaks().catch(()=>null),
+            ProgressAPI.getAchievements().catch(()=>null)
+        ]);
+
+        // Display non-chart parts immediately
+        if (statsRes?.success) displayStats(statsRes.data?.stats || statsRes.data);
+        if (streakRes?.success) displayStreak(streakRes.data);
+        if (historyRes?.success) {
+            const hist = Array.isArray(historyRes.data) ? historyRes.data 
+                       : Array.isArray(historyRes.data?.logs) ? historyRes.data.logs : [];
+            displayHistory(hist.slice(0,5));
+        }
+        if (achRes?.success) {
+            const ach = Array.isArray(achRes.data) ? achRes.data : [];
+            notifyNewAchievements(ach);
+            displayAchievements(ach);
+            console.log('✅ Achievements verified from database:', ach.length, 'items');
+        }
+
+        // Charts are now LAZY — only render when user scrolls to them
+        if (!chartsRendered) initLazyCharts();
+
     } catch (error) {
         console.error('loadProgress error:', error);
         try { if (typeof Toast !== 'undefined') Toast.error('Failed to load progress data'); } catch(_) {}
@@ -1687,6 +1679,43 @@ async function loadProgress() {
         _LM.hide();
     }
 }
+
+
+    /* ── LAZY CHARTS (only when visible) ─────────────────────────────── */
+function initLazyCharts() {
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !chartsRendered) {
+            chartsRendered = true;
+            renderAllCharts();
+            observer.disconnect();
+        }
+    }, { threshold: 0.1 });
+
+    const chartSection = document.getElementById('trendChart')?.parentElement || 
+                         document.querySelector('.chart-card.full-width');
+    if (chartSection) observer.observe(chartSection);
+}
+
+function renderAllCharts() {
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not loaded — charts disabled');
+        return;
+    }
+    // Re-fetch latest data for charts only
+    Promise.all([
+        ProgressAPI.getStats(currentPeriod),
+        ProgressAPI.getWorkoutHistory(30)
+    ]).then(([statsRes, histRes]) => {
+        const stats = statsRes?.data?.stats || statsRes?.data || {};
+        const hist  = Array.isArray(histRes?.data) ? histRes.data 
+                    : Array.isArray(histRes?.data?.logs) ? histRes.data.logs : [];
+
+        if (stats.byDate) renderFrequencyChart(stats.byDate);
+        if (stats.byCategory) renderCategoryChart(stats.byCategory);
+        if (hist.length) renderTrendChart(hist);
+    });
+}
+    
 
 function updateStatCard(attr, value) {
     var el = document.querySelector('[data-stat="' + attr + '"]');
@@ -1802,22 +1831,19 @@ function handleLogout() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
     try { if (typeof updatePlanBadge    === 'function') updatePlanBadge();    } catch(_) {}
     loadProgress();
-    // Logout button
-    var _lb = document.getElementById('sidebarLogoutBtn');
-    if (_lb) _lb.addEventListener('click', function() { if (typeof handleLogout === 'function') handleLogout(); });
-    // Time-period buttons
-    var _tf = document.querySelector('.time-filters');
-    if (_tf) _tf.addEventListener('click', function(e) {
-        var btn = e.target.closest('.time-btn');
+
+    // Time filter listener (now safe)
+    document.querySelector('.time-filters').addEventListener('click', e => {
+        const btn = e.target.closest('.time-btn');
         if (!btn) return;
-        document.querySelectorAll('.time-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentPeriod = btn.dataset.period;
-        loadProgress();
+        loadProgress();   // ← now safe, charts won't re-render unnecessarily
     });
 });
 
@@ -1890,6 +1916,7 @@ const CHART_DEFAULTS = {
 var _freqChart = null, _catChart = null, _trendChart = null;
 
 function renderFrequencyChart(byDate) {
+     if (typeof Chart === 'undefined') return;
     var wrap = document.getElementById('frequencyChart');
     if (!wrap) return;
     if (typeof Chart === 'undefined') {
@@ -1931,6 +1958,7 @@ const CAT_PALETTE = {
     FLEXIBILITY:{bg:'rgba(167,139,250,0.55)',border:'rgba(167,139,250,1)'},
 };
 function renderCategoryChart(byCategory) {
+     if (typeof Chart === 'undefined') return;
     var wrap = document.getElementById('categoryChart');
     if (!wrap) return;
     if (typeof Chart === 'undefined') {
@@ -1958,6 +1986,7 @@ function renderCategoryChart(byCategory) {
 }
 
 function renderTrendChart(history) {
+     if (typeof Chart === 'undefined') return;
     var wrap = document.getElementById('trendChart');
     if (!wrap) return;
     if (typeof Chart === 'undefined') {
