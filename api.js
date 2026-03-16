@@ -749,3 +749,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+
+const ProgressAPI = {
+    getStats: async (period = '7d') =>
+        await apiRequest(`/progress/stats?period=${period}`),
+
+    getWorkoutHistory: async (limit = 20) =>
+        await apiRequest(`/progress/history?limit=${limit}`),
+
+    getStreaks: async () =>
+        await apiRequest(`/progress/streaks`),
+
+    getAchievements: async () =>
+        await apiRequest(`/progress/achievements`)
+};
