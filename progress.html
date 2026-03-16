@@ -1589,6 +1589,7 @@ async function loadProgress() {
     try {
         try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
         _LM.show('Loading progress...');
+        setTimeout(() => _LM.hide(), 12000);
 
         if (!TokenManager?.getAccessToken()) {
             _LM.hide();
@@ -1650,20 +1651,31 @@ async function loadProgress() {
         if (streakRes?.success) displayStreak(streakRes.data);
         if (_cachedHist.length) displayHistory(_cachedHist.slice(0,5));
         
-        if (achRes?.success) {
-            const ach = Array.isArray(achRes.data) ? achRes.data : (achRes.data?.achievements || []);
-            notifyNewAchievements(ach);
-            displayAchievements(ach);
-            console.log('✅ Achievements verified from database:', ach.length);
-        }
+        
+        // ─── Achievements — completely non-fatal, no early return ─────────────────────
+let achRes = null;
+try {
+    achRes = await ProgressAPI.getAchievements();   // use the stable endpoint only
+} catch(e) {
+    console.warn('Achievements fetch failed (non-fatal):', e);
+    // Optional fallback — only if you actually implemented /recalculate
+    // try { achRes = await ProgressAPI.recalculateAchievements(); } catch(_) {}
+}
 
-        // LAZY CHARTS — only when user scrolls to them (data already cached)
-        if (!chartsRendered) initLazyCharts();
-
-    } catch (error) {
-        console.error('loadProgress error:', error);
-        try { Toast.error('Failed to load progress data'); } catch(_) {}
-    } finally {
+try {
+    const rawAch = (achRes && achRes.success)
+        ? (Array.isArray(achRes.data) ? achRes.data : (achRes.data?.achievements || []))
+        : [];
+    if (rawAch.length) {
+        notifyNewAchievements(rawAch);
+        displayAchievements(rawAch);
+    } else {
+        const grid = document.getElementById('achievementsGrid');
+        if (grid) grid.innerHTML = '<p class="empty-state">COMPLETE WORKOUTS TO UNLOCK ACHIEVEMENTS</p>';
+    }
+} catch(e) {
+    console.warn('displayAchievements error:', e);
+} finally {
         clearTimeout(_safetyTimer);
         _LM.hide();
     }
