@@ -1585,6 +1585,15 @@ let chartsRendered = false;   // ← prevents re-rendering
 
     
 async function loadProgress() {
+    if (!TokenManager?.getAccessToken()) {
+        _LM.hide();
+        Toast.warning('Please log in to view your progress');
+        setTimeout(() => {
+            window.location.href = '/login.html'; // ← change to your actual login page path
+        }, 1800);
+        return;
+    }
+    
     let safetyTimer = setTimeout(() => _LM.hide(), 15000);
     try {
         try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
@@ -1645,29 +1654,24 @@ async function loadProgress() {
             }
         }
 
-        // Fetch all data in parallel
-        const [statsRes, historyRes, streakRes, achRes] = await Promise.all([
-            ProgressAPI.getStats(currentPeriod).catch(()=>null),
-            ProgressAPI.getWorkoutHistory(5).catch(()=>null),
-            ProgressAPI.getStreaks().catch(()=>null),
-            ProgressAPI.getAchievements().catch(()=>null)
-        ]);
+        // Fetch all data
+let statsRes = null, histRes = null, streakRes = null, achRes = null;
 
-        // Display non-chart parts immediately
-        if (statsRes?.success) displayStats(statsRes.data?.stats || statsRes.data);
-        if (streakRes?.success) displayStreak(streakRes.data);
-        if (historyRes?.success) {
-            const hist = Array.isArray(historyRes.data) ? historyRes.data 
-                       : Array.isArray(historyRes.data?.logs) ? historyRes.data.logs : [];
-            displayHistory(hist.slice(0,5));
-        }
-        if (achRes?.success) {
-            const ach = Array.isArray(achRes.data) ? achRes.data : [];
-            notifyNewAchievements(ach);
-            displayAchievements(ach);
-            console.log('✅ Achievements verified from database:', ach.length, 'items');
+try { statsRes  = await ProgressAPI.getStats(currentPeriod);     } catch(e) { console.warn('Stats API failed:', e); }
+try { histRes   = await ProgressAPI.getWorkoutHistory(5);        } catch(e) { console.warn('History API failed:', e); }
+try { streakRes = await ProgressAPI.getStreaks();                } catch(e) { console.warn('Streaks API failed:', e); }
+try { achRes    = await ProgressAPI.getAchievements();           } catch(e) { console.warn('Achievements API failed:', e); }
+
+// Then display what you can
+if (statsRes?.success)  displayStats(statsRes.data?.stats || statsRes.data);
+if (histRes?.success)   displayHistory(histRes.data?.logs || histRes.data || []);
+if (streakRes?.success) displayStreak(streakRes.data);
+if (achRes?.success) {
+    displayAchievements(achRes.data || []);
+    console.log('Achievements loaded from DB:', achRes.data?.length || 0);
         }
 
+        
         // Charts are now LAZY — only render when user scrolls to them
         if (!chartsRendered) initLazyCharts();
 
