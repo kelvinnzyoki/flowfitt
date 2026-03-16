@@ -1672,6 +1672,7 @@ async function loadProgress() {
 function initLazyCharts() {
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !chartsRendered) {
+            _LM.hide();
             chartsRendered = true;
             renderAllCharts();           // uses _cachedStats / _cachedHist
             observer.disconnect();
@@ -1686,13 +1687,22 @@ function initLazyCharts() {
 
 function renderAllCharts() {
     if (typeof Chart === 'undefined') return;
+    _LM.hide();
     const stats = _cachedStats || {};
     const hist  = _cachedHist || [];
+
+    
 
     // Render only what has data
     if (stats.byDate && Object.keys(stats.byDate).length) renderFrequencyChart(stats.byDate);
     if (stats.byCategory && Object.keys(stats.byCategory).length) renderCategoryChart(stats.byCategory);
     if (hist.length) renderTrendChart(hist);
+
+
+    if (_cachedStats?.byDate || _cachedStats?.byCategory || _cachedHist?.length) {
+    // If we already have chart data, hide loader early
+    _LM.hide();
+    }
 }
 
 /* ── Rest of your functions (unchanged except small cleanups) ───────────── */
