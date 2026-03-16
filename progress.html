@@ -1639,6 +1639,9 @@ async function loadProgress() {
 
         // Cache data for lazy charts
         if (statsRes?.success) _cachedStats = statsRes.data?.stats || statsRes.data || {};
+        if (_cachedStats?.byDate || _cachedStats?.byCategory || _cachedHist?.length) {
+    _LM.hide();
+        }
         if (histRes?.success) {
             const raw = histRes.data;
             _cachedHist = Array.isArray(raw) ? raw : Array.isArray(raw?.logs) ? raw.logs : Array.isArray(raw?.workouts) ? raw.workouts : [];
@@ -1672,10 +1675,16 @@ async function loadProgress() {
 function initLazyCharts() {
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !chartsRendered) {
-            _LM.hide();
+            
             chartsRendered = true;
             renderAllCharts();           // uses _cachedStats / _cachedHist
             observer.disconnect();
+        }
+
+        if (entries[0].isIntersecting) {
+    _LM.hide();
+    renderAllCharts();
+    observer.disconnect();
         }
     }, { threshold: 0.15, rootMargin: "100px" });
 
@@ -1699,10 +1708,7 @@ function renderAllCharts() {
     if (hist.length) renderTrendChart(hist);
 
 
-    if (_cachedStats?.byDate || _cachedStats?.byCategory || _cachedHist?.length) {
-    // If we already have chart data, hide loader early
-    _LM.hide();
-    }
+    
 }
 
 /* ── Rest of your functions (unchanged except small cleanups) ───────────── */
