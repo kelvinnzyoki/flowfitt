@@ -1840,8 +1840,7 @@ document.getElementById("sidebarLogoutBtn")
 document.addEventListener('DOMContentLoaded', function() {
     try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
     try { if (typeof updatePlanBadge    === 'function') updatePlanBadge();    } catch(_) {}
-    if (chartsRendered) return;
-    loadProgress();
+    
     // Logout button
     var _lb = document.getElementById('sidebarLogoutBtn');
     if (_lb) _lb.addEventListener('click', function() { if (typeof handleLogout === 'function') handleLogout(); });
@@ -1854,7 +1853,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.classList.add('active');
         currentPeriod = btn.dataset.period;
         chartsRendered = false;
-        loadProgress();
+        
     });
 });
 
@@ -2108,6 +2107,7 @@ function showConfirm(opts) {
 
 document.addEventListener("DOMContentLoaded", () => {
     populateSidebarUser?.();
+    renderAllCharts()
     loadProgress();
 });
     
