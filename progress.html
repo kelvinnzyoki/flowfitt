@@ -1558,22 +1558,23 @@ body.sidebar-open .sidebar {
 <!-- FIX #21: api.js loaded ONCE only -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="api.js"></script>
-<script>
+
+    <script>
 /* ── Safe wrappers ── */
 var _LM = {
     show: function(msg){ try{ if(typeof LoadingManager!=='undefined') LoadingManager.show(msg); }catch(_){} },
-    hide: function(){    try{ if(typeof LoadingManager!=='undefined') LoadingManager.hide();    }catch(_){} }
+    hide: function(){ try{ if(typeof LoadingManager!=='undefined') LoadingManager.hide(); }catch(_){} }
 };
 
 /* Inline fallbacks */
-function formatDuration(mins){
-    var m = Math.round(mins||0);
-    return m < 60 ? m+' min' : Math.floor(m/60)+'h '+(m%60)+'m';
+function formatDuration(mins){ 
+    var m=Math.round(mins||0); 
+    return m<60 ? m+' min' : Math.floor(m/60)+'h '+(m%60)+'m';
 }
 function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function formatDate(raw){
-    if(!raw) return '\u2014';
-    try{ var d=new Date(raw); return isNaN(d)?'\u2014':d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){return '\u2014';}
+function formatDate(raw){ 
+    if(!raw) return '—'; 
+    try{ var d=new Date(raw); return isNaN(d)?'—':d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(e){return '—';}
 }
 
 try { requireAuth(); } catch(e){ console.warn('requireAuth:', e); }
@@ -1581,26 +1582,24 @@ try { requireAuth(); } catch(e){ console.warn('requireAuth:', e); }
 let currentPeriod = '7d';
 let progressPlan  = null;
 let chartsRendered = false;
-let _cachedStats   = null;   // set by loadProgress, used by renderAllCharts
-let _cachedHist    = [];     // set by loadProgress, used by renderAllCharts
+let _cachedStats = null;
+let _cachedHist  = [];
 
 async function loadProgress() {
-    // BUG 5 FIX: guard Toast before using it
-    if (!TokenManager?.getAccessToken()) {
-        _LM.hide();
-        try{ if(typeof Toast!=='undefined') Toast.warning('Please log in to view your progress'); }catch(_){}
-        setTimeout(() => { window.location.href = 'login.html'; }, 1800);
-        return;
-    }
-
-    // BUG 3 FIX: name matches clearTimeout below
     let _safetyTimer = setTimeout(() => _LM.hide(), 15000);
 
     try {
         try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
         _LM.show('Loading progress...');
 
-        // Plan + gate
+        if (!TokenManager?.getAccessToken()) {
+            _LM.hide();
+            try{ Toast.warning('Please log in to view progress'); }catch(_){}
+            setTimeout(() => window.location.href = 'login.html', 1500);
+            return;
+        }
+
+        // Plan gate
         let plan = null;
         try {
             if (typeof fetchActivePlan === 'function') {
@@ -1610,174 +1609,132 @@ async function loadProgress() {
         } catch(_) {}
         progressPlan = plan;
 
-        // Analytics gate for free users
+        // Analytics gate (free users)
         try {
             const hasAdvanced = plan && (plan.hasAdvancedAnalytics || plan.slug === 'pro' || plan.slug === 'elite');
             const trendEl = document.getElementById('trendChart');
-            const chartSectionEl = trendEl && (trendEl.closest('section') || trendEl.parentElement);
-            if (!hasAdvanced && chartSectionEl && !document.getElementById('chartGate')) {
-                chartSectionEl.style.position = 'relative';
-                chartSectionEl.style.overflow  = 'hidden';
+            const chartSection = trendEl && (trendEl.closest('.chart-card') || trendEl.parentElement);
+            if (!hasAdvanced && chartSection && !document.getElementById('chartGate')) {
+                chartSection.style.position = 'relative';
+                chartSection.style.overflow = 'hidden';
                 const gate = document.createElement('div');
                 gate.id = 'chartGate';
-                gate.style.cssText = 'position:absolute;inset:0;background:rgba(3,3,3,0.88);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;z-index:10;border-radius:inherit;text-align:center;padding:1.5rem';
-                gate.innerHTML = '<span style="font-size:2rem">&#128202;</span>'
-                    + '<strong style="font-family:Oswald,sans-serif;font-size:1.2rem;letter-spacing:1px">ADVANCED ANALYTICS</strong>'
-                    + '<p style="color:#888;font-size:.85rem;max-width:260px;line-height:1.5">Trend charts available on Pro &amp; Elite plans.</p>'
-                    + '<a href="subscription.html" style="padding:.65rem 1.4rem;background:linear-gradient(135deg,#D4AF37,#b8860b);color:#000;font-weight:800;font-family:Oswald,sans-serif;letter-spacing:2px;border-radius:10px;text-decoration:none;font-size:.85rem">&#9889; UPGRADE TO PRO</a>';
-                chartSectionEl.appendChild(gate);
+                gate.style.cssText = 'position:absolute;inset:0;background:rgba(3,3,3,0.9);backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;z-index:10;border-radius:inherit;text-align:center;padding:2rem';
+                gate.innerHTML = `<span style="font-size:3rem">📊</span>
+                    <strong style="font-family:'Oswald',sans-serif;font-size:1.3rem;letter-spacing:1px;color:#D4AF37">ADVANCED ANALYTICS</strong>
+                    <p style="color:#888;max-width:280px">Trend charts & detailed analysis available on Pro & Elite plans.</p>
+                    <a href="subscription.html" style="padding:0.7rem 1.6rem;background:linear-gradient(135deg,#D4AF37,#edcf7d);color:#000;font-weight:800;font-family:'Oswald',sans-serif;border-radius:12px;text-decoration:none">⚡ UPGRADE TO PRO</a>`;
+                chartSection.appendChild(gate);
             }
         } catch(_) {}
 
-        // Guard: ProgressAPI must be defined
-        if (typeof ProgressAPI === 'undefined') {
-            var ag = document.getElementById('achievementsGrid');
-            if (ag) ag.innerHTML = '<p class="chart-empty-state">Loading data...</p>';
-            return;
-        }
+        if (typeof ProgressAPI === 'undefined') return;
 
-        // BUG 1+2 FIX: API calls FIRST, then display
-        // BUG 7 FIX: each call individually wrapped so one failure never blocks others
+        // Fetch everything (individual try/catch so one failure doesn't kill the page)
         let statsRes = null, histRes = null, streakRes = null, achRes = null;
-        try { statsRes  = await ProgressAPI.getStats(currentPeriod);  } catch(e){ console.warn('Stats API:', e); }
-        try { histRes   = await ProgressAPI.getWorkoutHistory(5);     } catch(e){ console.warn('History API:', e); }
-        try { streakRes = await ProgressAPI.getStreaks();             } catch(e){ console.warn('Streaks API:', e); }
-        try { achRes    = await ProgressAPI.getAchievements();        } catch(e){ console.warn('Achievements API:', e); }
+        try { statsRes  = await ProgressAPI.getStats(currentPeriod); } catch(e){ console.warn('Stats failed', e); }
+        try { histRes   = await ProgressAPI.getWorkoutHistory(30); } catch(e){ console.warn('History failed', e); }  // 30 for trend chart
+        try { streakRes = await ProgressAPI.getStreaks(); } catch(e){ console.warn('Streaks failed', e); }
+        try { achRes    = await ProgressAPI.getAchievements(); } catch(e){ console.warn('Achievements failed', e); }
 
-        // Display stats
-        // Cache stats for lazy chart rendering
-        if (statsRes?.success && statsRes.data) {
-            _cachedStats = statsRes.data.stats || statsRes.data;
-            try { displayStats(_cachedStats); } catch(e){ console.warn('displayStats:', e); }
-        }
-
-        // Display history (latest 5) — cache full history for charts
-        if (histRes?.success && histRes.data) {
+        // Cache data for lazy charts
+        if (statsRes?.success) _cachedStats = statsRes.data?.stats || statsRes.data || {};
+        if (histRes?.success) {
             const raw = histRes.data;
-            _cachedHist = Array.isArray(raw) ? raw
-                        : Array.isArray(raw.logs)     ? raw.logs
-                        : Array.isArray(raw.workouts) ? raw.workouts
-                        : Array.isArray(raw.history)  ? raw.history : [];
-            try { displayHistory(_cachedHist.slice(0,5)); } catch(e){ console.warn('displayHistory:', e); }
-        } else {
-            _cachedHist = [];
-            try { displayHistory([]); } catch(_) {}
+            _cachedHist = Array.isArray(raw) ? raw : Array.isArray(raw?.logs) ? raw.logs : Array.isArray(raw?.workouts) ? raw.workouts : [];
         }
 
-        // Display streak
-        if (streakRes?.success && streakRes.data)
-            try { displayStreak(streakRes.data); } catch(e){ console.warn('displayStreak:', e); }
-
-        // Display achievements (BUG 1+2 FIX: use achRes, run AFTER API call)
-        var achGrid = document.getElementById('achievementsGrid');
-        if (achGrid) {
-            const _achRaw = (achRes?.success)
-                ? (Array.isArray(achRes.data) ? achRes.data
-                   : Array.isArray(achRes.data?.achievements) ? achRes.data.achievements
-                   : [])
-                : [];
-            if (_achRaw.length) {
-                try { notifyNewAchievements(_achRaw); } catch(_) {}
-                try { displayAchievements(_achRaw); } catch(e){ console.warn('displayAchievements:', e); }
-            } else {
-                achGrid.innerHTML = '<p class="chart-empty-state">COMPLETE WORKOUTS TO UNLOCK ACHIEVEMENTS</p>';
-            }
+        // Display non-chart content immediately
+        if (_cachedStats) displayStats(_cachedStats);
+        if (streakRes?.success) displayStreak(streakRes.data);
+        if (_cachedHist.length) displayHistory(_cachedHist.slice(0,5));
+        
+        if (achRes?.success) {
+            const ach = Array.isArray(achRes.data) ? achRes.data : (achRes.data?.achievements || []);
+            notifyNewAchievements(ach);
+            displayAchievements(ach);
+            console.log('✅ Achievements verified from database:', ach.length);
         }
 
-        // Render charts directly — data already cached, no observer needed
-        if (!chartsRendered) {
-            chartsRendered = true;
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    renderAllCharts();
-                    observer.disconnect();
-                }
-            }, { threshold: 0.1, rootMargin: "100px" });
-
-            const chartSection = document.getElementById('trendChart')?.parentElement ||
-                                 document.querySelector('.chart-card.full-width:last-child');
-            if (chartSection) observer.observe(chartSection);
-                   }
+        // LAZY CHARTS — only when user scrolls to them (data already cached)
+        if (!chartsRendered) initLazyCharts();
 
     } catch (error) {
         console.error('loadProgress error:', error);
-        try { if (typeof Toast !== 'undefined') Toast.error('Failed to load progress data'); } catch(_) {}
+        try { Toast.error('Failed to load progress data'); } catch(_) {}
     } finally {
-        // BUG 3 FIX: _safetyTimer matches declaration above
         clearTimeout(_safetyTimer);
         _LM.hide();
     }
 }
 
-/* ── Charts: render immediately with cached data ───── */
+/* ── LAZY CHARTS (data already in memory) ───────────────────────────── */
 function initLazyCharts() {
-    // No IntersectionObserver — data already in memory, render now
-    if (!chartsRendered) {
-        chartsRendered = true;
-        renderAllCharts();
-    }
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !chartsRendered) {
+            chartsRendered = true;
+            renderAllCharts();           // uses _cachedStats / _cachedHist
+            observer.disconnect();
+        }
+    }, { threshold: 0.15, rootMargin: "100px" });
+
+    // Observe the trend chart card (the heavy one) — or any full-width chart card
+    const target = document.getElementById('trendChart')?.closest('.chart-card') || 
+                   document.querySelector('.chart-card.full-width:last-child');
+    if (target) observer.observe(target);
 }
 
 function renderAllCharts() {
     if (typeof Chart === 'undefined') return;
     const stats = _cachedStats || {};
-    const hist  = _cachedHist  || [];
+    const hist  = _cachedHist || [];
 
-    // Render one chart per frame so UI never freezes
-    requestAnimationFrame(() => {
-        if (stats.byDate && Object.keys(stats.byDate).length)
-            renderFrequencyChart(stats.byDate);
-    });
-    requestAnimationFrame(() => {
-        if (stats.byCategory && Object.keys(stats.byCategory).length)
-            renderCategoryChart(stats.byCategory);
-    });
-    requestAnimationFrame(() => {
-        if (hist.length)
-            renderTrendChart(hist);
-    });
-        }
+    // Render only what has data
+    if (stats.byDate && Object.keys(stats.byDate).length) renderFrequencyChart(stats.byDate);
+    if (stats.byCategory && Object.keys(stats.byCategory).length) renderCategoryChart(stats.byCategory);
+    if (hist.length) renderTrendChart(hist);
+}
 
+/* ── Rest of your functions (unchanged except small cleanups) ───────────── */
 function updateStatCard(attr, value) {
-    var el = document.querySelector('[data-stat="' + attr + '"]');
+    const el = document.querySelector(`[data-stat="${attr}"]`);
     if (el) el.textContent = value;
 }
 
 function displayStats(stats) {
     if (!stats) return;
     updateStatCard('total-workouts', stats.totalWorkouts || 0);
-    updateStatCard('total-duration',  formatDuration(stats.totalDuration || 0));
-    updateStatCard('total-calories',  Math.round(stats.totalCalories || 0).toLocaleString());
-    updateStatCard('avg-duration',    formatDuration(stats.avgDuration  || 0));
+    updateStatCard('total-duration', formatDuration(stats.totalDuration || 0));
+    updateStatCard('total-calories', Math.round(stats.totalCalories || 0).toLocaleString());
+    updateStatCard('avg-duration', formatDuration(stats.avgDuration || 0));
 }
 
 function displayHistory(history) {
-    var tbody = document.getElementById('historyTbody');
+    const tbody = document.getElementById('historyTbody');
     if (!tbody) return;
     if (!history || !history.length) {
         tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No workout history yet. Start logging workouts!</td></tr>';
         return;
     }
-    var catClass = function(cat) {
-        var cv = (cat || '').toLowerCase();
-        if (cv.indexOf('cardio')   !== -1) return 'cardio';
-        if (cv.indexOf('strength') !== -1) return 'strength';
-        if (cv.indexOf('core')     !== -1) return 'core';
-        if (cv.indexOf('hiit')     !== -1) return 'hiit';
+    const catClass = cat => {
+        const c = (cat||'').toLowerCase();
+        if (c.includes('cardio')) return 'cardio';
+        if (c.includes('strength')) return 'strength';
+        if (c.includes('core')) return 'core';
+        if (c.includes('hiit')) return 'hiit';
         return '';
     };
-    tbody.innerHTML = history.map(function(log) {
-        var cat = (log.exercise && log.exercise.category) || '\u2014';
-        var setsReps = (log.sets && log.reps) ? (log.sets + ' \xd7 ' + log.reps)
-                     : log.sets ? (log.sets + ' sets') : '\u2014';
-        return '<tr>'
-            + '<td>' + formatDate(log.date) + '</td>'
-            + '<td class="workout-name">' + escHtml((log.exercise && log.exercise.name) || '\u2014') + '</td>'
-            + '<td><span class="workout-badge ' + catClass(cat) + '">' + escHtml(cat) + '</span></td>'
-            + '<td>' + formatDuration(log.duration) + '</td>'
-            + '<td>' + setsReps + '</td>'
-            + '<td>' + (log.caloriesBurned ? Math.round(log.caloriesBurned) + ' kcal' : '\u2014') + '</td>'
-            + '</tr>';
+    tbody.innerHTML = history.map(log => {
+        const cat = log.exercise?.category || '—';
+        const setsReps = (log.sets && log.reps) ? `${log.sets} × \( {log.reps}` : (log.sets ? ` \){log.sets} sets` : '—');
+        return `<tr>
+            <td>${formatDate(log.date)}</td>
+            <td class="workout-name">${escHtml(log.exercise?.name || '—')}</td>
+            <td><span class="workout-badge \( {catClass(cat)}"> \){escHtml(cat)}</span></td>
+            <td>${formatDuration(log.duration)}</td>
+            <td>${setsReps}</td>
+            <td>${log.caloriesBurned ? Math.round(log.caloriesBurned)+' kcal' : '—'}</td>
+        </tr>`;
     }).join('');
 }
 
@@ -1786,6 +1743,8 @@ function displayStreak(streak) {
     updateStatCard('current-streak', streak.currentStreak || 0);
     updateStatCard('longest-streak', streak.longestStreak || 0);
 }
+
+
 
 /* ── Achievement display ────────────────────────────── */
 function _fmtReq(req) {
