@@ -1567,10 +1567,8 @@ var _LM = {
 };
 
 /* Inline fallbacks */
-function formatDuration(mins){ 
-    var m=Math.round(mins||0); 
-    return m<60 ? m+' min' : Math.floor(m/60)+'h '+(m%60)+'m';
-}
+
+
 function escHtml(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function formatDate(raw){ 
     if(!raw) return '—'; 
@@ -1819,6 +1817,10 @@ function handleLogout() {
         onOk: async function() { _LM.show('Logging out...'); await AuthAPI.logout(); }
     });
 }
+        
+        
+document.getElementById("sidebarLogoutBtn")
+?.addEventListener("click", handleLogout);
 
 document.addEventListener('DOMContentLoaded', function() {
     try { if (typeof populateSidebarUser === 'function') populateSidebarUser(); } catch(_) {}
@@ -2087,6 +2089,12 @@ function showConfirm(opts) {
     window.openSidebar   = openSidebar;
     window.closeSidebar  = closeSidebar;
     window.toggleSidebar = toggleSidebar;
+
+document.addEventListener("DOMContentLoaded", () => {
+    populateSidebarUser?.();
+    loadProgress();
+});
+    
 }());
 </script>
 </body>
