@@ -1561,6 +1561,7 @@ body.sidebar-open .sidebar {
 
     <script>
 /* ── Safe wrappers ── */
+
 var _LM = {
     show: function(msg){ try{ if(typeof LoadingManager!=='undefined') LoadingManager.show(msg); }catch(_){} },
     hide: function(){ try{ if(typeof LoadingManager!=='undefined') LoadingManager.hide(); }catch(_){} }
@@ -1591,7 +1592,7 @@ async function loadProgress() {
         _LM.show('Loading progress...');
 
         if (!TokenManager?.getAccessToken()) {
-            _LM.hide();
+            
             try{ Toast.warning('Please log in to view progress'); }catch(_){}
             setTimeout(() => window.location.href = 'login.html', 1500);
             return;
@@ -1638,7 +1639,7 @@ async function loadProgress() {
         // Cache data for lazy charts
         if (statsRes?.success) _cachedStats = statsRes.data?.stats || statsRes.data || {};
         if (_cachedStats?.byDate || _cachedStats?.byCategory || _cachedHist?.length) {
-    _LM.hide();
+    
         }
         if (histRes?.success) {
             const raw = histRes.data;
@@ -1670,26 +1671,36 @@ async function loadProgress() {
 }
 
 /* ── LAZY CHARTS (data already in memory) ───────────────────────────── */
+let lazyInitDone = false;
 function initLazyCharts() {
+    if (lazyInitDone) return;
+    lazyInitDone = true;
+    
     const observer = new IntersectionObserver((entries) => {
-        
 
-        if (entries[0].isIntersecting) {
-    _LM.hide();
-    renderAllCharts();
-    observer.disconnect();
+        if (entries[0].isIntersecting && !chartsRendered) {
+
+            chartsRendered = true;   // ⭐ VERY IMPORTANT
+
+            
+            renderAllCharts();
+
+            observer.disconnect();
         }
-    }, { threshold: 0.15, rootMargin: "100px" });
 
-    // Observe the trend chart card (the heavy one) — or any full-width chart card
-    const target = document.getElementById('trendChart')?.closest('.chart-card') || 
-                   document.querySelector('.chart-card.full-width:last-child');
+    }, { threshold: 0.15 });
+
+    const target =
+        document.getElementById('trendChart')?.closest('.chart-card');
+
     if (target) observer.observe(target);
 }
 
 function renderAllCharts() {
+    const trend = document.getElementById('trendChart');
+trend.innerHTML = '';     // ⭐ prevent stacking canvases
     if (typeof Chart === 'undefined') return;
-    _LM.hide();
+    
     const stats = _cachedStats || {};
     const hist  = _cachedHist || [];
 
@@ -1863,7 +1874,7 @@ function notifyNewAchievements(all) {
     saveKnownUnlocked(nowUnlocked);
     try { localStorage.setItem('ff_achievement_update', Date.now().toString()); } catch(_) {}
 }
-function showAchievementToast(achievement) {
+function showAchievementTolast(achievement) {
     var existing = document.querySelectorAll('.achievement-toast');
     var offset   = existing.length * 80;
     var el = document.createElement('div');
