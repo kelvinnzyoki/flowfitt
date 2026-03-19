@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowFit — Transform Your Body at Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!--
+  Josefin Sans  100–400  : ultra-thin geometric sans — headings & labels
+  Lora          300–400  : elegant serif — display text, price
+  JetBrains Mono 300     : monospace — stats/numbers
+-->
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400&family=Lora:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+/* ╔═══════════════════════════════════════════════╗
+   ║  DESIGN TOKENS                                ║
+   ╚═══════════════════════════════════════════════╝ */
+:root {
+  /* background scale */
+  --ink:       #07060c;
+  --ink-1:     #0c0b12;
+  --ink-2:     #111019;
+  --surface:   rgba(15,14,24,0.85);
+  --surface-2: rgba(20,18,32,0.72);
+
+  /* gold */
+  --Au:        #C9A84C;
+  --Au-hi:     #E8C96A;
+  --Au-lo:     #8E6E28;
+  --Au-mist:   rgba(201,168,76,0.08);
+  --Au-rim:    rgba(201,168,76,0.22);
+  --Au-glow:   rgba(201,168,76,0.18);
+
+  /* accent palette — used sparingly for section variety */
+  --sage:      #3BBF8A;   /* available features, success */
+  --sage-dim:  rgba(59,191,138,0.12);
+  --sky:       #5B9CF6;   /* secondary accent */
+  --coral:     #E07B54;   /* third accent */
+  --smoke:     #8892A4;   /* secondary text on some surfaces */
+
+  /* gradients */
+  --g-Au:  linear-gradient(135deg,#E8C96A 0%,#C9A84C 50%,#8E6E28 100%);
+  --g-Au2: linear-gradient(180deg,#E8C96A 0%,#C9A84C 100%);
+  --g-card:linear-gradient(145deg,rgba(20,18,32,0.95),rgba(14,13,22,0.95));
+
+  /* text */
+  --t1: #F0EBE0;   /* primary — warm cream */
+  --t2: #8A8590;   /* secondary — muted lavender-grey */
+  --t3: #44404A;   /* disabled / locked */
+  --t4: #C4BFCA;   /* light secondary (on dark panels) */
+
+  /* borders */
+  --b1: rgba(201,168,76,0.14);
+  --b2: rgba(201,168,76,0.26);
+  --b3: rgba(240,235,228,0.05);
+  --b4: rgba(240,235,228,0.09);
+
+  /* type */
+  --f-display: 'Josefin Sans', sans-serif;
+  --f-serif:   'Lora', Georgia, serif;
+  --f-mono:    'JetBrains Mono', monospace;
+
+  /* motion */
+  --ease:   cubic-bezier(0.16,1,0.3,1);
+  --ease-s: cubic-bezier(0.34,1.56,0.64,1);
+
+  /* geometry */
+  --r-card: 20px;
+  --r-sm:   12px;
+  --r-pill: 9999px;
+
+  /* spacing */
+  --col-max: 1340px;
+  --pad-x:   3rem;
+}
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  RESET                                        ║
+   ╚═══════════════════════════════════════════════╝ */
+*,*::before,*::after {
+  margin:0; padding:0; box-sizing:border-box;
+}
+html { scroll-behavior:smooth; overflow-x:hidden; }
+body {
+  font-family: var(--f-display);
+  font-weight: 300;
+  background: var(--ink);
+  color: var(--t1);
+  overflow-x: hidden;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  ATMOSPHERE                                   ║
+   ╚═══════════════════════════════════════════════╝ */
+.blob {
+  position:fixed; border-radius:50%;
+  pointer-events:none; z-index:0;
+  will-change: transform;
+}
+.blob-1 {
+  width:780px; height:780px;
+  background:radial-gradient(circle,rgba(201,168,76,.22) 0%,transparent 68%);
+  top:-220px; right:-180px; filter:blur(110px);
+  animation:b1 34s ease-in-out infinite;
+}
+.blob-2 {
+  width:920px; height:920px;
+  background:radial-gradient(circle,rgba(142,110,40,.18) 0%,transparent 68%);
+  bottom:-100px; left:-280px; filter:blur(130px);
+  animation:b2 44s ease-in-out infinite;
+}
+.blob-3 {
+  width:520px; height:520px;
+  background:radial-gradient(circle,rgba(91,156,246,.10) 0%,transparent 68%);
+  top:48%; right:5%; filter:blur(100px);
+  animation:b3 26s ease-in-out infinite;
+}
+@keyframes b1 {0%,100%{transform:translate(0,0) scale(1)}45%{transform:translate(-60px,80px) scale(1.09)}75%{transform:translate(40px,-40px) scale(.93)}}
+@keyframes b2 {0%,100%{transform:translate(0,0)}38%{transform:translate(75px,-65px) scale(1.07)}70%{transform:translate(-45px,30px) scale(.95)}}
+@keyframes b3 {0%,100%{transform:translate(0,0)}50%{transform:translate(-70px,60px)}}
+
+/* Noise grain overlay */
+body::after {
+  content:''; position:fixed; inset:0;
+  pointer-events:none; z-index:1;
+  opacity:.018;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:220px;
+}
+.bg-animation { display:none; } /* legacy compat */
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  NAVIGATION                                   ║
+   ╚═══════════════════════════════════════════════╝ */
+nav {
+  position:fixed; top:0; width:100%;
+  padding:1.2rem var(--pad-x);
+  display:flex; justify-content:space-between; align-items:center;
+  z-index:1000;
+  backdrop-filter:blur(36px) saturate(200%);
+  -webkit-backdrop-filter:blur(36px) saturate(200%);
+  background:rgba(7,6,12,.68);
+  border-bottom:1px solid var(--b1);
+  transition:background .4s ease,border-color .4s ease,box-shadow .4s ease;
+}
+nav.scrolled {
+  background:rgba(7,6,12,.94);
+  border-bottom-color:var(--b2);
+  box-shadow:0 4px 50px rgba(0,0,0,.55);
+}
+
+/* ── Logo mark ── */
+.logo-wrap {
+  display:inline-flex; align-items:center; gap:.8rem;
+  text-decoration:none; user-select:none;
+}
+.logo-mark { display:flex; align-items:center; flex-shrink:0; }
+.logo-mark svg { display:block; }
+/* Wordmark: two-line stack for clear hierarchy */
+.logo-wordmark {
+  display:flex; flex-direction:column;
+  gap:.02rem; line-height:1;
+}
+.logo-flow {
+  font-family:var(--f-display);
+  font-weight:200; font-size:.88rem;
+  letter-spacing:.38em; text-transform:uppercase;
+  color:var(--Au-hi);
+}
+.logo-fit {
+  font-family:var(--f-display);
+  font-weight:700; font-size:.62rem;
+  letter-spacing:.55em; text-transform:uppercase;
+  color:var(--Au);
+  opacity:.8;
+}
+
+.nav-links { display:flex; gap:2.5rem; list-style:none; align-items:center; }
+.nav-links a:not(.btn) {
+  color:var(--t2); text-decoration:none;
+  font-size:.82rem; font-weight:300; letter-spacing:.05em;
+  text-transform:uppercase;
+  transition:color .25s; position:relative;
+}
+.nav-links a:not(.btn)::after {
+  content:''; position:absolute; bottom:-2px; left:0;
+  width:0; height:1px; background:var(--Au);
+  transition:width .35s var(--ease);
+}
+.nav-links a:not(.btn):hover { color:var(--t1); }
+.nav-links a:not(.btn):hover::after { width:100%; }
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  BUTTONS — "Liquid Edge" signature system     ║
+   ║                                               ║
+   ║  Primary: gold fill with animated shimmer +   ║
+   ║    rotating arc glow on the border            ║
+   ║  Ghost  : transparent with a "drawing" border ║
+   ║    that traces itself on hover (clip-path)    ║
+   ╚═══════════════════════════════════════════════╝ */
+/* ══════════════════════════════════════════════
+   BUTTONS — "Arrowhead" signature system
+   ──────────────────────────────────────────────
+   PRIMARY  : pointed right tip (→ forward/action)
+              gold fill + shimmer sweep + glow aura
+   GHOST    : pointed right tip, hollow variant
+              hairline gold edge + fill-wash hover
+   Both use clip-path polygon — true non-rectangular
+   shape, not border-radius.
+══════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════
+   BUTTONS — "Parallelogram" signature system
+   ──────────────────────────────────────────────
+   Both buttons use clip-path parallelogram.
+   Primary  → leans RIGHT (forward action)
+   Ghost    → leans LEFT  (inverse, outbound)
+   The opposing lean makes them a visual pair —
+   together they look designed, not default.
+   Both shapes cut ALL FOUR corners at angles
+   so they are unmistakably non-rectangular.
+══════════════════════════════════════════════ */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  font-family:var(--f-display);
+  font-weight:400; font-size:.73rem;
+  letter-spacing:.12em; text-transform:uppercase;
+  text-decoration:none; cursor:pointer; border:none; background:none;
+  padding:.84rem 2.6rem .84rem 2rem;
+  position:relative;
+  white-space:nowrap;
+  border-radius:0;
+  transition:transform .32s var(--ease), box-shadow .32s var(--ease), filter .32s ease;
+}
+
+/* ══════════════════════════════════════════════════════
+   BUTTONS — "Arrow" system
+   ───────────────────────────────────────────────────────
+   Shape: right-pointing arrow (pentagon).
+   The tip is 22px deep — at button height ~44px this is
+   exactly a 45° angle, creating a crisp unmissable point.
+   Works at any width: narrow pill buttons, full-width CTAs.
+
+   Primary = gold-filled arrow
+   Ghost   = outlined arrow (same shape, matching family)
+══════════════════════════════════════════════════════ */
+.btn-primary {
+  background:var(--g-Au);
+  color:#0a0800;
+  /* Arrow pointing right: flat left, pointed right tip */
+  clip-path:polygon(0 0, calc(100% - 22px) 0, 100% 50%, calc(100% - 22px) 100%, 0 100%);
+  /* Extra right padding so text clears the tip */
+  padding:.82rem 2.8rem .82rem 1.8rem;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    0 6px 28px rgba(201,168,76,.44),
+    0 2px 8px rgba(0,0,0,.4);
+  overflow:hidden;
+}
+/* Shimmer: diagonal beam sweeps left → right on hover */
+.btn-primary::before {
+  content:'';
+  position:absolute; top:-60%; left:-110%; width:55%; height:220%;
+  background:linear-gradient(108deg,transparent 20%,rgba(255,255,255,.42) 50%,transparent 80%);
+  transition:left .56s var(--ease);
+  pointer-events:none;
+}
+.btn-primary:hover::before { left:170%; }
+/* Radial glow aura behind the button on hover */
+.btn-primary::after {
+  content:'';
+  position:absolute; inset:-6px;
+  background:radial-gradient(ellipse at 65% 50%, rgba(201,168,76,.55), transparent 65%);
+  opacity:0; transition:opacity .36s ease; z-index:-1; filter:blur(10px);
+}
+.btn-primary:hover::after { opacity:1; }
+.btn-primary:hover {
+  transform:translateY(-3px);
+  filter:brightness(1.07);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.3),
+    0 12px 42px rgba(201,168,76,.56),
+    0 4px 14px rgba(0,0,0,.44);
+}
+.btn-primary:active { transform:translateY(0); filter:brightness(.95); }
+
+/* ── Ghost: same arrow shape, outlined ── */
+.btn-ghost {
+  background:transparent;
+  color:var(--Au-hi);
+  clip-path:polygon(0 0, calc(100% - 22px) 0, 100% 50%, calc(100% - 22px) 100%, 0 100%);
+  padding:.82rem 2.8rem .82rem 1.8rem;
+  /* inset box-shadow IS clipped to polygon → draws gold line on all edges */
+  box-shadow:inset 0 0 0 1.5px rgba(201,168,76,.32);
+  overflow:hidden;
+}
+/* Gold fill wash grows on hover */
+.btn-ghost::before {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(108deg, rgba(201,168,76,.14) 0%, rgba(201,168,76,.05) 100%);
+  opacity:0; transition:opacity .36s ease; pointer-events:none;
+}
+/* Border brightens on hover */
+.btn-ghost::after {
+  content:'';
+  position:absolute; inset:0;
+  box-shadow:inset 0 0 0 1.5px rgba(201,168,76,.68);
+  opacity:0; transition:opacity .36s ease; pointer-events:none;
+}
+.btn-ghost:hover::before { opacity:1; }
+.btn-ghost:hover::after  { opacity:1; }
+.btn-ghost:hover {
+  color:var(--t1);
+  transform:translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(201,168,76,.35),
+    0 4px 24px rgba(201,168,76,.14);
+}
+
+/* Hero CTA override size */
+.hero-cta .btn-primary { font-size:.76rem; }
+.hero-cta .btn         { padding:.9rem 3rem .9rem 2rem; }
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  HERO                                         ║
+   ╚═══════════════════════════════════════════════╝ */
+.hero {
+  min-height:100vh; display:flex; align-items:center;
+  padding:9rem var(--pad-x) 14rem;
+  position:relative; z-index:1;
+  background:url('fit.webp') center 30% / cover no-repeat;
+  background-attachment:fixed;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:
+    linear-gradient(108deg,rgba(7,6,12,.96) 0%,rgba(7,6,12,.55) 46%,rgba(10,9,18,.90) 100%),
+    linear-gradient(180deg,transparent 56%,var(--ink) 100%);
+}
+/* Gold hairline top */
+.hero::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent 5%,var(--Au-rim),var(--Au),var(--Au-rim),transparent 95%);
+}
+/* Wave divider at bottom */
+.hero-wave {
+  position:absolute; bottom:-1px; left:0; right:0;
+  height:100px; z-index:2; pointer-events:none; overflow:hidden;
+}
+.hero-wave svg { width:100%; height:100%; display:block; }
+.hero > *:not(.hero-wave)::before { position:relative; z-index:3; }
+.hero-content {
+  max-width:var(--col-max); margin:0 auto; width:100%;
+  display:grid; grid-template-columns:1.2fr .8fr; gap:5rem;
+  align-items:center; position:relative; z-index:3;
+}
+
+/* Eyebrow */
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:.65rem;
+  padding:.4rem 1.1rem; border-radius:var(--r-pill);
+  background:rgba(201,168,76,.08); border:1px solid var(--b1);
+  color:var(--Au-hi);
+  font-size:.65rem; font-weight:200; letter-spacing:.16em; text-transform:uppercase;
+  margin-bottom:1.8rem;
+  animation:slideUp .9s var(--ease) both;
+}
+.eyebrow-pulse {
+  width:5px; height:5px; border-radius:50%; background:var(--Au);
+  animation:pulse 2.8s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(.5);opacity:.4} }
+
+/* Headline — Josefin Sans 100 is very thin and distinctive */
+.hero-text h1 {
+  font-family:var(--f-display);
+  font-weight:200;
+  font-size:clamp(3rem,6.5vw,7rem);
+  line-height:.98; letter-spacing:-.01em;
+  margin-bottom:1.6rem;
+  animation:slideUp .9s var(--ease) .1s both;
+}
+.hero-text h1 .line-2 {
+  display:block;
+  font-weight:400;
+  background:var(--g-Au);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-text p {
+  font-family:var(--f-display);
+  font-weight:300; font-size:.98rem; line-height:1.92; letter-spacing:.03em;
+  color:rgba(240,235,228,.60);
+  max-width:490px; margin-bottom:2.4rem;
+  animation:slideUp .9s var(--ease) .2s both;
+}
+.hero-cta {
+  display:flex; gap:1rem; flex-wrap:wrap;
+  animation:slideUp .9s var(--ease) .32s both;
+}
+
+
+/* Trust strip */
+.hero-trust {
+  display:flex; align-items:center; gap:1.1rem;
+  margin-top:2.4rem;
+  animation:slideUp .9s var(--ease) .48s both;
+}
+.trust-avatars { display:flex; }
+.t-av {
+  width:32px; height:32px; border-radius:50%;
+  border:2px solid var(--ink);
+  background:var(--g-Au); color:#0a0800;
+  font-size:.58rem; font-weight:400; letter-spacing:.02em;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--f-display);
+  margin-left:-9px;
+}
+.t-av:first-child { margin-left:0; }
+.trust-text { font-family:var(--f-display); font-size:.74rem; color:var(--t2); line-height:1.45; font-weight:300; }
+.trust-text strong { color:var(--Au-hi); font-weight:300; display:block; letter-spacing:.03em; }
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(26px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Workout Preview Card ── */
+.hero-visual { animation:slideUp .9s var(--ease) .22s both; }
+
+.workout-preview {
+  background:var(--g-card);
+  backdrop-filter:blur(32px) saturate(180%); -webkit-backdrop-filter:blur(32px) saturate(180%);
+  border-radius:24px; padding:2.4rem 2.2rem;
+  border:1px solid var(--b2);
+  box-shadow:0 36px 90px rgba(0,0,0,.65),0 0 0 1px rgba(201,168,76,.08);
+  position:relative;
+  overflow:hidden; /* cards are sealed — nothing bleeds out */
+  transform:perspective(900px) rotateY(-4deg) rotateX(2deg);
+  transition:transform .55s var(--ease),box-shadow .55s var(--ease);
+}
+.workout-preview:hover {
+  transform:perspective(900px) rotateY(0) rotateX(0) translateY(-8px);
+  box-shadow:0 48px 100px rgba(0,0,0,.7),0 0 80px rgba(201,168,76,.14);
+}
+/* Pinstripe top bar */
+.workout-preview::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--g-Au); z-index:1;
+}
+/* Ambient inner glow */
+.workout-preview::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:50%;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.12),transparent 70%);
+  pointer-events:none;
+}
+
+.floating-badge {
+  /* Now lives INSIDE the header row — no longer absolute */
+  display:inline-flex; align-items:center;
+  background:var(--g-Au); color:#0a0800;
+  padding:.28rem .9rem; border-radius:3px;
+  font-family:var(--f-display); font-size:.6rem; font-weight:500;
+  letter-spacing:.1em; text-transform:uppercase;
+  box-shadow:0 4px 16px rgba(201,168,76,.4);
+  flex-shrink:0;
+}
+.preview-header {
+  /* Three slots: [session-badge]  [title]  [level-badge]
+     Space-between so they spread naturally */
+  display:flex; justify-content:space-between; align-items:center;
+  gap:.6rem;
+  margin-bottom:1.6rem;
+}
+.preview-title {
+  font-family:var(--f-serif);
+  font-size:1.05rem; font-weight:400; font-style:italic; letter-spacing:-.01em;
+  color:var(--t1);
+  /* No padding-right hack — badges are now in the flex row */
+}
+.preview-badge {
+  /* In-flow level badge — no longer absolute */
+  display:inline-flex; align-items:center;
+  background:rgba(59,191,138,.1); border:1px solid rgba(59,191,138,.25);
+  padding:.28rem .75rem; border-radius:3px;
+  font-size:.6rem; font-weight:400; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--sage);
+  font-family:var(--f-display);
+  flex-shrink:0;
+}
+.exercise-list { display:flex; flex-direction:column; gap:.55rem; }
+.exercise-item {
+  display:grid; grid-template-columns:52px 1fr; gap:.85rem;
+  align-items:center;
+  padding:.7rem .85rem;
+  background:rgba(240,235,228,.028); border-radius:var(--r-sm);
+  border:1px solid transparent;
+  transition:all .3s var(--ease);
+}
+.exercise-item:hover {
+  background:rgba(201,168,76,.06); border-color:var(--b1);
+  transform:translateX(4px);
+}
+/* IMAGE icons — real fitness photos */
+.exercise-img {
+  width:44px; height:44px; border-radius:10px;
+  overflow:hidden; flex-shrink:0;
+  border:1px solid var(--b1);
+}
+.exercise-img img {
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+.exercise-info h4 {
+  font-family:var(--f-display); font-size:.88rem; font-weight:400;
+  letter-spacing:.02em; margin-bottom:.15rem; color:var(--t1);
+}
+.exercise-info p {
+  /* t2 (#8A8590) not t3 (#44404A) — visible on dark background */
+  color:var(--t2); font-size:.76rem; font-weight:300; letter-spacing:.02em;
+}
+
+/* Preview progress */
+.preview-progress { margin-top:1.4rem; padding-top:1.2rem; border-top:1px solid var(--b3); }
+.preview-progress-label {
+  display:flex; justify-content:space-between;
+  font-size:.68rem; color:var(--t2); margin-bottom:.55rem;
+  font-family:var(--f-display); font-weight:200; letter-spacing:.06em;
+}
+.preview-progress-label span:last-child { color:var(--Au); font-weight:300; }
+.progress-track { height:3px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; width:25%; background:var(--g-Au); border-radius:2px; }
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  STATS BAND                                   ║
+   ╚═══════════════════════════════════════════════╝ */
+.stats {
+  padding:5.5rem var(--pad-x);
+  position:relative; z-index:2;
+  border-top:1px solid var(--b1); border-bottom:1px solid var(--b1);
+}
+/* Subtle gradient backing */
+.stats::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg,rgba(201,168,76,.025) 0%,transparent 100%);
+  pointer-events:none;
+}
+.stats-grid {
+  max-width:var(--col-max); margin:0 auto;
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  background:var(--b1); /* creates hairline separators */
+  border:1px solid var(--b1);
+  border-radius:var(--r-card);
+  overflow:hidden; /* contains the grid cleanly */
+}
+.stat-item {
+  text-align:center; padding:2.4rem 1.5rem;
+  background:var(--ink-1);
+  position:relative;
+  transition:background .35s ease;
+}
+.stat-item:hover { background:var(--ink-2); }
+.stat-number {
+  font-family:var(--f-mono); font-weight:300;
+  font-size:clamp(2rem,3vw,2.8rem);
+  letter-spacing:-.04em; line-height:1; margin-bottom:.4rem;
+  background:var(--g-Au);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.stat-label {
+  font-family:var(--f-display);
+  color:var(--t2); font-size:.76rem; font-weight:300; letter-spacing:.08em; text-transform:uppercase;
+}
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  SHARED SECTION HEADER                        ║
+   ╚═══════════════════════════════════════════════╝ */
+.section-header { text-align:center; margin-bottom:4rem; }
+.section-label {
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.36rem 1.1rem; border-radius:3px;
+  background:rgba(201,168,76,.07); border:1px solid var(--b1);
+  color:var(--Au-hi);
+  font-family:var(--f-display); font-size:.64rem; font-weight:200;
+  letter-spacing:.18em; text-transform:uppercase;
+  margin-bottom:1.3rem;
+}
+.section-header h2 {
+  font-family:var(--f-serif); font-weight:300; font-style:italic;
+  font-size:clamp(2.2rem,3.8vw,3.8rem);
+  letter-spacing:-.01em; line-height:1.06; margin-bottom:.9rem;
+  color:var(--t1);
+}
+.section-header p {
+  font-family:var(--f-display);
+  font-size:.9rem;  font-weight:300; color:var(--t2);
+  max-width:500px; margin:0 auto; line-height:2; letter-spacing:.02em;
+}
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  FEATURES                                     ║
+   ║  Grid fix: cells never overflow, text wraps   ║
+   ╚═══════════════════════════════════════════════╝ */
+.features-section {
+  padding:9rem var(--pad-x);
+  position:relative; z-index:2;
+}
+.features-inner { max-width:var(--col-max); margin:0 auto; }
+
+.features-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px; /* hairline gaps, like a gallery wall */
+  background:var(--b1);
+  border:1px solid var(--b1);
+  border-radius:var(--r-card);
+  overflow:hidden; /* THIS seals the grid — nothing bleeds outside */
+}
+.feature-card {
+  background:var(--ink-1);
+  padding:2.4rem 2.2rem;
+  position:relative;
+  transition:background .4s ease;
+  /* No overflow:visible needed — content is naturally contained */
+}
+.feature-card:hover { background:var(--ink-2); }
+
+/* Hover top-bar that sweeps in */
+.feature-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--g-Au);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .5s var(--ease);
+}
+.feature-card:hover::before { transform:scaleX(1); }
+
+/* Icon: SVG in a framed box */
+.feat-icon-wrap {
+  width:54px; height:54px; border-radius:var(--r-sm);
+  background:rgba(201,168,76,.09); border:1px solid var(--b1);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:1.4rem;
+  transition:background .35s ease,box-shadow .35s ease;
+}
+.feature-card:hover .feat-icon-wrap {
+  background:rgba(201,168,76,.16);
+  box-shadow:0 4px 20px rgba(201,168,76,.22);
+}
+.feat-icon-wrap svg { width:24px; height:24px; }
+
+.feature-card h3 {
+  font-family:var(--f-display);
+  font-size:1rem; font-weight:300; letter-spacing:.04em;
+  margin-bottom:.75rem; color:var(--t1);
+  text-transform:uppercase;
+}
+.feature-card p {
+  font-family:var(--f-display);
+  color:var(--t2); font-size:.85rem; font-weight:300;
+  line-height:1.9; letter-spacing:.02em;
+  /* Text wrapping — guaranteed to never overflow cell */
+  word-break:break-word;
+  overflow-wrap:break-word;
+}
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  PRICING                                      ║
+   ╚═══════════════════════════════════════════════╝ */
+.pricing-section {
+  padding:10rem var(--pad-x) 11rem;
+  position:relative; z-index:2;
+  background:var(--ink-1);
+  border-top:1px solid var(--b1); border-bottom:1px solid var(--b1);
+}
+/* Diagonal clip top */
+.pricing-section::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:80px;
+  background:var(--ink);
+  clip-path:polygon(0 0,100% 0,100% 0,0 100%);
+  z-index:0; pointer-events:none;
+}
+.pricing-inner { max-width:var(--col-max); margin:0 auto; position:relative; z-index:1; }
+
+.pricing-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.5rem;
+  align-items:start;
+  /* Padding for the floating badge above featured card */
+  padding-top:1.8rem;
+}
+
+.pricing-card {
+  background:var(--g-card);
+  border-radius:var(--r-card); padding:2.4rem;
+  border:1px solid var(--b1);
+  position:relative;
+  /* overflow:hidden seals the card — text wraps inside, nothing bleeds out */
+  overflow:hidden;
+  transition:transform .4s var(--ease), box-shadow .4s var(--ease), border-color .4s ease;
+}
+.pricing-card:not(.featured):hover {
+  transform:translateY(-8px);
+  border-color:var(--b2);
+  box-shadow:0 28px 70px rgba(0,0,0,.55);
+}
+
+/* ── Featured card ── */
+.pricing-card.featured {
+  background:linear-gradient(160deg,rgba(35,26,8,.97) 0%,rgba(16,14,28,.97) 100%);
+  border:1px solid rgba(201,168,76,.38);
+  /* The card lifts above others */
+  transform:translateY(-16px);
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,.08),
+    0 32px 80px rgba(0,0,0,.75),
+    0 0 100px rgba(201,168,76,.15),
+    inset 0 1px 0 rgba(201,168,76,.18);
+  z-index:2;
+}
+.pricing-card.featured:hover {
+  transform:translateY(-24px);
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,.12),
+    0 40px 90px rgba(0,0,0,.8),
+    0 0 120px rgba(201,168,76,.20),
+    inset 0 1px 0 rgba(201,168,76,.22);
+}
+/* Ambient radial light at top of featured card */
+.pricing-card.featured::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:200px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.22),transparent 72%);
+  pointer-events:none;
+}
+
+/* Pricing badge — lives ABOVE the card using negative margin approach */
+.pricing-badge {
+  position:absolute; top:-1px; left:50%; transform:translateX(-50%);
+  /* Sits at the very top of the card's padding area */
+  margin-top:-1.8rem;
+  /* Inlined from the grid padding-top value */
+  background:var(--g-Au); color:#0a0800;
+  padding:.3rem 1.2rem; border-radius:0 0 6px 6px;
+  font-family:var(--f-display); font-size:.62rem; font-weight:400;
+  letter-spacing:.14em; text-transform:uppercase;
+  box-shadow:0 4px 20px rgba(201,168,76,.5); white-space:nowrap;
+  /* Override absolute positioning to use document flow */
+  position:relative; top:auto; left:auto; transform:none;
+  display:inline-block; margin-bottom:1.2rem;
+}
+
+.plan-badge-wrap { margin-bottom:.8rem; }
+.plan-tier-badge {
+  display:inline-flex; align-items:center; gap:.35rem;
+  padding:.28rem .85rem; border-radius:3px;
+  font-family:var(--f-display); font-size:.62rem; font-weight:300;
+  letter-spacing:.12em; text-transform:uppercase;
+}
+.free-badge    { background:rgba(59,191,138,.10); color:var(--sage); border:1px solid rgba(59,191,138,.22); }
+.pro-badge     { background:rgba(201,168,76,.12); color:var(--Au); border:1px solid var(--b1); }
+.premium-badge { background:rgba(232,201,106,.15); color:var(--Au-hi); border:1px solid rgba(201,168,76,.28); }
+
+.pricing-card h3 {
+  font-family:var(--f-serif); font-weight:300; font-style:italic;
+  font-size:2rem; letter-spacing:-.01em; margin-bottom:.2rem; color:var(--t1);
+}
+.pricing-card .price {
+  font-family:var(--f-mono); font-weight:300;
+  font-size:2.8rem; letter-spacing:-.05em;
+  margin:1rem 0 .2rem; line-height:1;
+  background:var(--g-Au);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; display:block;
+}
+.pricing-card .price span {
+  font-size:.82rem; font-family:var(--f-display); font-weight:200;
+  -webkit-text-fill-color:var(--t2); color:var(--t2); letter-spacing:.02em;
+}
+.plan-desc {
+  font-family:var(--f-display); font-size:.82rem; font-weight:300;
+  color:var(--t2); line-height:1.82; margin-bottom:1.4rem; letter-spacing:.02em;
+  /* text stays inside card */
+  word-break:break-word; overflow-wrap:break-word;
+}
+
+/* Feature list — fully contained inside card */
+.pricing-features {
+  list-style:none; margin:1.4rem 0; display:flex; flex-direction:column;
+}
+.pricing-features li {
+  padding:.48rem 0;
+  border-bottom:1px solid var(--b3);
+  display:flex; align-items:flex-start; gap:.7rem;
+  font-family:var(--f-display); font-size:.82rem; font-weight:300;
+  line-height:1.62; letter-spacing:.02em;
+  word-break:break-word; overflow-wrap:break-word;
+}
+.pricing-features li:last-child { border-bottom:none; }
+/* Checkmarks as styled spans, not CSS pseudo-content */
+.feat-available { color:var(--t4) !important; }
+.feat-available::before { display:none !important; }
+.feat-locked { color:var(--t3) !important; }
+.feat-locked::before { display:none !important; }
+
+/* Check / cross icons */
+.feat-check { color:var(--sage); font-size:.7rem; flex-shrink:0; margin-top:.2rem; }
+.feat-cross  { color:var(--t3); font-size:.7rem; flex-shrink:0; margin-top:.2rem; opacity:.6; }
+
+/* Pricing CTA */
+.pricing-cta {
+  display:block; width:100%; text-align:center;
+  margin-top:1.6rem;
+}
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  FOOTER                                       ║
+   ╚═══════════════════════════════════════════════╝ */
+footer {
+  padding:6rem var(--pad-x) 2.5rem;
+  position:relative; z-index:2;
+  border-top:1px solid var(--b1);
+  background:var(--ink);
+}
+.footer-content {
+  max-width:var(--col-max); margin:0 auto;
+  display:grid; grid-template-columns:2.2fr 1fr 1fr 1fr; gap:3rem;
+  margin-bottom:4rem;
+}
+.footer-brand p {
+  color:var(--t2); margin-top:1.4rem;
+  font-family:var(--f-display); font-size:.82rem; font-weight:300;
+  line-height:1.9; max-width:290px; letter-spacing:.02em;
+}
+.footer-links h4 {
+  font-family:var(--f-display); font-size:.64rem; font-weight:300;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:var(--Au); margin-bottom:1.5rem;
+}
+.footer-links ul { list-style:none; }
+.footer-links li { margin-bottom:.75rem; }
+.footer-links a {
+  color:var(--t2); text-decoration:none;
+  font-family:var(--f-display); font-size:.82rem; font-weight:300;
+  letter-spacing:.03em;
+  transition:color .25s, letter-spacing .25s;
+  display:inline-block;
+}
+.footer-links a:hover { color:var(--Au-hi); letter-spacing:.06em; }
+.footer-bottom {
+  max-width:var(--col-max); margin:0 auto;
+  padding-top:2rem; border-top:1px solid var(--b3);
+  display:flex; align-items:center; justify-content:space-between;
+  color:var(--t3); font-family:var(--f-display); font-size:.74rem; font-weight:300; letter-spacing:.04em;
+}
+.footer-bottom-links { display:flex; gap:1.6rem; }
+.footer-bottom-links a {
+  color:var(--t3); text-decoration:none;
+  font-family:var(--f-display); font-size:.72rem; font-weight:200;
+  transition:color .25s;
+}
+.footer-bottom-links a:hover { color:var(--Au-hi); }
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  SCROLL REVEAL                                ║
+   ╚═══════════════════════════════════════════════╝ */
+.reveal { opacity:0; transform:translateY(24px); transition:opacity .75s var(--ease),transform .75s var(--ease); }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-delay-1 { transition-delay:.1s; }
+.reveal-delay-2 { transition-delay:.2s; }
+.reveal-delay-3 { transition-delay:.3s; }
+
+/* ╔═══════════════════════════════════════════════╗
+   ║  RESPONSIVE                                   ║
+   ╚═══════════════════════════════════════════════╝ */
+@media(max-width:1100px) {
+  :root { --pad-x: 2rem; }
+  .hero-content { grid-template-columns:1fr; gap:3.5rem; }
+  .hero { padding:8rem var(--pad-x) 12rem; }
+  .features-grid { grid-template-columns:repeat(2,1fr); }
+  .pricing-grid  { grid-template-columns:1fr; max-width:440px; margin-left:auto; margin-right:auto; }
+  .pricing-card.featured { transform:none; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+  .footer-content { grid-template-columns:1fr 1fr; }
+  .workout-preview { transform:none; }
+}
+@media(max-width:768px) {
+  :root { --pad-x:1.5rem; }
+  nav { padding:1rem var(--pad-x); }
+  .nav-links { display:none; }
+  .hero { padding:7rem var(--pad-x) 10rem; }
+  .features-grid { grid-template-columns:1fr; }
+  .pricing-grid { max-width:100%; }
+  .footer-content { grid-template-columns:1fr; gap:2rem; }
+  .footer-bottom { flex-direction:column; gap:1rem; text-align:center; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:480px) {
+  .hero-cta { flex-direction:column; }
+  .hero-cta .btn { width:100%; }
+  .stats-grid { grid-template-columns:1fr; }
+}
+
+/* Legacy compat */
+.gradient-text {
+  background:var(--g-Au) !important;
+  -webkit-background-clip:text !important; -webkit-text-fill-color:transparent !important;
+  background-clip:text !important;
+}
+</style>
+</head>
+<body>
+
+<!-- Atmosphere -->
+<div class="blob blob-1" aria-hidden="true"></div>
+<div class="blob blob-2" aria-hidden="true"></div>
+<div class="blob blob-3" aria-hidden="true"></div>
+<div class="bg-animation" aria-hidden="true"></div>
+
+<!-- ══════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════ -->
+<nav id="mainNav">
+
+  <!--
+  ╔══════════════════════════════════════════════════╗
+  ║  FLOWFIT LOGO                                    ║
+  ║                                                  ║
+  ║  Mark: A stylized flame/motion glyph.            ║
+  ║  Three stacked chevrons pointing right —         ║
+  ║  each progressively smaller, creating a          ║
+  ║  sense of forward acceleration and flow.         ║
+  ║  The gap between chevrons echoes the letter F.   ║
+  ║                                                  ║
+  ║  Wordmark: "FLOW" thin 100wt + "FIT" 400wt       ║
+  ║  stacked vertically, all-caps, wide-tracked.     ║
+  ╚══════════════════════════════════════════════════╝
+  -->
+  <a href="<a href="<a href="#" class="logo-wrap" aria-label="FlowFit">
+    <div class="logo-mark">
+      <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pulseA" x1="0" y1="0" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#E8C96A"/>
+            <stop offset="55%"  stop-color="#C9A84C"/>
+            <stop offset="100%" stop-color="#8E6E28"/>
+          </linearGradient>
+          <linearGradient id="bgA" x1="0" y1="0" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#1a1508"/>
+            <stop offset="100%" stop-color="#0d0b18"/>
+          </linearGradient>
+        </defs>
+        <!-- Outer circle ring — dashed arc suggests "progress/orbit" -->
+        <circle cx="19" cy="19" r="17.5" fill="url(#bgA)"/>
+        <circle cx="19" cy="19" r="16"
+          stroke="url(#pulseA)" stroke-width="1.6" fill="none"
+          stroke-dasharray="68 32" stroke-dashoffset="20"
+          stroke-linecap="round" opacity=".55"/>
+        <!-- ECG heartbeat line — flat→rise→fall→rise→flat -->
+        <polyline
+          points="3,19  8,19  11,9  14,27  17,13  20,22  23,19  35,19"
+          stroke="url(#pulseA)"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"/>
+      </svg>
+    </div>
+    <div class="logo-wordmark">
+      <span class="logo-flow">Flow</span>
+      <span class="logo-fit">Fit</span>
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="login.html" class="btn btn-ghost">Login</a></li>
+    <li><a href="register.html" class="btn btn-primary">Sign Up</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-pulse"></span>
+        Your Personal Fitness OS
+      </div>
+      <h1>
+        Transform Your Body
+        <span class="line-2">at Home</span>
+      </h1>
+      <p>
+        Professional workout tracking, personalized programs, and real-time
+        progress analytics. Your fitness journey starts here.
+      </p>
+      <div class="hero-cta">
+        <a href="register.html" class="btn btn-primary">Start Free Trial</a>
+        <a href="#features" class="btn btn-ghost">Explore Features</a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-avatars">
+          <div class="t-av">JK</div>
+          <div class="t-av">AM</div>
+          <div class="t-av">TR</div>
+          <div class="t-av">+</div>
+        </div>
+        <div class="trust-text">
+          <strong>50,000+ athletes</strong>
+          already crushing their goals
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="workout-preview">
+        <div class="preview-header">
+          <div class="floating-badge">Live Session</div>
+          <div class="preview-title">Today's Workout</div>
+          <div class="preview-badge">Beginner</div>
+        </div>
+        <div class="exercise-list">
+          <!-- Real images from Unsplash — fitness photography -->
+          <div class="exercise-item">
+            <div class="exercise-img">
+              <img src="https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=88&h=88&fit=crop&q=80" alt="Push-ups" loading="lazy">
+            </div>
+            <div class="exercise-info">
+              <h4>Push-ups</h4>
+              <p>3 sets × 12 reps</p>
+            </div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-img">
+              <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=88&h=88&fit=crop&q=80" alt="Burpees" loading="lazy">
+            </div>
+            <div class="exercise-info">
+              <h4>Burpees</h4>
+              <p>3 sets × 10 reps</p>
+            </div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-img">
+              <img src="https://images.unsplash.com/photo-1567598508481-65985588e295?w=88&h=88&fit=crop&q=80" alt="Squats" loading="lazy">
+            </div>
+            <div class="exercise-info">
+              <h4>Squats</h4>
+              <p>4 sets × 15 reps</p>
+            </div>
+          </div>
+          <div class="exercise-item">
+            <div class="exercise-img">
+              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=88&h=88&fit=crop&q=80" alt="Plank" loading="lazy">
+            </div>
+            <div class="exercise-info">
+              <h4>Plank</h4>
+              <p>3 sets × 45 sec</p>
+            </div>
+          </div>
+        </div>
+        <div class="preview-progress">
+          <div class="preview-progress-label">
+            <span>Session Progress</span>
+            <span>1 of 4 done</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave divider -->
+  <div class="hero-wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,50 C240,100 480,0 720,50 C960,100 1200,10 1440,50 L1440,100 L0,100 Z" fill="#07060c"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     STATS
+══════════════════════════════════════ -->
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <div class="stat-number">50K+</div>
+      <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-1">
+      <div class="stat-number">2M+</div>
+      <div class="stat-label">Workouts Logged</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-2">
+      <div class="stat-number">150+</div>
+      <div class="stat-label">Exercise Library</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-3">
+      <div class="stat-number">98%</div>
+      <div class="stat-label">Satisfaction Rate</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FEATURES
+══════════════════════════════════════ -->
+<section class="features-section" id="features">
+  <div class="features-inner">
+    <div class="section-header reveal">
+      <span class="section-label">Features</span>
+      <h2>Everything You Need to Succeed</h2>
+      <p>Powerful tools designed to help you achieve your fitness goals faster and smarter</p>
+    </div>
+
+    <div class="features-grid">
+
+      <!-- SVG icons — clean gold line art, no emojis -->
+
+      <div class="feature-card reveal">
+        <div class="feat-icon-wrap">
+          <!-- Analytics / line chart -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#iA)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <defs><linearGradient id="iA" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#E8C96A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient></defs>
+            <polyline points="3 17 8 11 13 14 21 6"/>
+            <line x1="3" y1="21" x2="21" y2="21"/>
+          </svg>
+        </div>
+        <h3>Smart Tracking</h3>
+        <p>Log every rep, set, and workout. Track your progress with detailed analytics and beautiful visualizations that show your improvement over time.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feat-icon-wrap">
+          <!-- Target / bullseye -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#iB)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <defs><linearGradient id="iB" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#E8C96A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient></defs>
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+        </div>
+        <h3>Personalized Programs</h3>
+        <p>Get customized workout plans tailored to your fitness level, goals, and available equipment. Progressive overload built in automatically.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feat-icon-wrap">
+          <!-- Trophy -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#iC)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <defs><linearGradient id="iC" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#E8C96A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient></defs>
+            <path d="M8 21h8m-4-4v4M6 3H4a1 1 0 00-1 1v2a5 5 0 005 5h8a5 5 0 005-5V4a1 1 0 00-1-1h-2M6 3h12v7a6 6 0 01-12 0V3z"/>
+          </svg>
+        </div>
+        <h3>Gamification &amp; Streaks</h3>
+        <p>Stay motivated with daily streaks, achievement badges, and milestone celebrations. Turn your fitness journey into an engaging game.</p>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feat-icon-wrap">
+          <!-- Mobile phone -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#iD)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <defs><linearGradient id="iD" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#E8C96A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient></defs>
+            <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+        </div>
+        <h3>Mobile Optimized</h3>
+        <p>Access your workouts anywhere, anytime. Our responsive design works perfectly on all devices, from phone to desktop.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feat-icon-wrap">
+          <!-- Bar chart rising -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#iE)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <defs><linearGradient id="iE" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#E8C96A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient></defs>
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+          </svg>
+        </div>
+        <h3>Progress Analytics</h3>
+        <p>Comprehensive charts and graphs showing your strength gains, workout frequency, calories burned, and body composition changes.</p>
+      </div>
+
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feat-icon-wrap">
+          <!-- Diamond / gem -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#iF)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <defs><linearGradient id="iF" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#E8C96A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient></defs>
+            <path d="M2.7 7.5L12 21l9.3-13.5M6.5 2.5h11L21 7.5H3z"/>
+          </svg>
+        </div>
+        <h3>Premium Content</h3>
+        <p>Unlock advanced programs, video demonstrations, nutrition guides, and priority support with our premium subscription tiers.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     PRICING
+══════════════════════════════════════ -->
+<section class="pricing-section" id="pricing">
+  <div class="pricing-inner">
+    <div class="section-header reveal">
+      <span class="section-label">Pricing</span>
+      <h2>Choose Your Plan</h2>
+      <p>Start free and upgrade when you're ready for advanced features</p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- FREE -->
+      <div class="pricing-card reveal">
+        <div class="plan-badge-wrap">
+          <span class="plan-tier-badge free-badge">Free Trial</span>
+        </div>
+        <h3>Free</h3>
+        <div class="price">$0<span> / mo</span></div>
+        <p class="plan-desc">Perfect for getting started with guided beginner workouts.</p>
+        <ul class="pricing-features">
+          <li class="feat-available"><span class="feat-check">✓</span> Full beginner exercise library</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Manual workout logging</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Basic progress tracking</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Beginner workout programs</li>
+          <li class="feat-available"><span class="feat-check">✓</span> 7-day streak tracker</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Mobile app access</li>
+          <li class="feat-locked"><span class="feat-cross">✕</span> Video demonstrations</li>
+          <li class="feat-locked"><span class="feat-cross">✕</span> Intermediate programs</li>
+          <li class="feat-locked"><span class="feat-cross">✕</span> Advanced analytics</li>
+        </ul>
+        <a href="register.html" class="btn btn-ghost pricing-cta">Get Started Free</a>
+      </div>
+
+      <!-- PRO (featured) -->
+      <div class="pricing-card featured reveal reveal-delay-1">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="plan-badge-wrap">
+          <span class="plan-tier-badge pro-badge">Pro</span>
+        </div>
+        <h3>Pro</h3>
+        <div class="price">$12<span> / mo</span></div>
+        <p class="plan-desc">For dedicated athletes ready to level up from beginner to intermediate.</p>
+        <ul class="pricing-features">
+          <li class="feat-available"><span class="feat-check">✓</span> Everything in Free</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Beginner + Intermediate library</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Video exercise demos</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Full workout programs (all levels)</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Advanced progress analytics</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Custom workout plan builder</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Progress charts &amp; insights</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Priority email support</li>
+          <li class="feat-locked"><span class="feat-cross">✕</span> AI-generated plans</li>
+          <li class="feat-locked"><span class="feat-cross">✕</span> 1-on-1 coaching</li>
+          <li class="feat-locked"><span class="feat-cross">✕</span> Nutrition tracking</li>
+        </ul>
+        <a href="register.html" class="btn btn-primary pricing-cta">Start 7-Day Pro Trial</a>
+      </div>
+
+      <!-- PREMIUM -->
+      <div class="pricing-card reveal reveal-delay-2">
+        <div class="plan-badge-wrap">
+          <span class="plan-tier-badge premium-badge">Premium</span>
+        </div>
+        <h3>Premium</h3>
+        <div class="price">$24<span> / mo</span></div>
+        <p class="plan-desc">The complete FlowFit experience — every feature, every tool, every level.</p>
+        <ul class="pricing-features">
+          <li class="feat-available"><span class="feat-check">✓</span> Everything in Pro</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Full advanced exercise library</li>
+          <li class="feat-available"><span class="feat-check">✓</span> AI-generated personalized plans</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Nutrition &amp; macro tracking</li>
+          <li class="feat-available"><span class="feat-check">✓</span> 1-on-1 coaching calls</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Wearable device integration</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Custom macros &amp; meal planning</li>
+          <li class="feat-available"><span class="feat-check">✓</span> Early access to new features</li>
+          <li class="feat-available"><span class="feat-check">✓</span> White-glove priority support</li>
+        </ul>
+        <a href="register.html" class="btn btn-ghost pricing-cta">Go Premium</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-brand">
+      <!-- Footer logo -->
+      <a href="#" class="logo-wrap" aria-label="FlowFit">
+      <div class="logo-mark"><svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="pB" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stop-color="#EDD87A"/>
+              <stop offset="55%"  stop-color="#C9A84C"/>
+              <stop offset="100%" stop-color="#8E6E28"/>
+            </linearGradient>
+          </defs>
+          <circle cx="20" cy="20" r="18" fill="#0f0e18"/>
+          <circle cx="20" cy="20" r="16"
+            stroke="url(#pB)" stroke-width="1.8" fill="none"
+            stroke-dasharray="72 29" stroke-dashoffset="18"
+            stroke-linecap="round"/>
+          <path d="M4,20 L11,20 L14,12 L18,28 L22,16 L25,20 L36,20"
+            stroke="url(#pB)" stroke-width="2.4" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-wordmark">
+        <span class="logo-flow">FLOW</span><span class="logo-fit">FIT</span>
+      </div>
+    </a>
+      <p>Transform your body at home with professional workout tracking, personalized programs, and real-time progress analytics.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#" onclick="isAuthenticated() ? window.location.href='dashboard.html' : window.location.href='login.html'; return false;">Dashboard</a></li>
+        <li><a href="#">Mobile App</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Cookie Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 FlowFit. All rights reserved. Built with care for fitness enthusiasts.</p>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS — all original JS preserved
+══════════════════════════════════════ -->
+<script src="api.js"></script>
+<script>
+    /* ── Original auth logic (unchanged) ─────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+        const loggedIn = isAuthenticated();
+
+        const navSignUp = document.querySelector('a[href="register.html"].btn.btn-primary');
+        if (navSignUp && loggedIn) {
+            navSignUp.textContent = 'Dashboard';
+            navSignUp.href = 'dashboard.html';
+        }
+
+        document.querySelectorAll('a[href="dashboard.html"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (!isAuthenticated()) {
+                    e.preventDefault();
+                    window.location.href = 'register.html';
+                }
+            });
+        });
+    });
+
+    /* ── Nav scroll effect ─────────────────────── */
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 40) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    }, { passive: true });
+
+    /* ── Scroll-reveal observer ────────────────── */
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ── Pricing card tilt (subtle 3D) ─────────── */
+    document.querySelectorAll('.pricing-card:not(.featured)').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect  = card.getBoundingClientRect();
+            const cx    = rect.left + rect.width / 2;
+            const cy    = rect.top  + rect.height / 2;
+            const rx    = ((e.clientY - cy) / rect.height) * 6;
+            const ry    = ((e.clientX - cx) / rect.width)  * -6;
+            card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    });
+
+    /* ── Feature card subtle tilt ─────────────── */
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const cx   = rect.left + rect.width / 2;
+            const cy   = rect.top  + rect.height / 2;
+            const rx   = ((e.clientY - cy) / rect.height) * 4;
+            const ry   = ((e.clientX - cx) / rect.width)  * -4;
+            card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-10px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    });
+</script>
+
+</body>
+</html>
