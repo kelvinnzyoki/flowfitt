@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - FlowFit Elite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400&family=Lora:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/*
+ * FlowFit — Shared Design System
+ * Applies the landing-page aesthetic (Josefin Sans + Lora + JetBrains Mono,
+ * obsidian-gold tokens, sidebar, cards, inputs, buttons) to all interior pages.
+ *
+ * Specificity note: many existing rules use !important.
+ * We match or exceed that where needed, but prefer clean overrides via :root tokens.
+ */
+
+/* ═══════════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════════ */
+:root {
+  /* backgrounds */
+  --ink:         #07060c;
+  --ink-1:       #0c0b12;
+  --ink-2:       #111019;
+  --ink-3:       #16142080;
+  --surface:     rgba(15, 14, 24, 0.88);
+  --surface-2:   rgba(20, 18, 32, 0.72);
+  --g-card:      linear-gradient(145deg, rgba(20,18,32,0.95), rgba(14,13,22,0.95));
+
+  /* gold */
+  --Au:          #C9A84C;
+  --Au-hi:       #E8C96A;
+  --Au-lo:       #8E6E28;
+  --Au-mist:     rgba(201, 168, 76, 0.08);
+  --Au-rim:      rgba(201, 168, 76, 0.22);
+  --Au-glow:     rgba(201, 168, 76, 0.18);
+  --g-Au:        linear-gradient(135deg, #E8C96A 0%, #C9A84C 50%, #8E6E28 100%);
+
+  /* accents */
+  --sage:        #3BBF8A;
+  --sage-dim:    rgba(59, 191, 138, 0.12);
+  --sky:         #5B9CF6;
+  --coral:       #E07B54;
+  --red:         #E05454;
+
+  /* text */
+  --t1:          #F0EBE0;
+  --t2:          #8A8590;
+  --t3:          #44404A;
+  --t4:          #C4BFCA;
+
+  /* borders */
+  --b1:          rgba(201, 168, 76, 0.14);
+  --b2:          rgba(201, 168, 76, 0.26);
+  --b3:          rgba(240, 235, 228, 0.05);
+  --b4:          rgba(240, 235, 228, 0.09);
+
+  /* typography */
+  --f-display:   'Josefin Sans', sans-serif;
+  --f-serif:     'Lora', Georgia, serif;
+  --f-mono:      'JetBrains Mono', monospace;
+
+  /* motion */
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* layout */
+  --sidebar-w:   270px;
+  --r-card:      16px;
+  --r-sm:        10px;
+  --r-pill:      9999px;
+
+  /* legacy aliases — keeps existing JS/inline-styles working */
+  --bg-deep:          var(--ink);
+  --bg-surface:       var(--ink-1);
+  --bg-card:          var(--g-card);
+  --bg-elevated:      var(--ink-2);
+  --gold-main:        var(--Au);
+  --gold-bright:      var(--Au-hi);
+  --gold-deep:        var(--Au-lo);
+  --gold-gradient:    var(--g-Au);
+  --gold-soft:        var(--Au-mist);
+  --gold-glow:        var(--Au-glow);
+  --border-gold:      var(--b1);
+  --border-gold-hover:var(--b2);
+  --text-primary:     var(--t1);
+  --text-secondary:   var(--t2);
+  --accent-green:     var(--sage);
+  --transition:       all 0.3s var(--ease);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  font-family: var(--f-display);
+  font-weight: 300;
+  background-color: var(--ink);
+  color: var(--t1);
+  min-height: 100vh;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOADING OVERLAY
+═══════════════════════════════════════════════════════ */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--b1);
+  border-top-color: var(--Au);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: var(--f-display);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--Au);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+═══════════════════════════════════════════════════════ */
+#toastContainer {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.toast {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  padding: 0.8rem 1.4rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--b2);
+  background: var(--ink-2);
+  color: var(--t1);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: toastIn 0.3s var(--ease);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT — SIDEBAR + MAIN CONTENT
+═══════════════════════════════════════════════════════ */
+.dashboard-container,
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: var(--sidebar-w) !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background: var(--ink-1) !important;
+  border-right: 1px solid var(--b1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 2rem 1.5rem !important;
+  z-index: 100 !important;
+  transition: transform 0.3s var(--ease) !important;
+}
+
+/* Logo inside sidebar */
+.sidebar .logo {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.38em !important;
+  color: var(--Au-hi) !important;
+  background: none !important;
+  -webkit-text-fill-color: unset !important;
+  text-decoration: none !important;
+  display: block !important;
+  margin-bottom: 2.4rem !important;
+  padding: 0 !important;
+  text-transform: uppercase !important;
+}
+
+/* Nav menu */
+.nav-menu {
+  list-style: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.2rem !important;
+  flex: 1 !important;
+}
+
+.nav-item {
+  width: 100% !important;
+}
+
+.nav-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  padding: 0.72rem 1rem !important;
+  color: var(--t2) !important;
+  text-decoration: none !important;
+  border-radius: var(--r-sm) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  transition: all 0.25s ease !important;
+  border: 1px solid transparent !important;
+}
+
+.nav-link:hover {
+  color: var(--Au-hi) !important;
+  background: var(--Au-mist) !important;
+  border-color: var(--b1) !important;
+}
+
+.nav-link.active {
+  color: var(--ink) !important;
+  background: var(--g-Au) !important;
+  border-color: transparent !important;
+  font-weight: 400 !important;
+}
+
+/* Spacer pushes user section to bottom */
+.nav-spacer {
+  flex: 1 !important;
+  min-height: 1rem !important;
+}
+
+/* User section at sidebar bottom */
+.user-section {
+  border-top: 1px solid var(--b1) !important;
+  padding-top: 1.2rem !important;
+  margin-top: auto !important;
+}
+
+.user-profile {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  margin-bottom: 0.9rem !important;
+}
+
+.user-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.user-info h4 {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.82rem !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.2rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Plan badge */
+.plan-badge {
+  display: inline-block !important;
+  padding: 0.12rem 0.6rem !important;
+  border-radius: 3px !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.6rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.plan-free {
+  background: var(--Au-mist) !important;
+  color: var(--Au) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.plan-pro {
+  background: rgba(91, 156, 246, 0.1) !important;
+  color: var(--sky) !important;
+  border: 1px solid rgba(91, 156, 246, 0.25) !important;
+}
+
+.plan-elite,
+.plan-premium {
+  background: rgba(201, 168, 76, 0.15) !important;
+  color: var(--Au-hi) !important;
+  border: 1px solid var(--b2) !important;
+}
+
+/* Logout button */
+.logout-btn {
+  width: 100% !important;
+  padding: 0.65rem 1rem !important;
+  background: transparent !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  text-align: center !important;
+}
+
+.logout-btn:hover {
+  color: var(--red) !important;
+  border-color: rgba(224, 84, 84, 0.4) !important;
+  background: rgba(224, 84, 84, 0.06) !important;
+}
+
+/* ── MAIN CONTENT ── */
+.main-content,
+.main {
+  margin-left: var(--sidebar-w) !important;
+  flex: 1 !important;
+  min-height: 100vh !important;
+  padding: 2.5rem 3rem !important;
+  overflow-x: hidden !important;
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+  display: none !important;
+  position: fixed !important;
+  top: 1rem !important;
+  left: 1rem !important;
+  z-index: 200 !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: var(--ink-1) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--Au) !important;
+  font-size: 1.1rem !important;
+  cursor: pointer !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  z-index: 99 !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE HEADER
+═══════════════════════════════════════════════════════ */
+.header,
+.page-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+  margin-bottom: 2.5rem !important;
+}
+
+.header h1,
+.page-header h1,
+.page-title,
+.header-left h1 {
+  font-family: var(--f-serif) !important;
+  font-weight: 300 !important;
+  font-style: italic !important;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem) !important;
+  letter-spacing: -0.01em !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.3rem !important;
+}
+
+.header p,
+.page-header p,
+.page-subtitle,
+.header-left p {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.84rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════════════ */
+.card,
+.stat-card,
+.chart-card,
+.program-card,
+.exercise-card,
+.form-section,
+.week-block,
+.panel-card,
+.current-plan-banner,
+.plan-card {
+  background: var(--g-card) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-card) !important;
+  backdrop-filter: blur(16px) !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.card:hover,
+.stat-card:hover,
+.program-card:hover,
+.exercise-card:hover {
+  border-color: var(--b2) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 32px var(--Au-glow) !important;
+}
+
+/* Stat cards */
+.stat-card {
+  padding: 1.6rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+/* Stat icon — replace emoji display */
+.stat-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: var(--r-sm) !important;
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.1rem !important;
+  margin-bottom: 0.4rem !important;
+  color: var(--Au) !important;
+}
+
+.stat-value {
+  font-family: var(--f-mono) !important;
+  font-weight: 300 !important;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem) !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1 !important;
+  background: var(--g-Au) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.stat-label {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRIDS
+═══════════════════════════════════════════════════════ */
+.stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.chart-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.exercise-grid,
+.programs-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  gap: 1.2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════ */
+.btn,
+button.btn,
+a.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.73rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border: none !important;
+  white-space: nowrap !important;
+  padding: 0.75rem 2.2rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  /* Arrow tip: pointed right pentagon */
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    0 100%
+  ) !important;
+  border-radius: 0 !important;
+  transition:
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease),
+    filter 0.3s ease !important;
+}
+
+/* Shimmer sweep on primary */
+.btn-primary::before,
+.btn-enroll::before,
+.btn-start::before,
+.btn-log::before,
+.btn-continue::before,
+.btn-save::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -60% !important;
+  left: -110% !important;
+  width: 55% !important;
+  height: 220% !important;
+  background: linear-gradient(
+    108deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.38) 50%,
+    transparent 80%
+  ) !important;
+  transition: left 0.55s var(--ease) !important;
+  pointer-events: none !important;
+}
+
+/* Primary filled */
+.btn-primary,
+.btn-enroll,
+.btn-start,
+.btn-log,
+.btn-continue,
+.btn-save,
+button[class*="btn-primary"],
+input[type="submit"] {
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 5px 22px rgba(201, 168, 76, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.38) !important;
+}
+
+.btn-primary:hover,
+.btn-enroll:hover,
+.btn-start:hover,
+.btn-log:hover,
+.btn-continue:hover,
+.btn-save:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 32px rgba(201, 168, 76, 0.54),
+    0 4px 12px rgba(0, 0, 0, 0.42) !important;
+}
+
+.btn-primary:hover::before,
+.btn-enroll:hover::before,
+.btn-start:hover::before,
+.btn-log:hover::before,
+.btn-continue:hover::before,
+.btn-save:hover::before {
+  left: 170% !important;
+}
+
+/* Ghost outlined */
+.btn-ghost,
+.btn-details,
+.btn-cancel,
+.btn-secondary,
+button[class*="btn-secondary"],
+button[class*="btn-ghost"] {
+  background: transparent !important;
+  color: var(--Au-hi) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(201, 168, 76, 0.32) !important;
+}
+
+.btn-ghost:hover,
+.btn-details:hover,
+.btn-cancel:hover,
+.btn-secondary:hover {
+  color: var(--t1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(201, 168, 76, 0.6),
+    0 4px 20px rgba(201, 168, 76, 0.14) !important;
+  background: rgba(201, 168, 76, 0.08) !important;
+}
+
+/* Danger / destructive */
+.btn-danger,
+.logout-btn-top,
+button[class*="btn-danger"] {
+  background: transparent !important;
+  color: var(--red) !important;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    0 100%
+  ) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.3) !important;
+}
+
+.btn-danger:hover {
+  background: rgba(224, 84, 84, 0.08) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.6) !important;
+}
+
+/* Full-width override (used on modal/form submit) */
+.btn-full,
+.btn[style*="width:100%"],
+.btn[style*="width: 100%"] {
+  clip-path: none !important;
+  border-radius: var(--r-sm) !important;
+  width: 100% !important;
+  padding: 0.85rem 2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   INPUTS & FORMS
+═══════════════════════════════════════════════════════ */
+.form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.45rem !important;
+  margin-bottom: 1.2rem !important;
+}
+
+.form-label {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+.form-input,
+.form-select,
+.form-textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+select,
+textarea {
+  width: 100% !important;
+  padding: 0.78rem 1rem !important;
+  background: rgba(201, 168, 76, 0.04) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t1) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.02em !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+  outline: none !important;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--Au) !important;
+  box-shadow: 0 0 0 3px var(--Au-mist) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--t3) !important;
+  font-weight: 300 !important;
+}
+
+select option {
+  background: var(--ink-2) !important;
+  color: var(--t1) !important;
+}
+
+.form-section {
+  padding: 2rem !important;
+  border-radius: var(--r-card) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.form-section h2 {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--Au) !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1rem !important;
+}
+
+/* Error messages */
+.error-message,
+.form-error {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  color: var(--red) !important;
+  letter-spacing: 0.02em !important;
+  min-height: 1.2rem !important;
+  padding: 0.5rem 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FILTER TABS / TIME BUTTONS
+═══════════════════════════════════════════════════════ */
+.filter-tabs,
+.time-filters {
+  display: flex !important;
+  gap: 0.3rem !important;
+  background: rgba(201, 168, 76, 0.04) !important;
+  padding: 0.35rem !important;
+  border-radius: var(--r-sm) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.tab-btn,
+.time-btn {
+  padding: 0.5rem 1.2rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+}
+
+.tab-btn:hover,
+.time-btn:hover {
+  color: var(--t1) !important;
+}
+
+.tab-btn.active,
+.time-btn.active {
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  font-weight: 400 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SEARCH BAR
+═══════════════════════════════════════════════════════ */
+.search-bar {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.search-bar input {
+  padding-left: 2.8rem !important;
+  min-width: 240px !important;
+}
+
+.search-icon {
+  position: absolute !important;
+  left: 0.9rem !important;
+  color: var(--t2) !important;
+  font-size: 0.85rem !important;
+  pointer-events: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════ */
+.modal {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  z-index: 1000 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+.modal.active {
+  display: flex !important;
+}
+
+.modal-content {
+  background: var(--ink-2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7) !important;
+}
+
+.modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.modal-header h2,
+.modal-header h3 {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--Au-hi) !important;
+}
+
+.close-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--t2) !important;
+  font-size: 1.2rem !important;
+  cursor: pointer !important;
+  padding: 0.25rem !important;
+  line-height: 1 !important;
+  transition: color 0.2s !important;
+  clip-path: none !important;
+}
+
+.close-btn:hover {
+  color: var(--t1) !important;
+}
+
+/* ── FlowFit Confirm Dialog ── */
+.ff-confirm-box {
+  background: var(--ink-2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  max-width: 420px !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.ff-confirm-icon {
+  font-size: 2rem !important;
+  margin-bottom: 1rem !important;
+  color: var(--Au) !important;
+}
+
+.ff-confirm-title {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.ff-confirm-msg {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+  color: var(--t2) !important;
+  line-height: 1.7 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.ff-confirm-actions {
+  display: flex !important;
+  gap: 0.75rem !important;
+  justify-content: center !important;
+}
+
+.ff-confirm-ok.danger {
+  background: rgba(224, 84, 84, 0.15) !important;
+  color: var(--red) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════════════════ */
+.empty-state {
+  text-align: center !important;
+  padding: 4rem 2rem !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BADGES / TAGS
+═══════════════════════════════════════════════════════ */
+.difficulty-badge,
+.category-badge,
+.program-badge,
+.status-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.2rem 0.65rem !important;
+  border-radius: 3px !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+.difficulty-beginner,
+.difficulty-beginner.difficulty-badge {
+  background: rgba(59, 191, 138, 0.1) !important;
+  color: var(--sage) !important;
+  border: 1px solid rgba(59, 191, 138, 0.25) !important;
+}
+
+.difficulty-intermediate {
+  background: rgba(201, 168, 76, 0.1) !important;
+  color: var(--Au) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.difficulty-advanced {
+  background: rgba(224, 123, 84, 0.1) !important;
+  color: var(--coral) !important;
+  border: 1px solid rgba(224, 123, 84, 0.28) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRESS BARS
+═══════════════════════════════════════════════════════ */
+.progress-bar,
+.week-progress,
+.strength-bar {
+  height: 4px !important;
+  background: var(--b3) !important;
+  border-radius: 2px !important;
+  overflow: hidden !important;
+}
+
+.progress-fill,
+.week-progress-fill,
+.strength-fill {
+  height: 100% !important;
+  background: var(--g-Au) !important;
+  border-radius: 2px !important;
+  transition: width 0.4s var(--ease) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOP NAV (workout-session / program-detail — no sidebar)
+═══════════════════════════════════════════════════════ */
+.top-nav {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 1rem 2rem !important;
+  background: rgba(7, 6, 12, 0.92) !important;
+  border-bottom: 1px solid var(--b1) !important;
+  backdrop-filter: blur(28px) !important;
+}
+
+.nav-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.nav-title {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+.back-btn {
+  background: transparent !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  padding: 0.45rem 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  clip-path: none !important;
+}
+
+.back-btn:hover {
+  color: var(--Au-hi) !important;
+  border-color: var(--b2) !important;
+}
+
+.logo-small {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.3em !important;
+  color: var(--Au-hi) !important;
+  text-transform: uppercase !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH PAGES (login / register)
+═══════════════════════════════════════════════════════ */
+.auth-container {
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2rem !important;
+  position: relative !important;
+}
+
+.auth-card {
+  background: var(--g-card) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-card) !important;
+  padding: 3rem 2.5rem !important;
+  width: 100% !important;
+  max-width: 440px !important;
+  position: relative !important;
+  backdrop-filter: blur(24px) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Pinstripe top */
+.auth-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 2px !important;
+  background: var(--g-Au) !important;
+  border-radius: var(--r-card) var(--r-card) 0 0 !important;
+}
+
+.auth-card .logo {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.38em !important;
+  color: var(--Au-hi) !important;
+  background: none !important;
+  -webkit-text-fill-color: unset !important;
+  text-transform: uppercase !important;
+  margin-bottom: 2rem !important;
+  display: block !important;
+}
+
+.auth-header {
+  margin-bottom: 2rem !important;
+}
+
+.auth-header h1 {
+  font-family: var(--f-serif) !important;
+  font-weight: 300 !important;
+  font-style: italic !important;
+  font-size: 1.8rem !important;
+  letter-spacing: -0.01em !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.auth-header p {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.84rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+.auth-footer {
+  margin-top: 1.8rem !important;
+  text-align: center !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+.auth-footer a {
+  color: var(--Au-hi) !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+}
+
+.auth-footer a:hover {
+  color: var(--t1) !important;
+}
+
+.back-link {
+  position: absolute !important;
+  top: 2rem !important;
+  left: 2rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.06em !important;
+  color: var(--t2) !important;
+  text-decoration: none !important;
+  transition: color 0.25s !important;
+}
+
+.back-link:hover {
+  color: var(--Au-hi) !important;
+}
+
+/* Password toggle */
+.password-toggle {
+  position: relative !important;
+}
+
+.password-toggle-btn {
+  position: absolute !important;
+  right: 0.9rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  color: var(--t2) !important;
+  cursor: pointer !important;
+  font-size: 0.9rem !important;
+  padding: 0 !important;
+  clip-path: none !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
+}
+
+/* Password strength */
+.password-strength {
+  margin-top: 0.6rem !important;
+}
+
+.strength-bar {
+  height: 3px !important;
+  background: var(--b3) !important;
+  border-radius: 2px !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CHART CARDS
+═══════════════════════════════════════════════════════ */
+.chart-card {
+  padding: 1.8rem !important;
+  border-radius: var(--r-card) !important;
+}
+
+.chart-card h3,
+.chart-title {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+  margin-bottom: 1.2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXERCISE CARDS
+═══════════════════════════════════════════════════════ */
+.exercise-card {
+  border-radius: var(--r-card) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.exercise-image {
+  width: 100% !important;
+  height: 160px !important;
+  object-fit: cover !important;
+  display: block !important;
+  background: var(--ink-2) !important;
+}
+
+.exercise-content {
+  padding: 1.4rem !important;
+}
+
+.exercise-title {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.exercise-description {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  color: var(--t2) !important;
+  line-height: 1.7 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.exercise-meta {
+  display: flex !important;
+  gap: 0.5rem !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+}
+
+.exercise-tags {
+  display: flex !important;
+  gap: 0.4rem !important;
+  flex-wrap: wrap !important;
+  margin-top: 0.6rem !important;
+}
+
+.exercise-actions {
+  display: flex !important;
+  gap: 0.6rem !important;
+  margin-top: 1rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRAM CARDS
+═══════════════════════════════════════════════════════ */
+.program-card {
+  border-radius: var(--r-card) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.program-header {
+  padding: 1.8rem !important;
+  background: var(--Au-mist) !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.program-icon {
+  font-size: 2rem !important;
+  margin-bottom: 0.75rem !important;
+  display: block !important;
+  width: 48px !important;
+  height: 48px !important;
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.program-meta {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.75rem !important;
+  padding: 1.2rem 1.6rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTROLS BAR (search + filters)
+═══════════════════════════════════════════════════════ */
+.controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PLAN / SUBSCRIPTION CARDS
+═══════════════════════════════════════════════════════ */
+.plan-card {
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  position: relative !important;
+  transition:
+    transform 0.35s var(--ease),
+    box-shadow 0.35s var(--ease),
+    border-color 0.35s ease !important;
+}
+
+.plan-card.featured,
+.plan-card.popular {
+  border-color: rgba(201, 168, 76, 0.38) !important;
+  transform: translateY(-12px) !important;
+  box-shadow:
+    0 0 0 1px rgba(201, 168, 76, 0.07),
+    0 28px 70px rgba(0, 0, 0, 0.7),
+    0 0 90px rgba(201, 168, 76, 0.13) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--b2);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--Au-lo);
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEV / TRIAL BANNER
+═══════════════════════════════════════════════════════ */
+.dev-banner,
+.trial-banner,
+.alert-banner {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 1rem !important;
+  padding: 1.2rem 1.6rem !important;
+  border-radius: var(--r-card) !important;
+  margin-bottom: 1.5rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+}
+
+.dev-banner {
+  background: rgba(91, 156, 246, 0.08) !important;
+  border: 1px solid rgba(91, 156, 246, 0.22) !important;
+  color: var(--sky) !important;
+}
+
+.trial-banner {
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  color: var(--t1) !important;
+}
+
+.alert-past-due {
+  background: rgba(224, 84, 84, 0.08) !important;
+  border: 1px solid rgba(224, 84, 84, 0.28) !important;
+  color: var(--t1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 0px;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .sidebar {
+    transform: translateX(-100%) !important;
+    width: 260px !important;
+  }
+
+  .sidebar.mobile-active {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-overlay.mobile-active {
+    display: block !important;
+  }
+
+  .main-content,
+  .main {
+    margin-left: 0 !important;
+    padding: 1.5rem !important;
+    padding-top: 4rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .exercise-grid,
+  .programs-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .header,
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .auth-card {
+    padding: 2rem 1.5rem !important;
+  }
+
+  .btn {
+    clip-path: none !important;
+    border-radius: var(--r-sm) !important;
+  }
+}
+
+
+/* Dashboard specifics */
+.greeting {
+    font-family: var(--f-serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    color: var(--t1);
+    margin-bottom: 2.5rem;
+}
+.greeting span {
+    background: var(--g-Au);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+/* Recent workouts table */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.history-table th {
+    font-family: var(--f-display);
+    font-weight: 300;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--t2);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--b1);
+}
+.history-table td {
+    font-family: var(--f-display);
+    font-weight: 300;
+    font-size: 0.82rem;
+    color: var(--t1);
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--b3);
+}
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+.history-table tr:hover td {
+    background: var(--Au-mist);
+}
+/* Quick action buttons */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+.quick-btn {
+    padding: 1rem 1.2rem;
+    background: var(--g-card);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-sm);
+    color: var(--t1);
+    font-family: var(--f-display);
+    font-weight: 300;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    clip-path: none;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.quick-btn:hover {
+    border-color: var(--b2);
+    background: linear-gradient(145deg, rgba(25,22,38,0.95), rgba(18,16,28,0.95));
+}
+.quick-btn-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--Au-mist);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--Au);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+/* Achievement items */
+.achievement-item {
+    display: block;
+    padding: 0.85rem 1rem 0.85rem 1.1rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: var(--r-sm);
+    border: 1px solid var(--b1);
+    border-left: 3px solid rgba(255,255,255,0.06);
+    transition: border-color 0.2s, background 0.2s;
+}
+.achievement-item.unlocked {
+    border-color: rgba(59,191,138,0.2);
+    border-left-color: var(--sage);
+    background: rgba(59,191,138,0.03);
+}
+.achievement-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+}
+.achievement-name {
+    font-family: var(--f-display);
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--t1);
+}
+.achievement-badge-completed {
+    padding: 0.1rem 0.45rem;
+    border-radius: 3px;
+    background: rgba(59,191,138,0.15);
+    border: 1px solid rgba(59,191,138,0.3);
+    font-family: var(--f-display);
+    font-size: 0.58rem;
+    font-weight: 400;
+    color: var(--sage);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.achievement-desc {
+    font-family: var(--f-display);
+    font-weight: 300;
+    font-size: 0.76rem;
+    color: var(--t2);
+    margin-bottom: 0.4rem;
+    line-height: 1.5;
+}
+.achievement-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+.achievement-pts {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.5rem;
+    background: var(--Au-mist);
+    color: var(--Au);
+    border-radius: 3px;
+    font-family: var(--f-mono);
+    font-size: 0.68rem;
+    font-weight: 300;
+}
+.achievement-date {
+    font-family: var(--f-display);
+    font-size: 0.7rem;
+    color: var(--sage);
+    font-weight: 300;
+}
+.achievement-hint {
+    font-family: var(--f-display);
+    font-size: 0.7rem;
+    color: var(--t2);
+    font-weight: 300;
+}
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">&#9776;</button>
+
+    <!-- LOADING OVERLAY -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text">INITIALIZING SYSTEMS...</p>
+    </div>
+
+    
+
+    
+    
+<div class="dashboard-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+        <span class="logo">FLOWFIT</span>
+        <nav>
+            <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link"><span>Home</span></a></li>
+        <li class="nav-item"><a href="dashboard.html" class="nav-link active"><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="workouts.html" class="nav-link"><span>Workouts</span></a></li>
+        <li class="nav-item"><a href="programs.html" class="nav-link"><span>Programs</span></a></li>
+        <li class="nav-item"><a href="progress.html" class="nav-link"><span>Progress</span></a></li>
+        <li class="nav-item"><a href="profile.html" class="nav-link"><span>Profile</span></a></li>
+        <li class="nav-item"><a href="subscription.html" class="nav-link"><span>Subscription</span></a></li>
+            </ul>
+        </nav>
+        <!-- Spacer: pushes user-section down on large screens
+             but collapses so content scrolls on small screens -->
+        <div class="nav-spacer"></div>
+        <div class="user-section">
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-info">
+                    <h4 id="userName"><span id="userEmail" style="display:none"></span>Loading...</h4>
+                    <span id="planBadge" class="plan-badge plan-free">FREE</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="sidebarLogoutBtn"><span>LOGOUT</span></button>
+        </div>
+    </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+
+            <div class="header">
+                <h1 class="greeting" id="greeting">Welcome Back</h1>
+                <p class="date" id="currentDate">LOADING DATE...</p>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-icon"></span>
+                    <div class="stat-value" id="streakValue">0</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon"></span>
+                    <div class="stat-value" id="workoutCount">0</div>
+                    <div class="stat-label">Workouts</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">⏱️</span>
+                    <div class="stat-value" id="totalDuration">0h</div>
+                    <div class="stat-label">Total Time</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">⚡</span>
+                    <div class="stat-value" id="totalCalories">0</div>
+                    <div class="stat-label">Calories</div>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Mission History</h2>
+                        <a href="workouts.html" class="btn btn-primary">New Workout +</a>
+                    </div>
+                    <div id="recentWorkouts">
+                        <div class="empty-state">NO MISSIONS LOGGED YET.</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Medals</h2>
+                    </div>
+                    <div id="achievements">
+                        <div class="empty-state">COMPLETE WORKOUTS TO UNLOCK.</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="toastArea"></div>
+<script src="api.js"></script>
+    <script>
+
+        /* ── LOADING ──────────────────────────────── */
+        const _overlay = document.getElementById('loadingOverlay');
+        const PageLoader = {
+            show: () => {
+                _overlay.style.display = 'flex';
+                // Force reflow so the opacity transition fires
+                _overlay.offsetHeight;
+                _overlay.style.opacity = '1';
+            },
+            hide: () => {
+                _overlay.style.opacity = '0';
+                setTimeout(() => { _overlay.style.display = 'none'; }, 500);
+            }
+        };
+
+        /* ── DATE ────────────────────────────────── */
+        function updateDate() {
+            const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+            document.getElementById('currentDate').textContent =
+                new Date().toLocaleDateString('en-US', opts).toUpperCase();
+        }
+
+        /* ── SIDEBAR USER ────────────────────────── */
+        function initDashboardHeader() {
+            populateSidebarUser();
+            const user = TokenManager.getUser();
+            if (!user) return;
+            const name = user.name || user.email || 'User';
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+            // Update sidebar
+            const avatarEl = document.getElementById('userAvatar');
+            const nameEl   = document.getElementById('userName');
+            const emailEl  = document.getElementById('userEmail');
+            if (avatarEl) avatarEl.textContent = initials;
+            if (nameEl)   nameEl.textContent   = name;
+            if (emailEl)  emailEl.textContent  = user.role === 'ADMIN' ? 'Admin' : 'Member';
+            // Update greeting
+            const greetEl = document.getElementById('greeting');
+            if (greetEl) greetEl.textContent = 'WELCOME, ' + name.split(' ')[0].toUpperCase();
+        }
+
+        /* ── STREAK ──────────────────────────────── */
+        async function loadStreak() {
+            try {
+                const res = await ProgressAPI.getStreaks();
+                if (res.success && res.data) {
+                    // FIX: handle multiple possible field names from API
+                    const d = res.data;
+                    const streak = d.currentStreak ?? d.streak ?? d.current ?? d.streakDays ?? 0;
+                    document.getElementById('streakValue').textContent = streak;
+                }
+            } catch (e) { document.getElementById('streakValue').textContent = '0'; }
+        }
+
+        /* ── STATS ───────────────────────────────── */
+        async function loadStats() {
+            try {
+                const res = await ProgressAPI.getStats('30d');
+                // FIX: handle {data:{stats:{...}}} or flat {data:{...}} response shapes
+                const s = res.data?.stats || res.data || {};
+                if (res.success && s) {
+                    // FIX: try multiple field names the API may return
+                    const workouts = s.totalWorkouts ?? s.workoutCount ?? s.total ?? 0;
+                    document.getElementById('workoutCount').textContent = workouts;
+
+                    // totalDuration is in MINUTES (per api.js); show as Xh or Xm
+                    const mins = s.totalDuration ?? s.totalMinutes ?? s.duration ?? 0;
+                    document.getElementById('totalDuration').textContent =
+                        mins >= 60 ? (mins / 60).toFixed(1) + 'h' : (mins || 0) + 'm';
+
+                    const cals = s.totalCalories ?? s.caloriesBurned ?? s.calories ?? 0;
+                    document.getElementById('totalCalories').textContent =
+                        Math.round(cals).toLocaleString();
+                }
+            } catch (e) { console.error('Stats error:', e); }
+        }
+
+        /* ── RECENT WORKOUTS ─────────────────────── */
+        async function loadRecentWorkouts() {
+            try {
+                // FIX: use getWorkoutHistory (designed for this) not getUserProgress
+                // getUserProgress can return paginated {data:{logs:[...]}} not a flat array
+                const res = await ProgressAPI.getWorkoutHistory(5);
+                // Handle both flat array and nested {logs:[...]} shapes
+                const logs = Array.isArray(res.data) ? res.data
+                           : Array.isArray(res.data?.logs) ? res.data.logs
+                           : Array.isArray(res.data?.workouts) ? res.data.workouts
+                           : [];
+                if (logs.length > 0) {
+                    displayRecentWorkouts(logs);
+                } else {
+                    document.getElementById('recentWorkouts').innerHTML =
+                        '<div class="empty-state">NO MISSIONS LOGGED YET.</div>';
+                }
+            } catch (e) { console.error('Recent workouts error:', e); }
+        }
+
+        function displayRecentWorkouts(workouts) {
+            const container = document.getElementById('recentWorkouts');
+            container.innerHTML = workouts.map(log => {
+                // FIX: API may use createdAt, date, or completedAt
+                const rawDate  = log.date || log.createdAt || log.completedAt || log.updatedAt;
+                const date     = rawDate ? formatDate(rawDate) : '—';
+                const duration = formatDuration(log.duration || 0);
+                // FIX: exercise name may be nested or flat
+                const exName   = log.exercise?.name || log.exerciseName || log.name || 'Workout';
+                const sets     = log.sets ? `${log.sets} sets` : '';
+                const reps     = log.reps ? `&times; ${log.reps}` : '';
+                const cals     = log.caloriesBurned ? `${Math.round(log.caloriesBurned)} cal` : '';
+                return `<div class="workout-item">
+                    <div class="workout-info">
+                        <h4>${exName}</h4>
+                        <p>${date} &nbsp;&middot;&nbsp; ${duration}</p>
+                    </div>
+                    <div class="workout-stats">
+                        ${sets} ${reps}
+                        ${cals ? `<br><span style="font-size:0.82rem;color:#aaa;">${cals}</span>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        /* ── ACHIEVEMENTS ────────────────────────── */
+        async function loadAchievements() {
+            const el = document.getElementById('achievements');
+            try {
+                // Fetch achievements from server — trust only server's unlocked field
+                const achRes = await ProgressAPI.getAchievements();
+                const raw = Array.isArray(achRes.data) ? achRes.data : [];
+
+                // Separate earned from locked — medals section shows earned only
+                const earned = raw.filter(a => !!(a.unlocked || a.isUnlocked || a.earned))
+                                   .sort((a, b) => new Date(b.unlockedAt||0) - new Date(a.unlockedAt||0));
+                const locked = raw.filter(a => !(a.unlocked || a.isUnlocked || a.earned));
+
+                if (!raw.length) {
+                    el.innerHTML = '<div class="empty-state">NO MEDALS YET — LOG YOUR FIRST WORKOUT TO EARN ONE.</div>';
+                    return;
+                }
+
+                displayAchievements(earned, locked.length);
+
+                // Keep progress page in sync
+                const ids = earned.map(a => a.id);
+                localStorage.setItem('ff_unlocked_achievements', JSON.stringify(ids));
+
+            } catch (e) {
+                console.error('Achievements error:', e);
+                el.innerHTML = '<div class="empty-state">COULD NOT LOAD MEDALS.</div>';
+            }
+        }
+
+
+
+        function displayAchievements(earned, lockedCount = 0) {
+            const container = document.getElementById('achievements');
+
+            if (!earned.length) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding:2rem 0">
+                        <div style="font-size:2rem;margin-bottom:0.5rem">🏆</div>
+                        <div style="font-family:'Oswald',sans-serif;letter-spacing:2px;font-size:0.82rem;color:var(--text-secondary)">NO MEDALS EARNED YET</div>
+                        <div style="font-size:0.75rem;color:#555;margin-top:0.4rem">${lockedCount} medal${lockedCount!==1?'s':''} waiting to be unlocked</div>
+                    </div>`;
+                return;
+            }
+
+            // Show up to 6 earned medals as trophy cards
+            const show = earned.slice(0, 6);
+            container.innerHTML = show.map(a => `
+                <div class="achievement-badge" style="
+                    background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(212,175,55,0.04));
+                    border:1px solid rgba(212,175,55,0.35);
+                    position:relative;overflow:hidden;">
+                    <!-- Gold shimmer bar at top -->
+                    <div style="position:absolute;top:0;left:0;right:0;height:2px;
+                                background:linear-gradient(90deg,transparent,#D4AF37,transparent)"></div>
+                    <span class="achievement-icon" style="position:relative">
+                        ${a.icon||'🏆'}
+                        <span style="position:absolute;top:-4px;right:-6px;width:16px;height:16px;
+                                     border-radius:50%;background:linear-gradient(135deg,#4ade80,#22c55e);
+                                     display:flex;align-items:center;justify-content:center;
+                                     font-size:0.6rem;font-weight:900;color:#000;
+                                     border:1.5px solid #030303;box-shadow:0 1px 4px rgba(74,222,128,0.5)">✓</span>
+                    </span>
+                    <div class="achievement-info">
+                        <h4 style="color:var(--gold-main)">${a.name||'Medal'}</h4>
+                        <p style="color:#aaa">${a.description||''}</p>
+                        <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.3rem;flex-wrap:wrap">
+                            <span style="font-size:0.68rem;color:#4ade80;font-weight:600">✓ COMPLETED</span>
+                            <span style="font-size:0.68rem;color:var(--gold-main)">+${a.points||0} pts</span>
+                        </div>
+                        ${a.unlockedAt ? `<p style="font-size:0.66rem;color:#666;margin-top:2px">${formatDate(a.unlockedAt)}</p>` : ''}
+                    </div>
+                </div>`).join('') +
+                (lockedCount > 0 ? `
+                <div class="achievement-badge" style="opacity:0.35;border:1px dashed rgba(255,255,255,0.1);
+                     background:rgba(255,255,255,0.02);justify-content:center;flex-direction:column;
+                     text-align:center;gap:0.4rem;min-height:100px">
+                    <span style="font-size:1.5rem">🔒</span>
+                    <span style="font-family:'Oswald',sans-serif;font-size:0.75rem;color:#555;letter-spacing:1px">
+                        ${lockedCount} MORE TO UNLOCK
+                    </span>
+                </div>` : '');
+        }
+
+        /* ── LOGOUT ──────────────────────────────── */
+        function handleLogout() {
+            showConfirm({
+                icon: '🚪',
+                title: 'LOG OUT',
+                message: 'Are you sure you want to log out of FlowFit Elite?',
+                okText: 'LOG OUT',
+                cancelText: 'Stay',
+                danger: true,
+                onOk: async () => {
+                    PageLoader.show();
+                    // FIX: AuthAPI.logout() always navigates in its finally block,
+                    // so PageLoader.hide() after it is dead code — removed.
+                    await AuthAPI.logout();
+                }
+            });
+        }
+
+        /* ── MOBILE SIDEBAR ──────────────────────── */
+        // toggleSidebar, openSidebar, closeSidebar defined below
+
+        /* ── INIT ────────────────────────────────── */
+        async function loadDashboard() {
+            PageLoader.show();
+
+            // Safety net: force-hide overlay after 8 seconds no matter what
+            const safetyTimer = setTimeout(() => PageLoader.hide(), 8000);
+
+            try {
+                updateDate();
+                // Sidebar/plan init isolated — never blocks data loading
+                try { initDashboardHeader(); } catch (_) {}
+                try { await updatePlanBadge(); } catch (_) {}
+                await Promise.all([
+                    loadStreak(), loadStats(),
+                    loadRecentWorkouts(), loadAchievements()
+                ]);
+            } catch (e) {
+                console.error('Dashboard init error:', e);
+            } finally {
+                clearTimeout(safetyTimer);
+                PageLoader.hide();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try { requireAuth(); } catch (_) {}
+            // Recalculate achievements once per day — await so loadAchievements gets fresh data
+            const _sessKey = 'ff_ach_recalc_' + (new Date().toISOString().split('T')[0]);
+            if (!sessionStorage.getItem(_sessKey)) {
+                sessionStorage.setItem(_sessKey, '1');
+                try { if (typeof ProgressAPI !== 'undefined') await ProgressAPI.recalculateAchievements(); } catch (_) {}
+            }
+            loadDashboard();
+            const _lb = document.getElementById('sidebarLogoutBtn');
+            if (_lb) _lb.addEventListener('click', () => { if (typeof handleLogout === 'function') handleLogout(); });
+        });
+
+
+
+/* ── SIDEBAR SCROLL-LOCK ──────────────────────────── */
+
+
+/* ── LIVE ACHIEVEMENT REFRESH ──────────────────────────── */
+function refreshDashboardAchievements() { loadAchievements(); loadStats(); }
+
+// 1. On tab focus (returning from workout session)
+let _dashFocusTs = 0;
+window.addEventListener('focus', () => {
+    const now = Date.now();
+    if (now - _dashFocusTs > 15000) { _dashFocusTs = now; refreshDashboardAchievements(); }
+});
+
+// 2. Storage event — workout-session sets this key after logging
+window.addEventListener('storage', e => {
+    if (e.key === 'ff_workout_logged' || e.key === 'ff_achievement_update') {
+        refreshDashboardAchievements();
+        if (e.key === 'ff_workout_logged') {
+            loadRecentWorkouts();
+            localStorage.removeItem('ff_workout_logged');
+        }
+    }
+});
+
+// 3. Periodic poll every 90 seconds while tab is visible
+let _achPollInterval = null;
+function startAchievementPolling() {
+    if (_achPollInterval) return;
+    _achPollInterval = setInterval(() => {
+        if (!document.hidden) refreshDashboardAchievements();
+    }, 90000);
+}
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshDashboardAchievements();
+});
+startAchievementPolling();
+
+
+function showConfirm({ icon = '⚠️', title = 'Are you sure?', message = '', okText = 'Confirm', cancelText = 'Cancel', danger = false, onOk }) {
+    const ex = document.getElementById('ff-confirm');
+    if (ex) ex.remove();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ff-confirm-backdrop';
+    backdrop.id = 'ff-confirm';
+    backdrop.innerHTML = `
+        <div class="ff-confirm-box">
+            <span class="ff-confirm-icon">${icon}</span>
+            <div class="ff-confirm-title">${title}</div>
+            <p class="ff-confirm-msg">${message}</p>
+            <div class="ff-confirm-actions">
+                <button class="ff-confirm-cancel" id="ffCancel">${cancelText}</button>
+                <button class="ff-confirm-ok ${danger ? 'danger' : ''}" id="ffOk">${okText}</button>
+            </div>
+        </div>`;
+    document.body.appendChild(backdrop);
+    const close = () => {
+        backdrop.style.opacity = '0';
+        backdrop.style.pointerEvents = 'none';
+        backdrop.style.visibility = 'hidden';
+        if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    };
+    backdrop.querySelector('#ffCancel').addEventListener('click', e => { e.stopPropagation(); close(); });
+    backdrop.querySelector('#ffOk').addEventListener('click', e => { e.stopPropagation(); close(); if (onOk) onOk(); });
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+    document.addEventListener('keydown', function esc(e) {
+        if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+}
+
+
+
+/* ── FLOWFIT SIDEBAR JS v4 — smooth scroll + reliable swipe ─────────────── */
+(function () {
+    'use strict';
+    let _savedY = 0;
+
+    function openSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        _savedY = window.scrollY || 0;
+        sb.classList.add('mobile-active');
+        if (ov) ov.classList.add('active');
+        document.body.classList.add('sidebar-open');
+        document.body.style.top = `-${_savedY}px`;
+        sb.offsetHeight; // force reflow
+    }
+
+    function closeSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        sb.classList.remove('mobile-active');
+        if (ov) ov.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+        document.body.style.top = '';
+        window.scrollTo({ top: _savedY, behavior: 'instant' });
+    }
+
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        if (!sb) return;
+        sb.classList.contains('mobile-active') ? closeSidebar() : openSidebar();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+        });
+        const sb = document.getElementById('sidebar');
+        if (sb) {
+            let startX = 0;
+            sb.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+            sb.addEventListener('touchend', e => {
+                if (startX - e.changedTouches[0].clientX > 80) closeSidebar();
+            }, { passive: true });
+        }
+    });
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+    window.openSidebar  = openSidebar;
+    window.closeSidebar = closeSidebar;
+    window.toggleSidebar = toggleSidebar;
+}());
+
+</script>
+</body>
+</html>

@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workouts - FlowFit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400&family=Lora:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/*
+ * FlowFit — Shared Design System
+ * Applies the landing-page aesthetic (Josefin Sans + Lora + JetBrains Mono,
+ * obsidian-gold tokens, sidebar, cards, inputs, buttons) to all interior pages.
+ *
+ * Specificity note: many existing rules use !important.
+ * We match or exceed that where needed, but prefer clean overrides via :root tokens.
+ */
+
+/* ═══════════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════════ */
+:root {
+  /* backgrounds */
+  --ink:         #07060c;
+  --ink-1:       #0c0b12;
+  --ink-2:       #111019;
+  --ink-3:       #16142080;
+  --surface:     rgba(15, 14, 24, 0.88);
+  --surface-2:   rgba(20, 18, 32, 0.72);
+  --g-card:      linear-gradient(145deg, rgba(20,18,32,0.95), rgba(14,13,22,0.95));
+
+  /* gold */
+  --Au:          #C9A84C;
+  --Au-hi:       #E8C96A;
+  --Au-lo:       #8E6E28;
+  --Au-mist:     rgba(201, 168, 76, 0.08);
+  --Au-rim:      rgba(201, 168, 76, 0.22);
+  --Au-glow:     rgba(201, 168, 76, 0.18);
+  --g-Au:        linear-gradient(135deg, #E8C96A 0%, #C9A84C 50%, #8E6E28 100%);
+
+  /* accents */
+  --sage:        #3BBF8A;
+  --sage-dim:    rgba(59, 191, 138, 0.12);
+  --sky:         #5B9CF6;
+  --coral:       #E07B54;
+  --red:         #E05454;
+
+  /* text */
+  --t1:          #F0EBE0;
+  --t2:          #8A8590;
+  --t3:          #44404A;
+  --t4:          #C4BFCA;
+
+  /* borders */
+  --b1:          rgba(201, 168, 76, 0.14);
+  --b2:          rgba(201, 168, 76, 0.26);
+  --b3:          rgba(240, 235, 228, 0.05);
+  --b4:          rgba(240, 235, 228, 0.09);
+
+  /* typography */
+  --f-display:   'Josefin Sans', sans-serif;
+  --f-serif:     'Lora', Georgia, serif;
+  --f-mono:      'JetBrains Mono', monospace;
+
+  /* motion */
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* layout */
+  --sidebar-w:   270px;
+  --r-card:      16px;
+  --r-sm:        10px;
+  --r-pill:      9999px;
+
+  /* legacy aliases — keeps existing JS/inline-styles working */
+  --bg-deep:          var(--ink);
+  --bg-surface:       var(--ink-1);
+  --bg-card:          var(--g-card);
+  --bg-elevated:      var(--ink-2);
+  --gold-main:        var(--Au);
+  --gold-bright:      var(--Au-hi);
+  --gold-deep:        var(--Au-lo);
+  --gold-gradient:    var(--g-Au);
+  --gold-soft:        var(--Au-mist);
+  --gold-glow:        var(--Au-glow);
+  --border-gold:      var(--b1);
+  --border-gold-hover:var(--b2);
+  --text-primary:     var(--t1);
+  --text-secondary:   var(--t2);
+  --accent-green:     var(--sage);
+  --transition:       all 0.3s var(--ease);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  font-family: var(--f-display);
+  font-weight: 300;
+  background-color: var(--ink);
+  color: var(--t1);
+  min-height: 100vh;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOADING OVERLAY
+═══════════════════════════════════════════════════════ */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--b1);
+  border-top-color: var(--Au);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: var(--f-display);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--Au);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+═══════════════════════════════════════════════════════ */
+#toastContainer {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.toast {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  padding: 0.8rem 1.4rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--b2);
+  background: var(--ink-2);
+  color: var(--t1);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: toastIn 0.3s var(--ease);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT — SIDEBAR + MAIN CONTENT
+═══════════════════════════════════════════════════════ */
+.dashboard-container,
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: var(--sidebar-w) !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background: var(--ink-1) !important;
+  border-right: 1px solid var(--b1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 2rem 1.5rem !important;
+  z-index: 100 !important;
+  transition: transform 0.3s var(--ease) !important;
+}
+
+/* Logo inside sidebar */
+.sidebar .logo {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.38em !important;
+  color: var(--Au-hi) !important;
+  background: none !important;
+  -webkit-text-fill-color: unset !important;
+  text-decoration: none !important;
+  display: block !important;
+  margin-bottom: 2.4rem !important;
+  padding: 0 !important;
+  text-transform: uppercase !important;
+}
+
+/* Nav menu */
+.nav-menu {
+  list-style: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.2rem !important;
+  flex: 1 !important;
+}
+
+.nav-item {
+  width: 100% !important;
+}
+
+.nav-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  padding: 0.72rem 1rem !important;
+  color: var(--t2) !important;
+  text-decoration: none !important;
+  border-radius: var(--r-sm) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  transition: all 0.25s ease !important;
+  border: 1px solid transparent !important;
+}
+
+.nav-link:hover {
+  color: var(--Au-hi) !important;
+  background: var(--Au-mist) !important;
+  border-color: var(--b1) !important;
+}
+
+.nav-link.active {
+  color: var(--ink) !important;
+  background: var(--g-Au) !important;
+  border-color: transparent !important;
+  font-weight: 400 !important;
+}
+
+/* Spacer pushes user section to bottom */
+.nav-spacer {
+  flex: 1 !important;
+  min-height: 1rem !important;
+}
+
+/* User section at sidebar bottom */
+.user-section {
+  border-top: 1px solid var(--b1) !important;
+  padding-top: 1.2rem !important;
+  margin-top: auto !important;
+}
+
+.user-profile {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  margin-bottom: 0.9rem !important;
+}
+
+.user-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.user-info h4 {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.82rem !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.2rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Plan badge */
+.plan-badge {
+  display: inline-block !important;
+  padding: 0.12rem 0.6rem !important;
+  border-radius: 3px !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.6rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.plan-free {
+  background: var(--Au-mist) !important;
+  color: var(--Au) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.plan-pro {
+  background: rgba(91, 156, 246, 0.1) !important;
+  color: var(--sky) !important;
+  border: 1px solid rgba(91, 156, 246, 0.25) !important;
+}
+
+.plan-elite,
+.plan-premium {
+  background: rgba(201, 168, 76, 0.15) !important;
+  color: var(--Au-hi) !important;
+  border: 1px solid var(--b2) !important;
+}
+
+/* Logout button */
+.logout-btn {
+  width: 100% !important;
+  padding: 0.65rem 1rem !important;
+  background: transparent !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  text-align: center !important;
+}
+
+.logout-btn:hover {
+  color: var(--red) !important;
+  border-color: rgba(224, 84, 84, 0.4) !important;
+  background: rgba(224, 84, 84, 0.06) !important;
+}
+
+/* ── MAIN CONTENT ── */
+.main-content,
+.main {
+  margin-left: var(--sidebar-w) !important;
+  flex: 1 !important;
+  min-height: 100vh !important;
+  padding: 2.5rem 3rem !important;
+  overflow-x: hidden !important;
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+  display: none !important;
+  position: fixed !important;
+  top: 1rem !important;
+  left: 1rem !important;
+  z-index: 200 !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: var(--ink-1) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--Au) !important;
+  font-size: 1.1rem !important;
+  cursor: pointer !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  z-index: 99 !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE HEADER
+═══════════════════════════════════════════════════════ */
+.header,
+.page-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+  margin-bottom: 2.5rem !important;
+}
+
+.header h1,
+.page-header h1,
+.page-title,
+.header-left h1 {
+  font-family: var(--f-serif) !important;
+  font-weight: 300 !important;
+  font-style: italic !important;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem) !important;
+  letter-spacing: -0.01em !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.3rem !important;
+}
+
+.header p,
+.page-header p,
+.page-subtitle,
+.header-left p {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.84rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════════════ */
+.card,
+.stat-card,
+.chart-card,
+.program-card,
+.exercise-card,
+.form-section,
+.week-block,
+.panel-card,
+.current-plan-banner,
+.plan-card {
+  background: var(--g-card) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-card) !important;
+  backdrop-filter: blur(16px) !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.card:hover,
+.stat-card:hover,
+.program-card:hover,
+.exercise-card:hover {
+  border-color: var(--b2) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 32px var(--Au-glow) !important;
+}
+
+/* Stat cards */
+.stat-card {
+  padding: 1.6rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+/* Stat icon — replace emoji display */
+.stat-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: var(--r-sm) !important;
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.1rem !important;
+  margin-bottom: 0.4rem !important;
+  color: var(--Au) !important;
+}
+
+.stat-value {
+  font-family: var(--f-mono) !important;
+  font-weight: 300 !important;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem) !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1 !important;
+  background: var(--g-Au) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.stat-label {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRIDS
+═══════════════════════════════════════════════════════ */
+.stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.chart-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.exercise-grid,
+.programs-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  gap: 1.2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════ */
+.btn,
+button.btn,
+a.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.73rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border: none !important;
+  white-space: nowrap !important;
+  padding: 0.75rem 2.2rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  /* Arrow tip: pointed right pentagon */
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    0 100%
+  ) !important;
+  border-radius: 0 !important;
+  transition:
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease),
+    filter 0.3s ease !important;
+}
+
+/* Shimmer sweep on primary */
+.btn-primary::before,
+.btn-enroll::before,
+.btn-start::before,
+.btn-log::before,
+.btn-continue::before,
+.btn-save::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -60% !important;
+  left: -110% !important;
+  width: 55% !important;
+  height: 220% !important;
+  background: linear-gradient(
+    108deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.38) 50%,
+    transparent 80%
+  ) !important;
+  transition: left 0.55s var(--ease) !important;
+  pointer-events: none !important;
+}
+
+/* Primary filled */
+.btn-primary,
+.btn-enroll,
+.btn-start,
+.btn-log,
+.btn-continue,
+.btn-save,
+button[class*="btn-primary"],
+input[type="submit"] {
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 5px 22px rgba(201, 168, 76, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.38) !important;
+}
+
+.btn-primary:hover,
+.btn-enroll:hover,
+.btn-start:hover,
+.btn-log:hover,
+.btn-continue:hover,
+.btn-save:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 32px rgba(201, 168, 76, 0.54),
+    0 4px 12px rgba(0, 0, 0, 0.42) !important;
+}
+
+.btn-primary:hover::before,
+.btn-enroll:hover::before,
+.btn-start:hover::before,
+.btn-log:hover::before,
+.btn-continue:hover::before,
+.btn-save:hover::before {
+  left: 170% !important;
+}
+
+/* Ghost outlined */
+.btn-ghost,
+.btn-details,
+.btn-cancel,
+.btn-secondary,
+button[class*="btn-secondary"],
+button[class*="btn-ghost"] {
+  background: transparent !important;
+  color: var(--Au-hi) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(201, 168, 76, 0.32) !important;
+}
+
+.btn-ghost:hover,
+.btn-details:hover,
+.btn-cancel:hover,
+.btn-secondary:hover {
+  color: var(--t1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(201, 168, 76, 0.6),
+    0 4px 20px rgba(201, 168, 76, 0.14) !important;
+  background: rgba(201, 168, 76, 0.08) !important;
+}
+
+/* Danger / destructive */
+.btn-danger,
+.logout-btn-top,
+button[class*="btn-danger"] {
+  background: transparent !important;
+  color: var(--red) !important;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    0 100%
+  ) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.3) !important;
+}
+
+.btn-danger:hover {
+  background: rgba(224, 84, 84, 0.08) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.6) !important;
+}
+
+/* Full-width override (used on modal/form submit) */
+.btn-full,
+.btn[style*="width:100%"],
+.btn[style*="width: 100%"] {
+  clip-path: none !important;
+  border-radius: var(--r-sm) !important;
+  width: 100% !important;
+  padding: 0.85rem 2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   INPUTS & FORMS
+═══════════════════════════════════════════════════════ */
+.form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.45rem !important;
+  margin-bottom: 1.2rem !important;
+}
+
+.form-label {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+.form-input,
+.form-select,
+.form-textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+select,
+textarea {
+  width: 100% !important;
+  padding: 0.78rem 1rem !important;
+  background: rgba(201, 168, 76, 0.04) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t1) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.02em !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+  outline: none !important;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--Au) !important;
+  box-shadow: 0 0 0 3px var(--Au-mist) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--t3) !important;
+  font-weight: 300 !important;
+}
+
+select option {
+  background: var(--ink-2) !important;
+  color: var(--t1) !important;
+}
+
+.form-section {
+  padding: 2rem !important;
+  border-radius: var(--r-card) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.form-section h2 {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--Au) !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1rem !important;
+}
+
+/* Error messages */
+.error-message,
+.form-error {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  color: var(--red) !important;
+  letter-spacing: 0.02em !important;
+  min-height: 1.2rem !important;
+  padding: 0.5rem 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FILTER TABS / TIME BUTTONS
+═══════════════════════════════════════════════════════ */
+.filter-tabs,
+.time-filters {
+  display: flex !important;
+  gap: 0.3rem !important;
+  background: rgba(201, 168, 76, 0.04) !important;
+  padding: 0.35rem !important;
+  border-radius: var(--r-sm) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.tab-btn,
+.time-btn {
+  padding: 0.5rem 1.2rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+}
+
+.tab-btn:hover,
+.time-btn:hover {
+  color: var(--t1) !important;
+}
+
+.tab-btn.active,
+.time-btn.active {
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  font-weight: 400 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SEARCH BAR
+═══════════════════════════════════════════════════════ */
+.search-bar {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.search-bar input {
+  padding-left: 2.8rem !important;
+  min-width: 240px !important;
+}
+
+.search-icon {
+  position: absolute !important;
+  left: 0.9rem !important;
+  color: var(--t2) !important;
+  font-size: 0.85rem !important;
+  pointer-events: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════ */
+.modal {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  z-index: 1000 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+.modal.active {
+  display: flex !important;
+}
+
+.modal-content {
+  background: var(--ink-2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7) !important;
+}
+
+.modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.modal-header h2,
+.modal-header h3 {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--Au-hi) !important;
+}
+
+.close-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--t2) !important;
+  font-size: 1.2rem !important;
+  cursor: pointer !important;
+  padding: 0.25rem !important;
+  line-height: 1 !important;
+  transition: color 0.2s !important;
+  clip-path: none !important;
+}
+
+.close-btn:hover {
+  color: var(--t1) !important;
+}
+
+/* ── FlowFit Confirm Dialog ── */
+.ff-confirm-box {
+  background: var(--ink-2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  max-width: 420px !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.ff-confirm-icon {
+  font-size: 2rem !important;
+  margin-bottom: 1rem !important;
+  color: var(--Au) !important;
+}
+
+.ff-confirm-title {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.ff-confirm-msg {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+  color: var(--t2) !important;
+  line-height: 1.7 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.ff-confirm-actions {
+  display: flex !important;
+  gap: 0.75rem !important;
+  justify-content: center !important;
+}
+
+.ff-confirm-ok.danger {
+  background: rgba(224, 84, 84, 0.15) !important;
+  color: var(--red) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════════════════ */
+.empty-state {
+  text-align: center !important;
+  padding: 4rem 2rem !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BADGES / TAGS
+═══════════════════════════════════════════════════════ */
+.difficulty-badge,
+.category-badge,
+.program-badge,
+.status-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.2rem 0.65rem !important;
+  border-radius: 3px !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+.difficulty-beginner,
+.difficulty-beginner.difficulty-badge {
+  background: rgba(59, 191, 138, 0.1) !important;
+  color: var(--sage) !important;
+  border: 1px solid rgba(59, 191, 138, 0.25) !important;
+}
+
+.difficulty-intermediate {
+  background: rgba(201, 168, 76, 0.1) !important;
+  color: var(--Au) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.difficulty-advanced {
+  background: rgba(224, 123, 84, 0.1) !important;
+  color: var(--coral) !important;
+  border: 1px solid rgba(224, 123, 84, 0.28) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRESS BARS
+═══════════════════════════════════════════════════════ */
+.progress-bar,
+.week-progress,
+.strength-bar {
+  height: 4px !important;
+  background: var(--b3) !important;
+  border-radius: 2px !important;
+  overflow: hidden !important;
+}
+
+.progress-fill,
+.week-progress-fill,
+.strength-fill {
+  height: 100% !important;
+  background: var(--g-Au) !important;
+  border-radius: 2px !important;
+  transition: width 0.4s var(--ease) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOP NAV (workout-session / program-detail — no sidebar)
+═══════════════════════════════════════════════════════ */
+.top-nav {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 1rem 2rem !important;
+  background: rgba(7, 6, 12, 0.92) !important;
+  border-bottom: 1px solid var(--b1) !important;
+  backdrop-filter: blur(28px) !important;
+}
+
+.nav-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.nav-title {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+.back-btn {
+  background: transparent !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  padding: 0.45rem 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  clip-path: none !important;
+}
+
+.back-btn:hover {
+  color: var(--Au-hi) !important;
+  border-color: var(--b2) !important;
+}
+
+.logo-small {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.3em !important;
+  color: var(--Au-hi) !important;
+  text-transform: uppercase !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH PAGES (login / register)
+═══════════════════════════════════════════════════════ */
+.auth-container {
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2rem !important;
+  position: relative !important;
+}
+
+.auth-card {
+  background: var(--g-card) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-card) !important;
+  padding: 3rem 2.5rem !important;
+  width: 100% !important;
+  max-width: 440px !important;
+  position: relative !important;
+  backdrop-filter: blur(24px) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Pinstripe top */
+.auth-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 2px !important;
+  background: var(--g-Au) !important;
+  border-radius: var(--r-card) var(--r-card) 0 0 !important;
+}
+
+.auth-card .logo {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.38em !important;
+  color: var(--Au-hi) !important;
+  background: none !important;
+  -webkit-text-fill-color: unset !important;
+  text-transform: uppercase !important;
+  margin-bottom: 2rem !important;
+  display: block !important;
+}
+
+.auth-header {
+  margin-bottom: 2rem !important;
+}
+
+.auth-header h1 {
+  font-family: var(--f-serif) !important;
+  font-weight: 300 !important;
+  font-style: italic !important;
+  font-size: 1.8rem !important;
+  letter-spacing: -0.01em !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.auth-header p {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.84rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+.auth-footer {
+  margin-top: 1.8rem !important;
+  text-align: center !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+.auth-footer a {
+  color: var(--Au-hi) !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+}
+
+.auth-footer a:hover {
+  color: var(--t1) !important;
+}
+
+.back-link {
+  position: absolute !important;
+  top: 2rem !important;
+  left: 2rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.06em !important;
+  color: var(--t2) !important;
+  text-decoration: none !important;
+  transition: color 0.25s !important;
+}
+
+.back-link:hover {
+  color: var(--Au-hi) !important;
+}
+
+/* Password toggle */
+.password-toggle {
+  position: relative !important;
+}
+
+.password-toggle-btn {
+  position: absolute !important;
+  right: 0.9rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  color: var(--t2) !important;
+  cursor: pointer !important;
+  font-size: 0.9rem !important;
+  padding: 0 !important;
+  clip-path: none !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
+}
+
+/* Password strength */
+.password-strength {
+  margin-top: 0.6rem !important;
+}
+
+.strength-bar {
+  height: 3px !important;
+  background: var(--b3) !important;
+  border-radius: 2px !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CHART CARDS
+═══════════════════════════════════════════════════════ */
+.chart-card {
+  padding: 1.8rem !important;
+  border-radius: var(--r-card) !important;
+}
+
+.chart-card h3,
+.chart-title {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+  margin-bottom: 1.2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXERCISE CARDS
+═══════════════════════════════════════════════════════ */
+.exercise-card {
+  border-radius: var(--r-card) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.exercise-image {
+  width: 100% !important;
+  height: 160px !important;
+  object-fit: cover !important;
+  display: block !important;
+  background: var(--ink-2) !important;
+}
+
+.exercise-content {
+  padding: 1.4rem !important;
+}
+
+.exercise-title {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.exercise-description {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  color: var(--t2) !important;
+  line-height: 1.7 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.exercise-meta {
+  display: flex !important;
+  gap: 0.5rem !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+}
+
+.exercise-tags {
+  display: flex !important;
+  gap: 0.4rem !important;
+  flex-wrap: wrap !important;
+  margin-top: 0.6rem !important;
+}
+
+.exercise-actions {
+  display: flex !important;
+  gap: 0.6rem !important;
+  margin-top: 1rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRAM CARDS
+═══════════════════════════════════════════════════════ */
+.program-card {
+  border-radius: var(--r-card) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.program-header {
+  padding: 1.8rem !important;
+  background: var(--Au-mist) !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.program-icon {
+  font-size: 2rem !important;
+  margin-bottom: 0.75rem !important;
+  display: block !important;
+  width: 48px !important;
+  height: 48px !important;
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.program-meta {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.75rem !important;
+  padding: 1.2rem 1.6rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTROLS BAR (search + filters)
+═══════════════════════════════════════════════════════ */
+.controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PLAN / SUBSCRIPTION CARDS
+═══════════════════════════════════════════════════════ */
+.plan-card {
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  position: relative !important;
+  transition:
+    transform 0.35s var(--ease),
+    box-shadow 0.35s var(--ease),
+    border-color 0.35s ease !important;
+}
+
+.plan-card.featured,
+.plan-card.popular {
+  border-color: rgba(201, 168, 76, 0.38) !important;
+  transform: translateY(-12px) !important;
+  box-shadow:
+    0 0 0 1px rgba(201, 168, 76, 0.07),
+    0 28px 70px rgba(0, 0, 0, 0.7),
+    0 0 90px rgba(201, 168, 76, 0.13) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--b2);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--Au-lo);
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEV / TRIAL BANNER
+═══════════════════════════════════════════════════════ */
+.dev-banner,
+.trial-banner,
+.alert-banner {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 1rem !important;
+  padding: 1.2rem 1.6rem !important;
+  border-radius: var(--r-card) !important;
+  margin-bottom: 1.5rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+}
+
+.dev-banner {
+  background: rgba(91, 156, 246, 0.08) !important;
+  border: 1px solid rgba(91, 156, 246, 0.22) !important;
+  color: var(--sky) !important;
+}
+
+.trial-banner {
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  color: var(--t1) !important;
+}
+
+.alert-past-due {
+  background: rgba(224, 84, 84, 0.08) !important;
+  border: 1px solid rgba(224, 84, 84, 0.28) !important;
+  color: var(--t1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 0px;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .sidebar {
+    transform: translateX(-100%) !important;
+    width: 260px !important;
+  }
+
+  .sidebar.mobile-active {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-overlay.mobile-active {
+    display: block !important;
+  }
+
+  .main-content,
+  .main {
+    margin-left: 0 !important;
+    padding: 1.5rem !important;
+    padding-top: 4rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .exercise-grid,
+  .programs-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .header,
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .auth-card {
+    padding: 2rem 1.5rem !important;
+  }
+
+  .btn {
+    clip-path: none !important;
+    border-radius: var(--r-sm) !important;
+  }
+}
+
+
+/* Workouts page */
+.exercise-card {
+    cursor: pointer;
+    overflow: hidden;
+}
+/* Category icon box (replaces emoji) */
+.exercise-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-sm);
+    background: var(--Au-mist);
+    border: 1px solid var(--b1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--Au);
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: var(--f-display);
+    flex-shrink: 0;
+}
+/* Log workout modal */
+.modal-body .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+.modal-cta {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+}
+/* Banner for usage limits */
+.usage-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-sm);
+    margin-bottom: 1.5rem;
+    font-family: var(--f-display);
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--t2);
+}
+
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+<div class="dashboard-container">
+    <aside class="sidebar" id="sidebar">
+        <span class="logo">FLOWFIT</span>
+        <nav>
+            <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link"><span>Home</span></a></li>
+        <li class="nav-item"><a href="dashboard.html" class="nav-link"><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="workouts.html" class="nav-link active"><span>Workouts</span></a></li>
+        <li class="nav-item"><a href="programs.html" class="nav-link"><span>Programs</span></a></li>
+        <li class="nav-item"><a href="progress.html" class="nav-link"><span>Progress</span></a></li>
+        <li class="nav-item"><a href="profile.html" class="nav-link"><span>Profile</span></a></li>
+        <li class="nav-item"><a href="subscription.html" class="nav-link"><span>Subscription</span></a></li>
+            </ul>
+        </nav>
+        <!-- Spacer: pushes user-section down on large screens
+             but collapses so content scrolls on small screens -->
+        <div class="nav-spacer"></div>
+        <div class="user-section">
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-info">
+                    <h4 id="userName">Loading...</h4>
+                    <span id="planBadge" class="plan-badge plan-free">FREE</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="sidebarLogoutBtn"><span>LOGOUT</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Exercise Library</h1>
+            <p>Browse our comprehensive collection of home workouts</p>
+        </div>
+        <!-- Plan usage banner -->
+        <div id="planBanner" style="display:none;align-items:center;gap:.75rem;padding:.85rem 1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;font-size:.88rem;color:var(--text-secondary);margin-bottom:1.75rem"></div>
+
+        <!--
+          DEV BANNER: Only visible when DB is empty.
+          In production after seeding, this is never shown.
+        -->
+        <div class="dev-banner" id="devBanner">
+            ⚠️ Database is empty — showing sample exercises.
+            Run <code>npx prisma db seed</code> to populate your real data,
+            then exercises will load from the database automatically.
+        </div>
+
+        <div class="controls">
+            <div class="search-bar">
+                <span class="search-icon">&#128269;</span>
+                <input type="text" id="searchInput" placeholder="Search exercises...">
+            </div>
+            <div class="filter-tabs" id="filterTabs">
+                <button class="tab-btn active" data-filter="all">All</button>
+                <button class="tab-btn" data-filter="STRENGTH">Strength</button>
+                <button class="tab-btn" data-filter="CARDIO">Cardio</button>
+                <button class="tab-btn" data-filter="CORE">Core</button>
+                <button class="tab-btn" data-filter="HIIT">HIIT</button>
+                <button class="tab-btn" data-filter="FLEXIBILITY">Flexibility</button>
+            </div>
+        </div>
+
+        <div class="exercise-grid" id="exerciseGrid">
+            <div class="empty-state" id="gridStatusMsg" style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--text-secondary);">
+                <div style="font-size:2rem;margin-bottom:0.75rem;">⏳</div>
+                <div style="font-family:'Oswald',sans-serif;letter-spacing:2px;font-size:0.9rem;">LOADING EXERCISES...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Log Workout Modal — replaces the old prompt() dialogs -->
+<div class="modal" id="logModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 id="modalTitle">Log Workout</h2>
+                <p id="modalSubtitle">Track your performance</p>
+            </div>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="modalExId">
+            <input type="hidden" id="modalCalPerMin">
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Duration (minutes) *</label>
+                    <input type="number" id="logDuration" min="1" max="300" placeholder="e.g. 30">
+                </div>
+                <div class="form-field">
+                    <label>Difficulty</label>
+                    <select id="logDifficulty">
+                        <option value="">Select...</option>
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Sets (optional)</label>
+                    <input type="number" id="logSets" min="1" placeholder="e.g. 3">
+                </div>
+                <div class="form-field">
+                    <label>Reps per set (optional)</label>
+                    <input type="number" id="logReps" min="1" placeholder="e.g. 15">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>Heart Rate bpm (optional)</label>
+                    <input type="number" id="logHR" min="40" max="220" placeholder="e.g. 145">
+                </div>
+                <div class="form-field">
+                    <label>Calories (auto-estimated)</label>
+                    <input type="number" id="logCal" min="0" placeholder="Auto">
+                </div>
+            </div>
+            <div class="form-field">
+                <label>Notes (optional)</label>
+                <textarea id="logNotes" placeholder="How did it feel? Any personal bests?"></textarea>
+            </div>
+            <div class="modal-cta">
+                <button class="btn-log" id="logBtn" onclick="submitLog()">Log Workout</button>
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastArea"></div>
+<script src="api.js"></script>
+<script>
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FALLBACK DATA — exact mirror of seed.ts
+// Used ONLY when the API returns an empty array (DB not yet seeded).
+// Once you run `npx prisma db seed`, the API data is used and this is ignored.
+// IDs match seed.ts so logging still works even in fallback mode.
+// ─────────────────────────────────────────────────────────────────────────────
+const FALLBACK = [
+  // STRENGTH
+  { id:'ex-pushup', name:'Push-ups',          category:'STRENGTH',    caloriesPerMin:8,    difficulty:'BEGINNER',     icon:'💪', tags:['Upper Body','Chest','No Equipment'],    desc:'Classic upper body exercise targeting chest, shoulders, and triceps. Perfect for building strength.' },
+  { id:'ex-squat',  name:'Squats',            category:'STRENGTH',    caloriesPerMin:9,    difficulty:'BEGINNER',     icon:'🦵', tags:['Lower Body','Legs','No Equipment'],     desc:'Fundamental lower body movement for building leg strength, power, and mobility.' },
+  { id:'ex-lunge',  name:'Lunges',            category:'STRENGTH',    caloriesPerMin:7.5,  difficulty:'BEGINNER',     icon:'🚶', tags:['Lower Body','Balance'],                 desc:'Unilateral leg exercise that improves balance, coordination, and lower body strength.' },
+  { id:'ex-dips',   name:'Tricep Dips',       category:'STRENGTH',    caloriesPerMin:7,    difficulty:'INTERMEDIATE', icon:'💪', tags:['Upper Body','Triceps'],                 desc:'Bodyweight exercise targeting the triceps, chest, and anterior deltoids using a chair or bench.' },
+  { id:'ex-glute',  name:'Glute Bridges',     category:'STRENGTH',    caloriesPerMin:6,    difficulty:'BEGINNER',     icon:'🍑', tags:['Lower Body','Glutes','No Equipment'],   desc:'Hip extension exercise activating glutes and hamstrings. Drive hips to the ceiling.' },
+  { id:'ex-pike',   name:'Pike Push-ups',     category:'STRENGTH',    caloriesPerMin:8.5,  difficulty:'ADVANCED',     icon:'🔺', tags:['Shoulders','Advanced'],                 desc:'Advanced shoulder exercise. Form an inverted V and lower your head toward the floor.' },
+  // CARDIO
+  { id:'ex-burpee', name:'Burpees',           category:'CARDIO',      caloriesPerMin:12,   difficulty:'INTERMEDIATE', icon:'🏃', tags:['Full Body','Cardio','HIIT'],            desc:'High-intensity full-body exercise combining a squat, push-up, and jump. One of the best calorie burners.' },
+  { id:'ex-jjack',  name:'Jumping Jacks',     category:'CARDIO',      caloriesPerMin:8,    difficulty:'BEGINNER',     icon:'🤸', tags:['Cardio','Warm-up','No Equipment'],      desc:'Classic full-body cardio warm-up that elevates heart rate and improves coordination.' },
+  { id:'ex-hknees', name:'High Knees',        category:'CARDIO',      caloriesPerMin:10,   difficulty:'BEGINNER',     icon:'🏃', tags:['Cardio','Hip Flexors'],                 desc:'Running in place while driving knees up to hip level. Excellent for endurance.' },
+  { id:'ex-bkicks', name:'Butt Kicks',        category:'CARDIO',      caloriesPerMin:9,    difficulty:'BEGINNER',     icon:'🦵', tags:['Cardio','Hamstrings'],                  desc:'Jogging in place while kicking heels toward glutes. Improves hamstring flexibility.' },
+  // CORE
+  { id:'ex-plank',  name:'Plank',             category:'CORE',        caloriesPerMin:5,    difficulty:'BEGINNER',     icon:'🧘', tags:['Core','Abs','Stability'],               desc:'Isometric core exercise that builds endurance and stability throughout the entire body.' },
+  { id:'ex-mclimb', name:'Mountain Climbers', category:'CORE',        caloriesPerMin:11,   difficulty:'INTERMEDIATE', icon:'⛰️', tags:['Core','Cardio','HIIT'],                 desc:'Dynamic core and cardio exercise. From plank, alternate driving knees toward your chest at speed.' },
+  { id:'ex-crunch', name:'Crunches',          category:'CORE',        caloriesPerMin:5.5,  difficulty:'BEGINNER',     icon:'💫', tags:['Core','Abs','No Equipment'],            desc:'Classic abdominal exercise targeting the rectus abdominis. Lie on back, curl upper body upward.' },
+  { id:'ex-rtwist', name:'Russian Twists',    category:'CORE',        caloriesPerMin:6.5,  difficulty:'INTERMEDIATE', icon:'🌀', tags:['Core','Obliques','Rotation'],           desc:'Rotational core exercise targeting obliques. Sit with feet elevated, rotate side to side.' },
+  { id:'ex-lraise', name:'Leg Raises',        category:'CORE',        caloriesPerMin:5,    difficulty:'INTERMEDIATE', icon:'🦵', tags:['Core','Lower Abs'],                     desc:'Lower ab exercise. Raise straight legs to 90° then slowly lower without touching the floor.' },
+  // HIIT
+  { id:'ex-sqjmp',  name:'Jump Squats',       category:'HIIT',        caloriesPerMin:14,   difficulty:'INTERMEDIATE', icon:'⚡', tags:['HIIT','Plyometric','Legs'],             desc:'Explosive plyometric squat. Explode upward into a jump, land softly, repeat immediately.' },
+  { id:'ex-boxjmp', name:'Box Jumps',         category:'HIIT',        caloriesPerMin:13,   difficulty:'ADVANCED',     icon:'📦', tags:['HIIT','Plyometric','Power'],            desc:'Jump onto a sturdy platform to build explosive leg power. Step back down carefully.' },
+  { id:'ex-sprint', name:'Sprint Intervals',  category:'HIIT',        caloriesPerMin:16,   difficulty:'ADVANCED',     icon:'🏃', tags:['HIIT','Cardio','Endurance'],            desc:'Alternate max effort sprints with walking recovery. Massively effective for fat loss.' },
+  // FLEXIBILITY
+  { id:'ex-ddog',   name:'Downward Dog',      category:'FLEXIBILITY', caloriesPerMin:3.5,  difficulty:'BEGINNER',     icon:'🧘', tags:['Yoga','Stretch','Recovery'],            desc:'Foundational yoga pose stretching hamstrings, calves, and shoulders while strengthening arms.' },
+  { id:'ex-child',  name:"Child's Pose",      category:'FLEXIBILITY', caloriesPerMin:2,    difficulty:'BEGINNER',     icon:'🌿', tags:['Yoga','Recovery','Cool-down'],          desc:'Restorative pose gently stretching hips, thighs, and lower back. Perfect for cool-down.' },
+  { id:'ex-hipfx',  name:'Hip Flexor Stretch',category:'FLEXIBILITY', caloriesPerMin:2.5,  difficulty:'BEGINNER',     icon:'🧘', tags:['Stretch','Hips','Recovery'],            desc:'Kneeling lunge stretch opening up hip flexors that get tight from prolonged sitting.' },
+];
+
+let allExercises = [];
+let currentFilter = 'all';
+let isFallback = false;
+let currentPlan = null;   // set by initPlanGating()
+let monthlyLogCount = 0;  // workouts logged this month
+
+// ── Plan gating ───────────────────────────────────────────────────────────────
+async function initPlanGating() {
+    const { plan, sub } = await fetchActivePlan();
+    currentPlan = plan;
+
+    // Fetch monthly workout count for free users
+    const isFree = !plan || plan.slug === 'free';
+    if (isFree) {
+        try {
+            const statsRes = await ProgressAPI.getStats('30d');
+            const s = statsRes?.data?.stats || statsRes?.data || {};
+            monthlyLogCount = s.totalWorkouts ?? s.workoutCount ?? 0;
+        } catch {}
+    }
+
+    renderPlanBanner(plan, sub);
+    await updatePlanBadge();
+}
+
+function renderPlanBanner(plan, sub) {
+    const banner = document.getElementById('planBanner');
+    if (!banner) return;
+    const slug = plan?.slug || 'free';
+    if (slug === 'free') {
+        const remaining = Math.max(0, 10 - monthlyLogCount);
+        banner.style.display = 'flex';
+        banner.innerHTML = `
+            <span>🏃 <strong>${remaining} workout${remaining !== 1 ? 's' : ''}</strong> remaining this month on <strong>Free</strong></span>
+            <a href="subscription.html" style="margin-left:auto;padding:.35rem .9rem;background:linear-gradient(135deg,#D4AF37,#b8860b);color:#000;border-radius:8px;font-weight:700;font-size:.8rem;text-decoration:none;white-space:nowrap">⚡ UPGRADE</a>`;
+        if (remaining === 0) {
+            banner.style.background = 'rgba(248,113,113,0.12)';
+            banner.style.borderColor = 'rgba(248,113,113,0.3)';
+        }
+    } else {
+        const label = slug === 'elite' ? '👑 Elite' : '⚡ Pro';
+        const trialNote = sub?.status === 'TRIALING' ? ' — Trial Active' : '';
+        banner.style.display = 'flex';
+        banner.innerHTML = `<span>${label}<strong style="color:#D4AF37">${trialNote}</strong> · Unlimited workouts</span>`;
+        banner.style.background = 'rgba(212,175,55,0.07)';
+        banner.style.borderColor = 'rgba(212,175,55,0.2)';
+    }
+}
+
+function canLogWorkout() {
+    if (!currentPlan || currentPlan.slug !== 'free') return true;
+    const limit = currentPlan.maxWorkoutsPerMonth ?? 10;
+    return monthlyLogCount < limit;
+}
+
+// ── Load exercises: real DB first, fallback if empty/error ──────────────────
+async function loadExercises() {
+    // Show grid loading text immediately (already in HTML as default)
+    // Safety timer: if EVERYTHING fails and finally never runs, still render after 10s
+    const safetyTimer = setTimeout(() => {
+        if (!allExercises.length) {
+            allExercises = FALLBACK;
+            isFallback = true;
+            document.getElementById('devBanner').classList.add('visible');
+            renderExercises(allExercises);
+            try { if (typeof LoadingManager !== 'undefined') LoadingManager.hide(); } catch(_) {}
+        }
+    }, 10000);
+
+    // If api.js hasn't loaded, fall straight to fallback exercises
+    if (typeof WorkoutsAPI === 'undefined') {
+        clearTimeout(safetyTimer);
+        allExercises = FALLBACK;
+        isFallback   = true;
+        document.getElementById('devBanner').classList.add('visible');
+        renderExercises(allExercises);
+        return;
+    }
+
+    try {
+        const res = await WorkoutsAPI.getExercises({ limit: 100 });
+
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+            // ✅ Real data from DB
+            allExercises = res.data;
+            isFallback   = false;
+
+        } else if (res && res.success && Array.isArray(res.data) && res.data.length === 0) {
+            // DB seeded but empty, or truly empty
+            allExercises = FALLBACK;
+            isFallback   = true;
+            document.getElementById('devBanner').classList.add('visible');
+
+        } else {
+            // success:false or unexpected shape
+            console.warn('[loadExercises] Unexpected API response:', res);
+            allExercises = FALLBACK;
+            isFallback   = true;
+            document.getElementById('devBanner').classList.add('visible');
+        }
+
+    } catch (err) {
+        console.error('[loadExercises] Error:', err);
+        allExercises = FALLBACK;
+        isFallback   = true;
+        document.getElementById('devBanner').classList.add('visible');
+
+        if (err.message && err.message.includes('timed out')) {
+            Toast.warning('Server took too long to respond — showing sample data');
+        } else if (err.message && (err.message.includes('401') || err.message.includes('expired'))) {
+            Toast.error('Session expired. Please log in again.');
+        } else if (err.message && err.message.toLowerCase().includes('network')) {
+            Toast.error('No connection to server — showing sample data');
+        } else {
+            Toast.warning('Could not reach server — showing sample data');
+        }
+
+    } finally {
+        clearTimeout(safetyTimer);
+        try { if (typeof LoadingManager !== 'undefined') LoadingManager.hide(); } catch(_) {}
+        // ✅ renderExercises ALWAYS fires here — guaranteed
+        renderExercises(allExercises);
+    }
+}
+
+// ── Render — your original card design, driven by API or fallback data ───────
+function renderExercises(list) {
+    const grid = document.getElementById('exerciseGrid');
+    if (!list.length) {
+        grid.innerHTML = '<div class="empty-state">No exercises match your search.</div>';
+        return;
+    }
+
+    grid.innerHTML = list.map((ex, i) => {
+        // Fallback items have extra fields; API items need derivation
+        const icon   = ex.icon  || getCatIcon(ex.category);
+        const diff   = ex.difficulty || deriveLevel(ex.caloriesPerMin);
+        const tags   = ex.tags  || [ex.category];
+        const desc   = ex.desc  || ex.description || '';
+        const calTxt = ex.caloriesPerMin
+            ? `🔥 ~${Math.round(ex.caloriesPerMin * 10)} cal / 10 min`
+            : '';
+
+        return `
+        <div class="exercise-card">
+            <div class="exercise-image">
+                <span>${icon}</span>
+                <div class="difficulty-badge difficulty-${diff.toLowerCase()}">${diff}</div>
+            </div>
+            <div class="exercise-content">
+                <h3 class="exercise-title">${esc(ex.name)}</h3>
+                <div class="exercise-meta">
+                    <span>📂 ${ex.category}</span>
+                    ${calTxt ? `<span>${calTxt}</span>` : ''}
+                </div>
+                <p class="exercise-description">${esc(desc)}</p>
+                <div class="exercise-tags">
+                    ${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+                </div>
+                <div class="exercise-actions">
+                    <button class="btn-action btn-start"
+                        onclick="goToSession('${ex.id}','${escAttr(ex.name)}',${ex.caloriesPerMin||0},'${ex.category||''}')">
+                        Start Exercise
+                    </button>
+                    <button class="btn-action btn-save"
+                        onclick="openModal('${ex.id}','${escAttr(ex.name)}',${ex.caloriesPerMin||0},'${ex.category||''}')">
+                        Log Quick
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function getCatIcon(cat) {
+    return {STRENGTH:'💪',CARDIO:'🏃',CORE:'🔥',HIIT:'⚡',FLEXIBILITY:'🧘',YOGA:'🧘'}[(cat||'').toUpperCase()] || '💪';
+}
+function deriveLevel(cal) {
+    if (!cal) return 'Beginner';
+    if (cal >= 12) return 'Advanced';
+    if (cal >= 8)  return 'Intermediate';
+    return 'Beginner';
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s||'').replace(/'/g,"\\'"); }
+
+// ── Search ───────────────────────────────────────────────────────────────────
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    const q = e.target.value.trim();
+    if (!q) { applyFilter(allExercises); return; }
+    if (q.length < 2) return;
+
+    searchTimer = setTimeout(async () => {
+        if (isFallback) {
+            // Client-side search on fallback data
+            applyFilter(allExercises.filter(ex =>
+                ex.name.toLowerCase().includes(q.toLowerCase()) ||
+                (ex.desc || ex.description || '').toLowerCase().includes(q.toLowerCase()) ||
+                (ex.tags||[ex.category]).some(t => t.toLowerCase().includes(q.toLowerCase()))
+            ));
+        } else {
+            try {
+                const res = await WorkoutsAPI.searchExercises(q);
+                if (res.success) renderExercises(
+                    currentFilter === 'all' ? res.data
+                    : res.data.filter(ex => (ex.category||'').toUpperCase() === currentFilter)
+                );
+            } catch { /* silent */ }
+        }
+    }, 300);
+});
+
+// ── Category filter tabs ─────────────────────────────────────────────────────
+document.getElementById('filterTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    document.getElementById('searchInput').value = '';
+    applyFilter(allExercises);
+});
+
+function applyFilter(list) {
+    if (currentFilter === 'all') { renderExercises(list); return; }
+    renderExercises(list.filter(ex => (ex.category||'').toUpperCase() === currentFilter));
+}
+
+// ── Log Workout Modal ────────────────────────────────────────────────────────
+function openModal(id, name, calPerMin, category) {
+    if (!canLogWorkout()) {
+        showUpgradePrompt('Unlimited Workouts', 'pro');
+        return;
+    }
+    document.getElementById('modalExId').value     = id;
+    document.getElementById('modalCalPerMin').value = calPerMin;
+    document.getElementById('modalTitle').textContent    = name;
+    document.getElementById('modalSubtitle').textContent = `${category} · ${calPerMin} cal/min`;
+    ['logDuration','logSets','logReps','logHR','logCal','logNotes']
+        .forEach(f => document.getElementById(f).value = '');
+    document.getElementById('logDifficulty').value = '';
+    document.getElementById('logModal').classList.add('active');
+    document.getElementById('logDuration').focus();
+}
+
+function closeModal() { document.getElementById('logModal').classList.remove('active'); }
+
+// Auto-estimate calories
+document.getElementById('logDuration').addEventListener('input', () => {
+    const min = parseInt(document.getElementById('logDuration').value) || 0;
+    const cpm = parseFloat(document.getElementById('modalCalPerMin').value) || 0;
+    const calField = document.getElementById('logCal');
+    if (min > 0 && cpm > 0 && !calField.dataset.edited) {
+        calField.value = Math.round(cpm * min);
+    }
+});
+document.getElementById('logCal').addEventListener('input', e => {
+    e.target.dataset.edited = e.target.value ? '1' : '';
+});
+
+async function submitLog() {
+    const duration = parseInt(document.getElementById('logDuration').value);
+    if (!duration || duration <= 0) { Toast.error('Please enter a duration'); return; }
+
+    const btn = document.getElementById('logBtn');
+    btn.disabled = true; btn.textContent = 'Logging...';
+
+    try {
+        await ProgressAPI.logWorkout({
+            exerciseId:    document.getElementById('modalExId').value,
+            duration,                                                          // minutes — matches backend
+            sets:          document.getElementById('logSets').value  || undefined,
+            reps:          document.getElementById('logReps').value  || undefined,
+            heartRate:     document.getElementById('logHR').value    || undefined,
+            caloriesBurned:document.getElementById('logCal').value   || undefined,
+            difficulty:    document.getElementById('logDifficulty').value || undefined,
+            notes:         document.getElementById('logNotes').value || undefined,
+        });
+        Toast.success('Workout logged! 🎉');
+        monthlyLogCount++;
+        renderPlanBanner(currentPlan, null);
+        closeModal();
+    } catch (err) {
+        Toast.error(err.message || 'Failed to log workout');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Log Workout 🎯';
+    }
+}
+
+function openExercise(id, ex) {
+    // Store in sessionStorage so exercise.html can access without a round trip
+    try { sessionStorage.setItem('currentExercise', JSON.stringify(ex)); } catch {}
+    window.location.href = `exercise.html?id=${id}`;
+}
+
+function saveExercise(id, name) {
+    Toast.info(`Save feature coming soon for "${name}"`);
+}
+
+function goToSession(id, name, cal, category) {
+    if (!canLogWorkout()) {
+        showUpgradePrompt('Unlimited Workouts', 'pro');
+        return;
+    }
+    window.location.href = `workout-session.html?id=${id}&name=${encodeURIComponent(name)}&cal=${cal}&category=${encodeURIComponent(category)}`;
+}
+
+document.getElementById('logModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('logModal')) closeModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Fire on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    try { requireAuth(); } catch (_) {}
+    try { populateSidebarUser(); } catch (_) {}
+    const _lb = document.getElementById('sidebarLogoutBtn');
+    if (_lb) _lb.addEventListener('click', () => { if (typeof handleLogout === 'function') handleLogout(); });
+    // Small delay so api.js tokens are confirmed ready (esp. on mobile)
+    setTimeout(() => {
+        initPlanGating().catch(() => {});
+        loadExercises();
+    }, 50);
+});
+
+
+/* ── SIDEBAR SCROLL-LOCK ──────────────────────────── */
+
+
+function showConfirm({ icon = '⚠️', title = 'Are you sure?', message = '', okText = 'Confirm', cancelText = 'Cancel', danger = false, onOk }) {
+    const ex = document.getElementById('ff-confirm');
+    if (ex) ex.remove();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ff-confirm-backdrop';
+    backdrop.id = 'ff-confirm';
+    backdrop.innerHTML = `
+        <div class="ff-confirm-box">
+            <span class="ff-confirm-icon">${icon}</span>
+            <div class="ff-confirm-title">${title}</div>
+            <p class="ff-confirm-msg">${message}</p>
+            <div class="ff-confirm-actions">
+                <button class="ff-confirm-cancel" id="ffCancel">${cancelText}</button>
+                <button class="ff-confirm-ok ${danger ? 'danger' : ''}" id="ffOk">${okText}</button>
+            </div>
+        </div>`;
+    document.body.appendChild(backdrop);
+    const close = () => {
+        backdrop.style.opacity = '0';
+        backdrop.style.pointerEvents = 'none';
+        backdrop.style.visibility = 'hidden';
+        if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    };
+    backdrop.querySelector('#ffCancel').addEventListener('click', e => { e.stopPropagation(); close(); });
+    backdrop.querySelector('#ffOk').addEventListener('click', e => { e.stopPropagation(); close(); if (onOk) onOk(); });
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+    document.addEventListener('keydown', function esc(e) {
+        if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+}
+function handleLogout() {
+    showConfirm({
+        icon: '🚪', title: 'LOG OUT',
+        message: 'Are you sure you want to log out of FlowFit Elite?',
+        okText: 'LOG OUT', cancelText: 'Stay', danger: true,
+        onOk: async () => { LoadingManager.show('Logging out...'); await AuthAPI.logout(); }
+    });
+}
+
+
+
+/* ── FLOWFIT SIDEBAR JS v4 — smooth scroll + reliable swipe ─────────────── */
+(function () {
+    'use strict';
+    let _savedY = 0;
+
+    function openSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        _savedY = window.scrollY || 0;
+        sb.classList.add('mobile-active');
+        if (ov) ov.classList.add('active');
+        document.body.classList.add('sidebar-open');
+        document.body.style.top = `-${_savedY}px`;
+        sb.offsetHeight; // force reflow
+    }
+
+    function closeSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        sb.classList.remove('mobile-active');
+        if (ov) ov.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+        document.body.style.top = '';
+        window.scrollTo({ top: _savedY, behavior: 'instant' });
+    }
+
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        if (!sb) return;
+        sb.classList.contains('mobile-active') ? closeSidebar() : openSidebar();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+        });
+        const sb = document.getElementById('sidebar');
+        if (sb) {
+            let startX = 0;
+            sb.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+            sb.addEventListener('touchend', e => {
+                if (startX - e.changedTouches[0].clientX > 80) closeSidebar();
+            }, { passive: true });
+        }
+    });
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+    window.openSidebar  = openSidebar;
+    window.closeSidebar = closeSidebar;
+    window.toggleSidebar = toggleSidebar;
+}());
+
+</script>
+</body>
+</html>

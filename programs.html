@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programs - FlowFit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400&family=Lora:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/*
+ * FlowFit — Shared Design System
+ * Applies the landing-page aesthetic (Josefin Sans + Lora + JetBrains Mono,
+ * obsidian-gold tokens, sidebar, cards, inputs, buttons) to all interior pages.
+ *
+ * Specificity note: many existing rules use !important.
+ * We match or exceed that where needed, but prefer clean overrides via :root tokens.
+ */
+
+/* ═══════════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════════ */
+:root {
+  /* backgrounds */
+  --ink:         #07060c;
+  --ink-1:       #0c0b12;
+  --ink-2:       #111019;
+  --ink-3:       #16142080;
+  --surface:     rgba(15, 14, 24, 0.88);
+  --surface-2:   rgba(20, 18, 32, 0.72);
+  --g-card:      linear-gradient(145deg, rgba(20,18,32,0.95), rgba(14,13,22,0.95));
+
+  /* gold */
+  --Au:          #C9A84C;
+  --Au-hi:       #E8C96A;
+  --Au-lo:       #8E6E28;
+  --Au-mist:     rgba(201, 168, 76, 0.08);
+  --Au-rim:      rgba(201, 168, 76, 0.22);
+  --Au-glow:     rgba(201, 168, 76, 0.18);
+  --g-Au:        linear-gradient(135deg, #E8C96A 0%, #C9A84C 50%, #8E6E28 100%);
+
+  /* accents */
+  --sage:        #3BBF8A;
+  --sage-dim:    rgba(59, 191, 138, 0.12);
+  --sky:         #5B9CF6;
+  --coral:       #E07B54;
+  --red:         #E05454;
+
+  /* text */
+  --t1:          #F0EBE0;
+  --t2:          #8A8590;
+  --t3:          #44404A;
+  --t4:          #C4BFCA;
+
+  /* borders */
+  --b1:          rgba(201, 168, 76, 0.14);
+  --b2:          rgba(201, 168, 76, 0.26);
+  --b3:          rgba(240, 235, 228, 0.05);
+  --b4:          rgba(240, 235, 228, 0.09);
+
+  /* typography */
+  --f-display:   'Josefin Sans', sans-serif;
+  --f-serif:     'Lora', Georgia, serif;
+  --f-mono:      'JetBrains Mono', monospace;
+
+  /* motion */
+  --ease:        cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* layout */
+  --sidebar-w:   270px;
+  --r-card:      16px;
+  --r-sm:        10px;
+  --r-pill:      9999px;
+
+  /* legacy aliases — keeps existing JS/inline-styles working */
+  --bg-deep:          var(--ink);
+  --bg-surface:       var(--ink-1);
+  --bg-card:          var(--g-card);
+  --bg-elevated:      var(--ink-2);
+  --gold-main:        var(--Au);
+  --gold-bright:      var(--Au-hi);
+  --gold-deep:        var(--Au-lo);
+  --gold-gradient:    var(--g-Au);
+  --gold-soft:        var(--Au-mist);
+  --gold-glow:        var(--Au-glow);
+  --border-gold:      var(--b1);
+  --border-gold-hover:var(--b2);
+  --text-primary:     var(--t1);
+  --text-secondary:   var(--t2);
+  --accent-green:     var(--sage);
+  --transition:       all 0.3s var(--ease);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  font-family: var(--f-display);
+  font-weight: 300;
+  background-color: var(--ink);
+  color: var(--t1);
+  min-height: 100vh;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOADING OVERLAY
+═══════════════════════════════════════════════════════ */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--b1);
+  border-top-color: var(--Au);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: var(--f-display);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--Au);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+═══════════════════════════════════════════════════════ */
+#toastContainer {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.toast {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  padding: 0.8rem 1.4rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--b2);
+  background: var(--ink-2);
+  color: var(--t1);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: toastIn 0.3s var(--ease);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT — SIDEBAR + MAIN CONTENT
+═══════════════════════════════════════════════════════ */
+.dashboard-container,
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: var(--sidebar-w) !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background: var(--ink-1) !important;
+  border-right: 1px solid var(--b1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 2rem 1.5rem !important;
+  z-index: 100 !important;
+  transition: transform 0.3s var(--ease) !important;
+}
+
+/* Logo inside sidebar */
+.sidebar .logo {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.38em !important;
+  color: var(--Au-hi) !important;
+  background: none !important;
+  -webkit-text-fill-color: unset !important;
+  text-decoration: none !important;
+  display: block !important;
+  margin-bottom: 2.4rem !important;
+  padding: 0 !important;
+  text-transform: uppercase !important;
+}
+
+/* Nav menu */
+.nav-menu {
+  list-style: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.2rem !important;
+  flex: 1 !important;
+}
+
+.nav-item {
+  width: 100% !important;
+}
+
+.nav-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  padding: 0.72rem 1rem !important;
+  color: var(--t2) !important;
+  text-decoration: none !important;
+  border-radius: var(--r-sm) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  transition: all 0.25s ease !important;
+  border: 1px solid transparent !important;
+}
+
+.nav-link:hover {
+  color: var(--Au-hi) !important;
+  background: var(--Au-mist) !important;
+  border-color: var(--b1) !important;
+}
+
+.nav-link.active {
+  color: var(--ink) !important;
+  background: var(--g-Au) !important;
+  border-color: transparent !important;
+  font-weight: 400 !important;
+}
+
+/* Spacer pushes user section to bottom */
+.nav-spacer {
+  flex: 1 !important;
+  min-height: 1rem !important;
+}
+
+/* User section at sidebar bottom */
+.user-section {
+  border-top: 1px solid var(--b1) !important;
+  padding-top: 1.2rem !important;
+  margin-top: auto !important;
+}
+
+.user-profile {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  margin-bottom: 0.9rem !important;
+}
+
+.user-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.user-info h4 {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.82rem !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.2rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Plan badge */
+.plan-badge {
+  display: inline-block !important;
+  padding: 0.12rem 0.6rem !important;
+  border-radius: 3px !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.6rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.plan-free {
+  background: var(--Au-mist) !important;
+  color: var(--Au) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.plan-pro {
+  background: rgba(91, 156, 246, 0.1) !important;
+  color: var(--sky) !important;
+  border: 1px solid rgba(91, 156, 246, 0.25) !important;
+}
+
+.plan-elite,
+.plan-premium {
+  background: rgba(201, 168, 76, 0.15) !important;
+  color: var(--Au-hi) !important;
+  border: 1px solid var(--b2) !important;
+}
+
+/* Logout button */
+.logout-btn {
+  width: 100% !important;
+  padding: 0.65rem 1rem !important;
+  background: transparent !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  text-align: center !important;
+}
+
+.logout-btn:hover {
+  color: var(--red) !important;
+  border-color: rgba(224, 84, 84, 0.4) !important;
+  background: rgba(224, 84, 84, 0.06) !important;
+}
+
+/* ── MAIN CONTENT ── */
+.main-content,
+.main {
+  margin-left: var(--sidebar-w) !important;
+  flex: 1 !important;
+  min-height: 100vh !important;
+  padding: 2.5rem 3rem !important;
+  overflow-x: hidden !important;
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+  display: none !important;
+  position: fixed !important;
+  top: 1rem !important;
+  left: 1rem !important;
+  z-index: 200 !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: var(--ink-1) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--Au) !important;
+  font-size: 1.1rem !important;
+  cursor: pointer !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.65) !important;
+  z-index: 99 !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE HEADER
+═══════════════════════════════════════════════════════ */
+.header,
+.page-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+  margin-bottom: 2.5rem !important;
+}
+
+.header h1,
+.page-header h1,
+.page-title,
+.header-left h1 {
+  font-family: var(--f-serif) !important;
+  font-weight: 300 !important;
+  font-style: italic !important;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem) !important;
+  letter-spacing: -0.01em !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.3rem !important;
+}
+
+.header p,
+.page-header p,
+.page-subtitle,
+.header-left p {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.84rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════════════ */
+.card,
+.stat-card,
+.chart-card,
+.program-card,
+.exercise-card,
+.form-section,
+.week-block,
+.panel-card,
+.current-plan-banner,
+.plan-card {
+  background: var(--g-card) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-card) !important;
+  backdrop-filter: blur(16px) !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.card:hover,
+.stat-card:hover,
+.program-card:hover,
+.exercise-card:hover {
+  border-color: var(--b2) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 32px var(--Au-glow) !important;
+}
+
+/* Stat cards */
+.stat-card {
+  padding: 1.6rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+/* Stat icon — replace emoji display */
+.stat-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: var(--r-sm) !important;
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.1rem !important;
+  margin-bottom: 0.4rem !important;
+  color: var(--Au) !important;
+}
+
+.stat-value {
+  font-family: var(--f-mono) !important;
+  font-weight: 300 !important;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem) !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1 !important;
+  background: var(--g-Au) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.stat-label {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRIDS
+═══════════════════════════════════════════════════════ */
+.stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.chart-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.exercise-grid,
+.programs-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+  gap: 1.2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════ */
+.btn,
+button.btn,
+a.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.73rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  border: none !important;
+  white-space: nowrap !important;
+  padding: 0.75rem 2.2rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  /* Arrow tip: pointed right pentagon */
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    0 100%
+  ) !important;
+  border-radius: 0 !important;
+  transition:
+    transform 0.3s var(--ease),
+    box-shadow 0.3s var(--ease),
+    filter 0.3s ease !important;
+}
+
+/* Shimmer sweep on primary */
+.btn-primary::before,
+.btn-enroll::before,
+.btn-start::before,
+.btn-log::before,
+.btn-continue::before,
+.btn-save::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -60% !important;
+  left: -110% !important;
+  width: 55% !important;
+  height: 220% !important;
+  background: linear-gradient(
+    108deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.38) 50%,
+    transparent 80%
+  ) !important;
+  transition: left 0.55s var(--ease) !important;
+  pointer-events: none !important;
+}
+
+/* Primary filled */
+.btn-primary,
+.btn-enroll,
+.btn-start,
+.btn-log,
+.btn-continue,
+.btn-save,
+button[class*="btn-primary"],
+input[type="submit"] {
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 5px 22px rgba(201, 168, 76, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.38) !important;
+}
+
+.btn-primary:hover,
+.btn-enroll:hover,
+.btn-start:hover,
+.btn-log:hover,
+.btn-continue:hover,
+.btn-save:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 10px 32px rgba(201, 168, 76, 0.54),
+    0 4px 12px rgba(0, 0, 0, 0.42) !important;
+}
+
+.btn-primary:hover::before,
+.btn-enroll:hover::before,
+.btn-start:hover::before,
+.btn-log:hover::before,
+.btn-continue:hover::before,
+.btn-save:hover::before {
+  left: 170% !important;
+}
+
+/* Ghost outlined */
+.btn-ghost,
+.btn-details,
+.btn-cancel,
+.btn-secondary,
+button[class*="btn-secondary"],
+button[class*="btn-ghost"] {
+  background: transparent !important;
+  color: var(--Au-hi) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(201, 168, 76, 0.32) !important;
+}
+
+.btn-ghost:hover,
+.btn-details:hover,
+.btn-cancel:hover,
+.btn-secondary:hover {
+  color: var(--t1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(201, 168, 76, 0.6),
+    0 4px 20px rgba(201, 168, 76, 0.14) !important;
+  background: rgba(201, 168, 76, 0.08) !important;
+}
+
+/* Danger / destructive */
+.btn-danger,
+.logout-btn-top,
+button[class*="btn-danger"] {
+  background: transparent !important;
+  color: var(--red) !important;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    0 100%
+  ) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.3) !important;
+}
+
+.btn-danger:hover {
+  background: rgba(224, 84, 84, 0.08) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.6) !important;
+}
+
+/* Full-width override (used on modal/form submit) */
+.btn-full,
+.btn[style*="width:100%"],
+.btn[style*="width: 100%"] {
+  clip-path: none !important;
+  border-radius: var(--r-sm) !important;
+  width: 100% !important;
+  padding: 0.85rem 2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   INPUTS & FORMS
+═══════════════════════════════════════════════════════ */
+.form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.45rem !important;
+  margin-bottom: 1.2rem !important;
+}
+
+.form-label {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+.form-input,
+.form-select,
+.form-textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+select,
+textarea {
+  width: 100% !important;
+  padding: 0.78rem 1rem !important;
+  background: rgba(201, 168, 76, 0.04) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t1) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.02em !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+  outline: none !important;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--Au) !important;
+  box-shadow: 0 0 0 3px var(--Au-mist) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--t3) !important;
+  font-weight: 300 !important;
+}
+
+select option {
+  background: var(--ink-2) !important;
+  color: var(--t1) !important;
+}
+
+.form-section {
+  padding: 2rem !important;
+  border-radius: var(--r-card) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.form-section h2 {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--Au) !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1rem !important;
+}
+
+/* Error messages */
+.error-message,
+.form-error {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  color: var(--red) !important;
+  letter-spacing: 0.02em !important;
+  min-height: 1.2rem !important;
+  padding: 0.5rem 0 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FILTER TABS / TIME BUTTONS
+═══════════════════════════════════════════════════════ */
+.filter-tabs,
+.time-filters {
+  display: flex !important;
+  gap: 0.3rem !important;
+  background: rgba(201, 168, 76, 0.04) !important;
+  padding: 0.35rem !important;
+  border-radius: var(--r-sm) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.tab-btn,
+.time-btn {
+  padding: 0.5rem 1.2rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+}
+
+.tab-btn:hover,
+.time-btn:hover {
+  color: var(--t1) !important;
+}
+
+.tab-btn.active,
+.time-btn.active {
+  background: var(--g-Au) !important;
+  color: var(--ink) !important;
+  font-weight: 400 !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SEARCH BAR
+═══════════════════════════════════════════════════════ */
+.search-bar {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.search-bar input {
+  padding-left: 2.8rem !important;
+  min-width: 240px !important;
+}
+
+.search-icon {
+  position: absolute !important;
+  left: 0.9rem !important;
+  color: var(--t2) !important;
+  font-size: 0.85rem !important;
+  pointer-events: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════ */
+.modal {
+  display: none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  z-index: 1000 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+.modal.active {
+  display: flex !important;
+}
+
+.modal-content {
+  background: var(--ink-2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7) !important;
+}
+
+.modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.modal-header h2,
+.modal-header h3 {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--Au-hi) !important;
+}
+
+.close-btn {
+  background: none !important;
+  border: none !important;
+  color: var(--t2) !important;
+  font-size: 1.2rem !important;
+  cursor: pointer !important;
+  padding: 0.25rem !important;
+  line-height: 1 !important;
+  transition: color 0.2s !important;
+  clip-path: none !important;
+}
+
+.close-btn:hover {
+  color: var(--t1) !important;
+}
+
+/* ── FlowFit Confirm Dialog ── */
+.ff-confirm-box {
+  background: var(--ink-2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  max-width: 420px !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.ff-confirm-icon {
+  font-size: 2rem !important;
+  margin-bottom: 1rem !important;
+  color: var(--Au) !important;
+}
+
+.ff-confirm-title {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.ff-confirm-msg {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+  color: var(--t2) !important;
+  line-height: 1.7 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.ff-confirm-actions {
+  display: flex !important;
+  gap: 0.75rem !important;
+  justify-content: center !important;
+}
+
+.ff-confirm-ok.danger {
+  background: rgba(224, 84, 84, 0.15) !important;
+  color: var(--red) !important;
+  box-shadow: inset 0 0 0 1.5px rgba(224, 84, 84, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════════════════ */
+.empty-state {
+  text-align: center !important;
+  padding: 4rem 2rem !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BADGES / TAGS
+═══════════════════════════════════════════════════════ */
+.difficulty-badge,
+.category-badge,
+.program-badge,
+.status-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.2rem 0.65rem !important;
+  border-radius: 3px !important;
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+.difficulty-beginner,
+.difficulty-beginner.difficulty-badge {
+  background: rgba(59, 191, 138, 0.1) !important;
+  color: var(--sage) !important;
+  border: 1px solid rgba(59, 191, 138, 0.25) !important;
+}
+
+.difficulty-intermediate {
+  background: rgba(201, 168, 76, 0.1) !important;
+  color: var(--Au) !important;
+  border: 1px solid var(--b1) !important;
+}
+
+.difficulty-advanced {
+  background: rgba(224, 123, 84, 0.1) !important;
+  color: var(--coral) !important;
+  border: 1px solid rgba(224, 123, 84, 0.28) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRESS BARS
+═══════════════════════════════════════════════════════ */
+.progress-bar,
+.week-progress,
+.strength-bar {
+  height: 4px !important;
+  background: var(--b3) !important;
+  border-radius: 2px !important;
+  overflow: hidden !important;
+}
+
+.progress-fill,
+.week-progress-fill,
+.strength-fill {
+  height: 100% !important;
+  background: var(--g-Au) !important;
+  border-radius: 2px !important;
+  transition: width 0.4s var(--ease) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOP NAV (workout-session / program-detail — no sidebar)
+═══════════════════════════════════════════════════════ */
+.top-nav {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 1rem 2rem !important;
+  background: rgba(7, 6, 12, 0.92) !important;
+  border-bottom: 1px solid var(--b1) !important;
+  backdrop-filter: blur(28px) !important;
+}
+
+.nav-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.nav-title {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+}
+
+.back-btn {
+  background: transparent !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--t2) !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.08em !important;
+  padding: 0.45rem 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  clip-path: none !important;
+}
+
+.back-btn:hover {
+  color: var(--Au-hi) !important;
+  border-color: var(--b2) !important;
+}
+
+.logo-small {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.3em !important;
+  color: var(--Au-hi) !important;
+  text-transform: uppercase !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH PAGES (login / register)
+═══════════════════════════════════════════════════════ */
+.auth-container {
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2rem !important;
+  position: relative !important;
+}
+
+.auth-card {
+  background: var(--g-card) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-card) !important;
+  padding: 3rem 2.5rem !important;
+  width: 100% !important;
+  max-width: 440px !important;
+  position: relative !important;
+  backdrop-filter: blur(24px) !important;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Pinstripe top */
+.auth-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 2px !important;
+  background: var(--g-Au) !important;
+  border-radius: var(--r-card) var(--r-card) 0 0 !important;
+}
+
+.auth-card .logo {
+  font-family: var(--f-display) !important;
+  font-weight: 200 !important;
+  font-size: 1rem !important;
+  letter-spacing: 0.38em !important;
+  color: var(--Au-hi) !important;
+  background: none !important;
+  -webkit-text-fill-color: unset !important;
+  text-transform: uppercase !important;
+  margin-bottom: 2rem !important;
+  display: block !important;
+}
+
+.auth-header {
+  margin-bottom: 2rem !important;
+}
+
+.auth-header h1 {
+  font-family: var(--f-serif) !important;
+  font-weight: 300 !important;
+  font-style: italic !important;
+  font-size: 1.8rem !important;
+  letter-spacing: -0.01em !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.auth-header p {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.84rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+.auth-footer {
+  margin-top: 1.8rem !important;
+  text-align: center !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  color: var(--t2) !important;
+  letter-spacing: 0.03em !important;
+}
+
+.auth-footer a {
+  color: var(--Au-hi) !important;
+  text-decoration: none !important;
+  transition: color 0.2s !important;
+}
+
+.auth-footer a:hover {
+  color: var(--t1) !important;
+}
+
+.back-link {
+  position: absolute !important;
+  top: 2rem !important;
+  left: 2rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.06em !important;
+  color: var(--t2) !important;
+  text-decoration: none !important;
+  transition: color 0.25s !important;
+}
+
+.back-link:hover {
+  color: var(--Au-hi) !important;
+}
+
+/* Password toggle */
+.password-toggle {
+  position: relative !important;
+}
+
+.password-toggle-btn {
+  position: absolute !important;
+  right: 0.9rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  color: var(--t2) !important;
+  cursor: pointer !important;
+  font-size: 0.9rem !important;
+  padding: 0 !important;
+  clip-path: none !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
+}
+
+/* Password strength */
+.password-strength {
+  margin-top: 0.6rem !important;
+}
+
+.strength-bar {
+  height: 3px !important;
+  background: var(--b3) !important;
+  border-radius: 2px !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CHART CARDS
+═══════════════════════════════════════════════════════ */
+.chart-card {
+  padding: 1.8rem !important;
+  border-radius: var(--r-card) !important;
+}
+
+.chart-card h3,
+.chart-title {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--t2) !important;
+  margin-bottom: 1.2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXERCISE CARDS
+═══════════════════════════════════════════════════════ */
+.exercise-card {
+  border-radius: var(--r-card) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.exercise-image {
+  width: 100% !important;
+  height: 160px !important;
+  object-fit: cover !important;
+  display: block !important;
+  background: var(--ink-2) !important;
+}
+
+.exercise-content {
+  padding: 1.4rem !important;
+}
+
+.exercise-title {
+  font-family: var(--f-display) !important;
+  font-weight: 400 !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: var(--t1) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.exercise-description {
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.8rem !important;
+  color: var(--t2) !important;
+  line-height: 1.7 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.exercise-meta {
+  display: flex !important;
+  gap: 0.5rem !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+}
+
+.exercise-tags {
+  display: flex !important;
+  gap: 0.4rem !important;
+  flex-wrap: wrap !important;
+  margin-top: 0.6rem !important;
+}
+
+.exercise-actions {
+  display: flex !important;
+  gap: 0.6rem !important;
+  margin-top: 1rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROGRAM CARDS
+═══════════════════════════════════════════════════════ */
+.program-card {
+  border-radius: var(--r-card) !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.program-header {
+  padding: 1.8rem !important;
+  background: var(--Au-mist) !important;
+  border-bottom: 1px solid var(--b1) !important;
+}
+
+.program-icon {
+  font-size: 2rem !important;
+  margin-bottom: 0.75rem !important;
+  display: block !important;
+  width: 48px !important;
+  height: 48px !important;
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: var(--r-sm) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.program-meta {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.75rem !important;
+  padding: 1.2rem 1.6rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTROLS BAR (search + filters)
+═══════════════════════════════════════════════════════ */
+.controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 2rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PLAN / SUBSCRIPTION CARDS
+═══════════════════════════════════════════════════════ */
+.plan-card {
+  border-radius: var(--r-card) !important;
+  padding: 2rem !important;
+  position: relative !important;
+  transition:
+    transform 0.35s var(--ease),
+    box-shadow 0.35s var(--ease),
+    border-color 0.35s ease !important;
+}
+
+.plan-card.featured,
+.plan-card.popular {
+  border-color: rgba(201, 168, 76, 0.38) !important;
+  transform: translateY(-12px) !important;
+  box-shadow:
+    0 0 0 1px rgba(201, 168, 76, 0.07),
+    0 28px 70px rgba(0, 0, 0, 0.7),
+    0 0 90px rgba(201, 168, 76, 0.13) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--b2);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--Au-lo);
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEV / TRIAL BANNER
+═══════════════════════════════════════════════════════ */
+.dev-banner,
+.trial-banner,
+.alert-banner {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 1rem !important;
+  padding: 1.2rem 1.6rem !important;
+  border-radius: var(--r-card) !important;
+  margin-bottom: 1.5rem !important;
+  font-family: var(--f-display) !important;
+  font-weight: 300 !important;
+  font-size: 0.82rem !important;
+}
+
+.dev-banner {
+  background: rgba(91, 156, 246, 0.08) !important;
+  border: 1px solid rgba(91, 156, 246, 0.22) !important;
+  color: var(--sky) !important;
+}
+
+.trial-banner {
+  background: var(--Au-mist) !important;
+  border: 1px solid var(--b1) !important;
+  color: var(--t1) !important;
+}
+
+.alert-past-due {
+  background: rgba(224, 84, 84, 0.08) !important;
+  border: 1px solid rgba(224, 84, 84, 0.28) !important;
+  color: var(--t1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 0px;
+  }
+
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
+  .sidebar {
+    transform: translateX(-100%) !important;
+    width: 260px !important;
+  }
+
+  .sidebar.mobile-active {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-overlay.mobile-active {
+    display: block !important;
+  }
+
+  .main-content,
+  .main {
+    margin-left: 0 !important;
+    padding: 1.5rem !important;
+    padding-top: 4rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .exercise-grid,
+  .programs-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .header,
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .auth-card {
+    padding: 2rem 1.5rem !important;
+  }
+
+  .btn {
+    clip-path: none !important;
+    border-radius: var(--r-sm) !important;
+  }
+}
+
+
+/* Programs page */
+.program-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-sm);
+    background: var(--Au-mist);
+    border: 1px solid var(--b1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--Au);
+    margin-bottom: 0.9rem;
+}
+.program-title {
+    font-family: var(--f-display);
+    font-weight: 400;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--t1);
+    margin-bottom: 0.4rem;
+}
+.program-desc {
+    font-family: var(--f-display);
+    font-weight: 300;
+    font-size: 0.8rem;
+    color: var(--t2);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+.program-stats {
+    display: flex;
+    gap: 1rem;
+    font-family: var(--f-display);
+    font-size: 0.72rem;
+    font-weight: 300;
+    color: var(--t2);
+    letter-spacing: 0.04em;
+    margin-bottom: 1rem;
+}
+.program-stats strong {
+    font-weight: 400;
+    color: var(--t1);
+}
+.section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: var(--Au);
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+}
+.continue-banner {
+    background: var(--Au-mist);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-card);
+    padding: 1.4rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.continue-banner h3 {
+    font-family: var(--f-display);
+    font-weight: 400;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--Au-hi);
+    margin-bottom: 0.25rem;
+}
+.continue-banner p {
+    font-family: var(--f-display);
+    font-weight: 300;
+    font-size: 0.8rem;
+    color: var(--t2);
+}
+
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="dashboard-container">
+    <aside class="sidebar" id="sidebar">
+        <span class="logo">FLOWFIT</span>
+        <nav>
+            <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link"><span>Home</span></a></li>
+        <li class="nav-item"><a href="dashboard.html" class="nav-link"><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="workouts.html" class="nav-link"><span>Workouts</span></a></li>
+        <li class="nav-item"><a href="programs.html" class="nav-link active"><span>Programs</span></a></li>
+        <li class="nav-item"><a href="progress.html" class="nav-link"><span>Progress</span></a></li>
+        <li class="nav-item"><a href="profile.html" class="nav-link"><span>Profile</span></a></li>
+        <li class="nav-item"><a href="subscription.html" class="nav-link"><span>Subscription</span></a></li>
+            </ul>
+        </nav>
+        <!-- Spacer: pushes user-section down on large screens
+             but collapses so content scrolls on small screens -->
+        <div class="nav-spacer"></div>
+        <div class="user-section">
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-info">
+                    <h4 id="userName">Loading...</h4>
+                    <span id="planBadge" class="plan-badge plan-free">FREE</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="sidebarLogoutBtn"><span>LOGOUT</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+    <!-- DEV MODE BANNER — shown only when API is unavailable / DB empty -->
+    <div id="devBanner" class="dev-banner" style="display:none;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);border-radius:12px;padding:0.85rem 1.2rem;margin-bottom:1.5rem;font-size:0.88rem;color:#f59e0b;">
+        ⚠️ Could not reach server — showing sample programs. Ensure the backend is running and the database is seeded.
+    </div>
+
+        <div class="header">
+            <h1>Workout Programs</h1>
+            <p>Structured plans to help you achieve your fitness goals</p>
+        </div>
+        <!-- Plan usage banner -->
+        <div id="planBanner" style="display:none;align-items:center;gap:.75rem;padding:.85rem 1.25rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;font-size:.88rem;color:var(--text-secondary);margin-bottom:1.75rem"></div>
+
+        
+
+        <!-- Active Enrollments — hidden until user has enrollments -->
+        <div class="section" id="enrollmentsSection" style="display:none;">
+            <h2 class="section-title">
+                <span class="section-icon">🔥</span> Continue Your Journey
+            </h2>
+            <div class="programs-grid" id="enrollmentsGrid"></div>
+        </div>
+
+        <!-- Available Programs -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="section-icon">⚡</span> Available Programs
+            </h2>
+            <div class="programs-grid" id="programsGrid">
+                <div class="empty-section">⏳ Loading programs...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="toastArea"></div>
+<script src="api.js"></script>
+<script>
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FALLBACK PROGRAMS — mirror of seed.ts
+// Shown only when DB is empty. IDs match seed so enrolling works post-seed.
+// ─────────────────────────────────────────────────────────────────────────────
+const FALLBACK_PROGRAMS = [
+  {
+    id: 'prog-beginner', title: 'Beginner Foundation',
+    description: 'Perfect for beginners. Master fundamental movements, build confidence, and establish a sustainable fitness habit over 4 weeks.',
+    durationWeeks: 4, daysPerWeek: 3, level: 'Beginner', icon: '🌱',
+  },
+  {
+    id: 'prog-hiit', title: 'Fat Burn HIIT',
+    description: 'High-intensity interval training to maximise calorie burn and boost your metabolism. For intermediate athletes ready to push their limits.',
+    durationWeeks: 6, daysPerWeek: 4, level: 'Intermediate', icon: '🔥',
+  },
+  {
+    id: 'prog-core', title: 'Core Power',
+    description: 'Focused 4-week core training to build a strong, stable midsection. Suitable for all fitness levels.',
+    durationWeeks: 4, daysPerWeek: 3, level: 'All Levels', icon: '🧘',
+  },
+  {
+    id: 'prog-strength', title: 'Full Body Strength',
+    description: 'Comprehensive 8-week bodyweight strength program with progressive overload. For intermediate athletes.',
+    durationWeeks: 8, daysPerWeek: 5, level: 'Intermediate', icon: '💪',
+  },
+  {
+    id: 'prog-flex', title: 'Mobility & Flexibility',
+    description: 'Improve range of motion, reduce injury risk, and recover faster. Perfect for athletes with tight hips and hamstrings.',
+    durationWeeks: 3, daysPerWeek: 4, level: 'All Levels', icon: '🤸',
+  },
+];
+
+let allPrograms    = [];
+let myEnrollments  = [];
+let isFallback     = false;
+let currentPlan    = null;  // set by initPlanGating()
+
+// ── Plan gating ───────────────────────────────────────────────────────────────
+async function initPlanGating() {
+    const { plan } = await fetchActivePlan();
+    currentPlan = plan;
+    await updatePlanBadge();
+    renderPlanBanner(plan);
+}
+
+function renderPlanBanner(plan) {
+    const banner = document.getElementById('planBanner');
+    if (!banner) return;
+    const slug = plan?.slug || 'free';
+    if (slug === 'free') {
+        const maxP = plan?.maxPrograms ?? 1;
+        const active = myEnrollments.filter(e => e.isActive !== false).length;
+        const remaining = Math.max(0, maxP - active);
+        banner.style.display = 'flex';
+        banner.innerHTML = `
+            <span>📋 <strong>${remaining} program slot${remaining !== 1 ? 's' : ''}</strong> available on <strong>Free</strong> (${maxP} max)</span>
+            <a href="subscription.html" style="margin-left:auto;padding:.35rem .9rem;background:linear-gradient(135deg,#D4AF37,#b8860b);color:#000;border-radius:8px;font-weight:700;font-size:.8rem;text-decoration:none;white-space:nowrap">⚡ UPGRADE</a>`;
+    } else {
+        banner.style.display = 'flex';
+        const label = slug === 'elite' ? '👑 Elite' : '⚡ Pro';
+        banner.innerHTML = `<span>${label} · <strong style="color:#D4AF37">Unlimited programs</strong></span>`;
+        banner.style.background = 'rgba(212,175,55,0.07)';
+        banner.style.borderColor = 'rgba(212,175,55,0.2)';
+    }
+}
+
+function canEnrollMore() {
+    if (!currentPlan || currentPlan.slug !== 'free') return true;
+    const max = currentPlan.maxPrograms ?? 1;
+    const active = myEnrollments.filter(e => e.isActive !== false).length;
+    return active < max;
+}
+
+async function loadAll() {
+    // Sidebar/plan init — isolated so any error never blocks the main loader
+    try { populateSidebarUser(); } catch (_) {}
+    try { await initPlanGating(); } catch (_) {}
+
+    LoadingManager.show('Loading programs...');
+    // Safety net: force-hide after 10s so overlay never gets permanently stuck
+    const _safetyTimer = setTimeout(() => LoadingManager.hide(), 10000);
+    try {
+
+        const [progRes, enrollRes] = await Promise.all([
+            ProgramsAPI.getPrograms({ limit: 50 }),
+            ProgramsAPI.getUserPrograms(),
+        ]);
+
+        // Enrollments
+        if (enrollRes.success && enrollRes.data) {
+            myEnrollments = enrollRes.data;
+            renderEnrollments(myEnrollments);
+        }
+
+        // Programs
+        if (progRes.success && progRes.data && progRes.data.length > 0) {
+            allPrograms = progRes.data;
+            isFallback  = false;
+        } else {
+            allPrograms = FALLBACK_PROGRAMS;
+            isFallback  = true;
+            document.getElementById('devBanner') && (document.getElementById('devBanner').style.display = 'block');
+        }
+
+        // Re-render banner now we know active enrollment count
+        if (currentPlan) renderPlanBanner(currentPlan);
+        renderPrograms(allPrograms);
+    } catch (err) {
+        console.error('Load error:', err);
+        allPrograms = FALLBACK_PROGRAMS;
+        isFallback  = true;
+        document.getElementById('devBanner') && (document.getElementById('devBanner').style.display = 'block');
+        renderPrograms(allPrograms);
+        Toast.warning('Could not reach server — showing sample programs');
+    } finally {
+        clearTimeout(_safetyTimer);
+        LoadingManager.hide();
+    }
+}
+
+// ── Render active enrollments ────────────────────────────────────────────────
+function renderEnrollments(enrollments) {
+    const section = document.getElementById('enrollmentsSection');
+    const grid    = document.getElementById('enrollmentsGrid');
+
+    if (!enrollments.length) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    grid.innerHTML = enrollments.map(e => {
+        const prog     = e.program;
+        const total    = (prog.durationWeeks || 0) * (prog.daysPerWeek || 0);
+        const pct      = total > 0 ? Math.round(e.completedDays / total * 100) : 0;
+        const done     = !e.isActive && e.completedAt;
+
+        return `
+        <div class="program-card">
+            <div class="program-header">
+                <span class="program-badge">${done ? '✅ Completed' : '🔥 In Progress'}</span>
+                <h3 class="program-title">${esc(prog.title)}</h3>
+            </div>
+            <div class="program-body">
+                <p class="program-description">${esc(prog.description || 'Your active training program.')}</p>
+                <div class="program-meta">
+                    <div class="meta-item"><div class="meta-icon">📅</div><div class="meta-label">Duration</div><div class="meta-value">${prog.durationWeeks}w</div></div>
+                    <div class="meta-item"><div class="meta-icon">📆</div><div class="meta-label">Days/Week</div><div class="meta-value">${prog.daysPerWeek}</div></div>
+                    <div class="meta-item"><div class="meta-icon">🏁</div><div class="meta-label">Week</div><div class="meta-value">${e.currentWeek}/${prog.durationWeeks}</div></div>
+                </div>
+                <div class="program-progress">
+                    <div class="progress-header">
+                        <span class="progress-label">Day ${e.completedDays} of ${total}</span>
+                        <span class="progress-pct">${pct}%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                </div>
+                <div class="program-cta">
+                    ${done
+                        ? `<button class="btn-program btn-completed" disabled>✅ Completed</button>`
+                        : `<button class="btn-program btn-continue"
+                            onclick="continueProgram('${prog.id}','${e.id}')">Continue →</button>`
+                    }
+                    <button class="btn-program btn-details"
+                        onclick="viewDetails('${prog.id}','${e.id}')">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ── Render available programs ────────────────────────────────────────────────
+function renderPrograms(programs) {
+    const grid = document.getElementById('programsGrid');
+    if (!programs.length) {
+        grid.innerHTML = '<div class="empty-section">No programs available yet.</div>';
+        return;
+    }
+
+    grid.innerHTML = programs.map(prog => {
+        const enrollment = myEnrollments.find(e => e.programId === prog.id);
+        const isEnrolled = !!enrollment;
+        const isDone     = isEnrolled && !enrollment.isActive;
+        // Fallback programs have level/icon; API programs don't — derive them
+        const level      = prog.level || deriveDifficulty(prog.durationWeeks, prog.daysPerWeek);
+        const icon       = prog.icon  || '💪';
+        const totalDays  = (prog.durationWeeks || 0) * (prog.daysPerWeek || 0);
+        const pct        = (enrollment && totalDays) ? Math.round(enrollment.completedDays / totalDays * 100) : 0;
+
+        return `
+        <div class="program-card">
+            <div class="program-header">
+                <span class="program-badge">${level}</span>
+                <h3 class="program-title">${esc(prog.title)}</h3>
+            </div>
+            <div class="program-body">
+                <p class="program-description">${esc(prog.description || 'No description provided.')}</p>
+                <div class="program-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon">📅</div>
+                        <div class="meta-label">Duration</div>
+                        <div class="meta-value">${prog.durationWeeks} Weeks</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">🎯</div>
+                        <div class="meta-label">Level</div>
+                        <div class="meta-value">${level}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon">📆</div>
+                        <div class="meta-label">Days/Week</div>
+                        <div class="meta-value">${prog.daysPerWeek}</div>
+                    </div>
+                </div>
+                ${isEnrolled ? `
+                <div class="program-progress">
+                    <div class="progress-header">
+                        <span class="progress-label">${isDone ? '✅ Completed' : 'Your progress'}</span>
+                        <span class="progress-pct">${pct}%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                </div>` : ''}
+                <div class="program-cta">
+                    ${isDone
+                        ? `<button class="btn-program btn-completed" disabled>✅ Completed</button>`
+                        : isEnrolled
+                            ? `<button class="btn-program btn-enrolled" disabled>✓ Enrolled</button>`
+                            : isFallback
+                                ? `<button class="btn-program btn-enroll" disabled title="Seed DB first to enable enrolment">Seed DB to Enrol</button>`
+                                : `<button class="btn-program btn-enroll"
+                                    onclick="enroll('${prog.id}','${escAttr(prog.title)}')">
+                                    Enroll Now
+                                   </button>`
+                    }
+                    <button class="btn-program btn-details"
+                        onclick="viewDetails('${prog.id}', '${isEnrolled ? enrollment.id : ''}')">
+                        View Details
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function deriveDifficulty(weeks, daysPerWeek) {
+    const load = (weeks || 4) * (daysPerWeek || 3);
+    if (load >= 35) return 'Advanced';
+    if (load >= 18) return 'Intermediate';
+    return 'Beginner';
+}
+
+// ── Enroll ───────────────────────────────────────────────────────────────────
+async function enroll(programId, title) {
+    if (!canEnrollMore()) {
+        showUpgradePrompt('Unlimited Programs', 'pro');
+        return;
+    }
+    showConfirm({
+        icon: '🏋️',
+        title: 'Enroll in Program',
+        message: `Ready to start <strong style="color:var(--gold-main)">${title}</strong>? Your progress will be tracked from today.`,
+        okText: 'ENROLL NOW',
+        cancelText: 'Not Yet',
+        onOk: async () => {
+            try {
+        LoadingManager.show('Enrolling...');
+        const res = await ProgramsAPI.enrollInProgram(programId);
+        if (res.success) {
+            Toast.success(`Enrolled in ${title}! 🎉`);
+            await loadAll();
+        }
+            } catch (err) {
+                if (err.message?.includes('already enrolled')) {
+                    Toast.warning('You are already enrolled in this program');
+                } else {
+                    Toast.error(err.message || 'Failed to enroll');
+                }
+            } finally {
+                LoadingManager.hide();
+            }
+        }
+    });
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+// Always lands on program-detail page so user can see full structure + progress
+function viewDetails(programId, enrollmentId) {
+    const url = enrollmentId
+        ? `program-detail.html?id=${programId}&enrollmentId=${enrollmentId}`
+        : `program-detail.html?id=${programId}`;
+    window.location.href = url;
+}
+
+// Continue: go to program-detail with enrollment context (shows progress + current day)
+function continueProgram(programId, enrollmentId) {
+    window.location.href = `program-detail.html?id=${programId}&enrollmentId=${enrollmentId}`;
+}
+
+// Legacy alias kept in case other code references it
+function goToProgram(programId, enrollmentId) {
+    viewDetails(programId, enrollmentId);
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s||'').replace(/'/g,"\\'"); }
+
+function handleLogout() {
+    showConfirm({
+        icon: '🚪',
+        title: 'LOG OUT',
+        message: 'Are you sure you want to log out of FlowFit Elite?',
+        okText: 'LOG OUT',
+        cancelText: 'Stay',
+        danger: true,
+        onOk: async () => {
+            LoadingManager.show('Logging out...');
+            await AuthAPI.logout();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const _lb = document.getElementById('sidebarLogoutBtn');
+    if (_lb) _lb.addEventListener('click', () => { if (typeof handleLogout === 'function') handleLogout(); });
+    loadAll();
+});
+
+
+/* ── CUSTOM CONFIRM MODAL ────────────────────────────────── */
+
+/* ── SIDEBAR SCROLL-LOCK ──────────────────────────── */
+
+function showConfirm({ icon = '⚠️', title = 'Are you sure?', message = '', okText = 'Confirm', cancelText = 'Cancel', danger = false, onOk }) {
+    const ex = document.getElementById('ff-confirm');
+    if (ex) ex.remove();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ff-confirm-backdrop';
+    backdrop.id = 'ff-confirm';
+    backdrop.innerHTML = `
+        <div class="ff-confirm-box">
+            <span class="ff-confirm-icon">${icon}</span>
+            <div class="ff-confirm-title">${title}</div>
+            <p class="ff-confirm-msg">${message}</p>
+            <div class="ff-confirm-actions">
+                <button class="ff-confirm-cancel" id="ffCancel">${cancelText}</button>
+                <button class="ff-confirm-ok ${danger ? 'danger' : ''}" id="ffOk">${okText}</button>
+            </div>
+        </div>`;
+    document.body.appendChild(backdrop);
+    const close = () => {
+        backdrop.style.opacity = '0';
+        backdrop.style.pointerEvents = 'none';
+        backdrop.style.visibility = 'hidden';
+        if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    };
+    backdrop.querySelector('#ffCancel').addEventListener('click', e => { e.stopPropagation(); close(); });
+    backdrop.querySelector('#ffOk').addEventListener('click', e => { e.stopPropagation(); close(); if (onOk) onOk(); });
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+    document.addEventListener('keydown', function esc(e) {
+        if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+}
+
+/* ── PLAN BADGE IN SIDEBAR ───────────────────────── */
+// updatePlanBadge() is defined in api.js — uses live subscription data
+
+
+
+/* ── FLOWFIT SIDEBAR JS v4 — smooth scroll + reliable swipe ─────────────── */
+(function () {
+    'use strict';
+    let _savedY = 0;
+
+    function openSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        _savedY = window.scrollY || 0;
+        sb.classList.add('mobile-active');
+        if (ov) ov.classList.add('active');
+        document.body.classList.add('sidebar-open');
+        document.body.style.top = `-${_savedY}px`;
+        sb.offsetHeight; // force reflow
+    }
+
+    function closeSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        sb.classList.remove('mobile-active');
+        if (ov) ov.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+        document.body.style.top = '';
+        window.scrollTo({ top: _savedY, behavior: 'instant' });
+    }
+
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        if (!sb) return;
+        sb.classList.contains('mobile-active') ? closeSidebar() : openSidebar();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+        });
+        const sb = document.getElementById('sidebar');
+        if (sb) {
+            let startX = 0;
+            sb.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+            sb.addEventListener('touchend', e => {
+                if (startX - e.changedTouches[0].clientX > 80) closeSidebar();
+            }, { passive: true });
+        }
+    });
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+    window.openSidebar  = openSidebar;
+    window.closeSidebar = closeSidebar;
+    window.toggleSidebar = toggleSidebar;
+}());
+
+</script>
+</body>
+</html>
