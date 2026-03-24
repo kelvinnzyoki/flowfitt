@@ -3603,20 +3603,23 @@ async function loadExercises() {
 // and a minimal dark placeholder with the category letter when it isn't.
 //
 function getExerciseMedia(ex) {
-    if (ex.gifUrl) {
-        // Real ExerciseDB animated GIF
-        const alt = esc(ex.name || 'Exercise');
+    const alt = esc(ex.name || 'Exercise');
+
+    if (ex.imageUrl) {
         return `
-            <div class="gif-placeholder">${alt}</div>
-<img
-    src="${ex.gifUrl}"
-    alt="${alt}"
-    loading="lazy"
-    decoding="async"
-    onload="this.previousElementSibling && this.previousElementSibling.remove()"
-    onerror="this.style.display='none';this.previousElementSibling&&(this.previousElementSibling.style.opacity='1')"
-/>
+            <img
+                src="${ex.imageUrl}"
+                alt="${alt}"
+                loading="lazy"
+                decoding="async"
+                onerror="this.style.display='none'"
+            >
+        `;
     }
+
+    // fallback placeholder
+    return `<div class="gif-placeholder">${alt}</div>`;
+  }
 
     // No GIF available (fallback/local data) — show a category-colour placeholder
     const CAT_COLOURS = {
