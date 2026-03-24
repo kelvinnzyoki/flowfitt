@@ -3607,15 +3607,15 @@ function getExerciseMedia(ex) {
         // Real ExerciseDB animated GIF
         const alt = esc(ex.name || 'Exercise');
         return `
-            <img
-                src="${ex.gifUrl}"
-                alt="${alt}"
-                loading="lazy"
-                decoding="async"
-                onload="this.previousElementSibling && this.previousElementSibling.remove()"
-                onerror="this.style.display='none';this.previousElementSibling&&(this.previousElementSibling.style.opacity='1')"
-            >
-            <div class="gif-placeholder">${alt}</div>`;
+            <div class="gif-placeholder">${alt}</div>
+<img
+    src="${ex.gifUrl}"
+    alt="${alt}"
+    loading="lazy"
+    decoding="async"
+    onload="this.previousElementSibling && this.previousElementSibling.remove()"
+    onerror="this.style.display='none';this.previousElementSibling&&(this.previousElementSibling.style.opacity='1')"
+/>
     }
 
     // No GIF available (fallback/local data) — show a category-colour placeholder
