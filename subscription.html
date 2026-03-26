@@ -4324,15 +4324,15 @@ a.btn,
           <p class="page-subtitle">Your plan, billing, and usage — all in one place</p>
       </div>
 
-      <!-- Past due alert — shown dynamically -->
-      <div class="alert-banner alert-past-due" id="pastDueBanner" style="display:none">
-          <span class="alert-icon">&#9888;&#65039;</span>
-          <div class="alert-text">
-              <strong>PAYMENT FAILED</strong>
-              <p>Your last payment couldn't be processed. Please update your payment method to keep access to your features.</p>
-              <button class="btn-manage btn-manage-primary" style="margin-top:0.75rem" onclick="openBillingPortal()">Update Payment Method</button>
-          </div>
-      </div>
+      <!-- Payment status alert — controlled by JS -->
+<div class="alert-banner alert-past-due" id="pastDueBanner" style="display: none;">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-text">
+        <strong>PAYMENT FAILED</strong>
+        <p id="failureMessage">Your last payment couldn't be processed. Please update your payment method to keep access to your features.</p>
+        <button class="btn-manage btn-manage-primary" onclick="openBillingPortal()">UPDATE PAYMENT METHOD</button>
+    </div>
+</div>
 
 
     <!-- TEMP DEBUG PANEL - remove after we fix the banner -->
