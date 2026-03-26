@@ -4681,6 +4681,16 @@ async function loadAll() {
 
   // ── Render: current plan banner ───────────────────────────────────────────────
 function renderCurrentPlan() {
+
+  // FORCE HIDE ANY PAYMENT FAILED BANNER (including the rogue one in the screenshot)
+    document.querySelectorAll('.alert-banner, .payment-failed-banner, [class*="failed"], [class*="past-due"], [id*="failed"], [id*="past"]').forEach(el => {
+        if (el && (el.textContent || '').toLowerCase().includes('payment failed')) {
+            el.style.display = 'none';
+            console.log('[BANNER DEBUG] Forced hide rogue banner');
+        }
+    });
+
+  
     // Always reset banners first
     const pastDueBanner = $('pastDueBanner');
     if (pastDueBanner) pastDueBanner.style.display = 'none';
@@ -5597,9 +5607,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // so the toast shows even if the API is slow or loadAll() errors.
     try { checkUrlParams(); } catch (_) {}
 
+  
+
   // Force hide any old failed banners immediately
     document.querySelectorAll('.alert-banner, .payment-failed-banner').forEach(el => {
         el.style.display = 'none';
+    });
+
+  // Immediate hide of any failed banner on load
+    document.querySelectorAll('.alert-banner, [class*="failed"], [class*="past-due"]').forEach(el => {
+        if (el && (el.textContent || '').toLowerCase().includes('payment failed')) {
+            el.style.display = 'none';
+        }
     });
   
     loadAll();
