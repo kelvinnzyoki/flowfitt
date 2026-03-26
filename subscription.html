@@ -4666,7 +4666,9 @@ async function loadAll() {
     }
   }
 
- // ── Render: current plan banner ───────────────────────────────────────────────
+
+
+  // ── Render: current plan banner ───────────────────────────────────────────────
 function renderCurrentPlan() {
     // Always reset banners first
     const pastDueBanner = $('pastDueBanner');
@@ -4676,14 +4678,18 @@ function renderCurrentPlan() {
     if (trialBanner) trialBanner.style.display = 'none';
 
     // Safety guard
-    if (!\( ('currentPlanName') || ! \)('statusPill')) return;
+    if (!$('currentPlanName') || !$('statusPill')) return;
 
     if (!currentSub) {
         $('currentPlanName').textContent = 'Free';
         if ($('currentPlanIcon')) $('currentPlanIcon').textContent = '';
         $('statusPill').textContent = 'FREE';
         $('statusPill').className = 'status-pill status-expired';
-        if ($('renewalText')) $('renewalText').textContent = 'No active subscription';
+
+        if ($('renewalText')) {
+            $('renewalText').textContent = 'No active subscription';
+        }
+
         if ($('planBadge')) {
             $('planBadge').textContent = 'FREE';
             $('planBadge').className = 'plan-badge plan-free';
@@ -4693,7 +4699,7 @@ function renderCurrentPlan() {
 
     const { plan, status, trialEndsAt, currentPeriodEnd, cancelAtPeriodEnd } = currentSub;
 
-    console.log('[Banner Debug] Status:', status, 'Plan:', plan?.name); // remove after you see it working
+    console.log('[Banner Debug] Status:', status, 'Plan:', plan?.name);
 
     // Treat cancelled/expired as Free
     if (['CANCELLED', 'EXPIRED', 'INCOMPLETE_EXPIRED'].includes(status)) {
@@ -4701,7 +4707,11 @@ function renderCurrentPlan() {
         if ($('currentPlanIcon')) $('currentPlanIcon').textContent = '';
         $('statusPill').textContent = 'FREE';
         $('statusPill').className = 'status-pill status-expired';
-        if ($('renewalText')) $('renewalText').textContent = 'No active subscription';
+
+        if ($('renewalText')) {
+            $('renewalText').textContent = 'No active subscription';
+        }
+
         if ($('planBadge')) {
             $('planBadge').textContent = 'FREE';
             $('planBadge').className = 'plan-badge plan-free';
@@ -4710,7 +4720,10 @@ function renderCurrentPlan() {
     }
 
     // Main plan info
-    if ($('currentPlanIcon')) $('currentPlanIcon').textContent = planIcon(plan?.slug || 'free');
+    if ($('currentPlanIcon')) {
+        $('currentPlanIcon').textContent = planIcon(plan?.slug || 'free');
+    }
+
     $('currentPlanName').textContent = plan?.name || 'Unknown Plan';
 
     const pill = $('statusPill');
@@ -4718,7 +4731,10 @@ function renderCurrentPlan() {
     pill.className = `status-pill ${getStatusClass(status || 'ACTIVE')}`;
 
     // Past Due Banner — ONLY show when truly past due
-    const hasFutureRenewal = currentPeriodEnd && new Date(currentPeriodEnd) > Date.now();
+    const hasFutureRenewal =
+        currentPeriodEnd &&
+        new Date(currentPeriodEnd).getTime() > Date.now();
+
     const showPastDue = status === 'PAST_DUE' && !hasFutureRenewal;
 
     if (pastDueBanner) {
@@ -4726,17 +4742,23 @@ function renderCurrentPlan() {
     }
 
     // Trial banner
-    if (status === 'TRIALING' && trialEndsAt && $('trialBanner')) {
+    if (status === 'TRIALING' && trialEndsAt && trialBanner) {
         const days = daysUntil(trialEndsAt);
-        $('trialBanner').style.display = 'flex';
-        if ($('trialDaysLeft')) $('trialDaysLeft').textContent = days;
-        if ($('trialEndDate')) $('trialEndDate').textContent = formatDate(trialEndsAt);
+        trialBanner.style.display = 'flex';
+
+        if ($('trialDaysLeft')) {
+            $('trialDaysLeft').textContent = days;
+        }
+
+        if ($('trialEndDate')) {
+            $('trialEndDate').textContent = formatDate(trialEndsAt);
+        }
     }
 
     // Renewal text
     if ($('renewalText') && currentPeriodEnd) {
-        $('renewalText').textContent = cancelAtPeriodEnd 
-            ? `Ends ${formatDate(currentPeriodEnd)}` 
+        $('renewalText').textContent = cancelAtPeriodEnd
+            ? `Ends ${formatDate(currentPeriodEnd)}`
             : `Renews ${formatDate(currentPeriodEnd)}`;
     }
 
@@ -4763,10 +4785,12 @@ function renderCurrentPlan() {
             planBadge.className = 'plan-badge plan-trial';
         } else {
             planBadge.textContent = (plan?.name || 'FREE').toUpperCase();
-            planBadge.className = `plan-badge plan-${(plan?.slug || 'free')}`;
+            planBadge.className = `plan-badge plan-${plan?.slug || 'free'}`;
         }
     }
   }
+    
+    
 // ── Render: plans grid ────────────────────────────────────────────────────────
 function renderPlansGrid() {
     const grid = $('plansGrid');
