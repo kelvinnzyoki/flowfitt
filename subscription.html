@@ -4815,6 +4815,12 @@ const showPastDue =
     }
   }
 
+  // EXTRA SAFETY: Hide ANY element that might contain "PAYMENT FAILED"
+    document.querySelectorAll('.alert-banner, .payment-failed-banner, [class*="failed"], [class*="past-due"]').forEach(el => {
+        if (el.textContent && el.textContent.includes('PAYMENT FAILED')) {
+            el.style.display = 'none';
+        }
+    });
 
 
         
@@ -5590,6 +5596,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Process ?success=1 / ?cancelled=1 immediately — before loadAll() resolves —
     // so the toast shows even if the API is slow or loadAll() errors.
     try { checkUrlParams(); } catch (_) {}
+
+  // Force hide any old failed banners immediately
+    document.querySelectorAll('.alert-banner, .payment-failed-banner').forEach(el => {
+        el.style.display = 'none';
+    });
+  
     loadAll();
     // Attach logout listener here so handleLogout is guaranteed to be defined
     const _lb = document.getElementById('sidebarLogoutBtn');
