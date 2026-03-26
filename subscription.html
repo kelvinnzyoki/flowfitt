@@ -4731,13 +4731,14 @@ function renderCurrentPlan() {
     pill.className = `status-pill ${getStatusClass(status || 'ACTIVE')}`;
 
     // Past Due Banner — ONLY show when truly past due
-    const hasFutureRenewal =
-        currentPeriodEnd &&
-        new Date(currentPeriodEnd).getTime() > Date.now();
+    const isHealthyStatus = ['ACTIVE', 'TRIALING'];
 
-    const showPastDue = status === 'PAST_DUE' && !hasFutureRenewal;
-
-    if (pastDueBanner) {
+const showPastDue =
+    status === 'PAST_DUE' &&
+    !isHealthyStatus.includes(status) &&
+    !(currentPeriodEnd && new Date(currentPeriodEnd).getTime() > Date.now());
+    
+  if (pastDueBanner) {
         pastDueBanner.style.display = showPastDue ? 'flex' : 'none';
     }
 
