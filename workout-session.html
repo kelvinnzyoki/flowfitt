@@ -722,7 +722,6 @@ input, select, textarea {
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     z-index: 9999 !important;
@@ -3995,7 +3994,6 @@ async function loadExercise() {
 
     // Fallback: check if api.js exposes a local cache, or use library
     if (!exercise) {
-        const lib = getLibraryData(EXERCISE_ID);
         exercise = {
             id: EXERCISE_ID,
             name: params.get('name') || 'Exercise',
