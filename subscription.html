@@ -4718,6 +4718,11 @@ const debugStatus = $('debugStatus');
 
     const { plan, status, trialEndsAt, currentPeriodEnd, cancelAtPeriodEnd } = currentSub;
 
+  if (debugStatus) debugStatus.textContent = status || 'UNKNOWN';
+    if (debugPlan) debugPlan.textContent = plan?.name || 'No plan';
+    if (debugEnd) debugEnd.textContent = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'null';
+    if (debugPastDue) debugPastDue.textContent = 'false';
+
     console.log('[Banner Debug] Status:', status, 'Plan:', plan?.name);
 
     // Treat cancelled/expired as Free
