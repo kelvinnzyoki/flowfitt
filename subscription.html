@@ -4588,6 +4588,14 @@ async function loadAll() {
     // Safety net: force-hide after 12s so overlay never gets permanently stuck
     const _safetyTimer = setTimeout(() => { $('loadingOverlay').style.display = 'none'; }, 12000);
     try {
+
+  // Immediate hide of any failed banner on load
+    document.querySelectorAll('.alert-banner, [class*="failed"], [class*="past-due"]').forEach(el => {
+        if (el && (el.textContent || '').toLowerCase().includes('payment failed')) {
+            el.style.display = 'none';
+        }
+    });
+      
         // ── Fetch plans + current subscription in parallel ──────────────────
         const [plansRes, subRes] = await Promise.allSettled([
             SubscriptionAPI.getPlans(),
@@ -5614,12 +5622,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.style.display = 'none';
     });
 
-  // Immediate hide of any failed banner on load
-    document.querySelectorAll('.alert-banner, [class*="failed"], [class*="past-due"]').forEach(el => {
-        if (el && (el.textContent || '').toLowerCase().includes('payment failed')) {
-            el.style.display = 'none';
-        }
-    });
+  
   
     loadAll();
     // Attach logout listener here so handleLogout is guaranteed to be defined
