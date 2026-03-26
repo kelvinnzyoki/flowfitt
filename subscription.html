@@ -4634,28 +4634,28 @@ async function loadAll() {
 }
 
 // ── URL param handlers (success/cancel from Stripe redirect) ──────────────────
-function checkUrlParams() {
+
+  function checkUrlParams() {
     const params = new URLSearchParams(window.location.search);
 
-    // ?success=1  — returned from Stripe after successful payment
     const isSuccess = params.get('success') === '1' ||
                       params.get('payment_status') === 'paid' ||
                       params.get('checkout') === 'success';
+
     if (isSuccess) {
         toast('Payment confirmed. Your plan has been activated.', 'success', 8000);
         window.history.replaceState({}, '', window.location.pathname);
         sessionStorage.removeItem('stripeRedirectPending');
         sessionStorage.removeItem('stripeReturnUrl');
-        // Reload subscription data to reflect new plan
-        // BUG-2 FIX: loadData() does not exist — correct function is loadAll()
 
-      if (pastDueBanner) pastDueBanner.style.display = 'none';
+        // Force hide banner
+        const pastDueBanner = $('pastDueBanner');
+        if (pastDueBanner) pastDueBanner.style.display = 'none';
 
-    setTimeout(() => loadAll(), 600);
-    return;
-  }
+        setTimeout(() => loadAll(), 600);
+        return;
+    }
 
-    // ?cancelled=1 — user clicked "Back" on Stripe checkout page
     const isCancelled = params.get('cancelled') === '1' ||
                         params.get('checkout') === 'cancel';
     if (isCancelled) {
@@ -4664,10 +4664,9 @@ function checkUrlParams() {
         sessionStorage.removeItem('stripeRedirectPending');
         sessionStorage.removeItem('stripeReturnUrl');
     }
-}
+  }
 
-// ── Render: current plan banner ───────────────────────────────────────────────
-
+ // ── Render: current plan banner ───────────────────────────────────────────────
 function renderCurrentPlan() {
     // Always reset banners first
     const pastDueBanner = $('pastDueBanner');
@@ -4676,7 +4675,8 @@ function renderCurrentPlan() {
     const trialBanner = $('trialBanner');
     if (trialBanner) trialBanner.style.display = 'none';
 
-    if (!\( ('currentPlanName') || ! \)('statusPill')) return; // safety
+    // Safety guard
+    if (!\( ('currentPlanName') || ! \)('statusPill')) return;
 
     if (!currentSub) {
         $('currentPlanName').textContent = 'Free';
@@ -4693,7 +4693,7 @@ function renderCurrentPlan() {
 
     const { plan, status, trialEndsAt, currentPeriodEnd, cancelAtPeriodEnd } = currentSub;
 
-    console.log('[Banner Debug] Current status:', status, 'Plan:', plan?.name); // remove after fix
+    console.log('[Banner Debug] Status:', status, 'Plan:', plan?.name); // remove after you see it working
 
     // Treat cancelled/expired as Free
     if (['CANCELLED', 'EXPIRED', 'INCOMPLETE_EXPIRED'].includes(status)) {
@@ -4766,8 +4766,7 @@ function renderCurrentPlan() {
             planBadge.className = `plan-badge plan-${(plan?.slug || 'free')}`;
         }
     }
-}
-
+  }
 // ── Render: plans grid ────────────────────────────────────────────────────────
 function renderPlansGrid() {
     const grid = $('plansGrid');
