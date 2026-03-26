@@ -4648,6 +4648,9 @@ function checkUrlParams() {
         sessionStorage.removeItem('stripeReturnUrl');
         // Reload subscription data to reflect new plan
         // BUG-2 FIX: loadData() does not exist — correct function is loadAll()
+
+      $('pastDueBanner').style.display = 'none';
+      
         setTimeout(() => loadAll(), 600);
         return;
     }
@@ -4664,10 +4667,10 @@ function checkUrlParams() {
 }
 
 // ── Render: current plan banner ───────────────────────────────────────────────
+
+  // ── Render: current plan banner ───────────────────────────────────────────────
 function renderCurrentPlan() {
-    // ── ALWAYS reset all dynamic banners first ─────────────────────────────
-    // Bug fix: without this, banners from a previous status (e.g. PAST_DUE)
-    // persist when the page re-renders with a different status (e.g. TRIALING).
+    // CRITICAL: always reset ALL banners first (prevents stale state)
     $('pastDueBanner').style.display = 'none';
     $('trialBanner').style.display   = 'none';
     $('cancelWarning').style.display = 'none';
@@ -4687,7 +4690,10 @@ function renderCurrentPlan() {
 
     const { plan, status, trialEndsAt, currentPeriodEnd, cancelAtPeriodEnd, cancelledAt } = currentSub;
 
-    // CANCELLED/EXPIRED — treat identically to no subscription (show as Free)
+    // DEBUG: remove this line after you confirm the fix
+    console.log('%c[Subscription Banner] Status from server →', 'color:#D4AF37;font-weight:bold', status, currentSub);
+
+    // ── Treat CANCELLED/EXPIRED as Free ──
     if (status === 'CANCELLED' || status === 'EXPIRED' || status === 'INCOMPLETE_EXPIRED') {
         $('currentPlanName').textContent = 'Free';
         $('currentPlanIcon').textContent = '';
@@ -4706,12 +4712,17 @@ function renderCurrentPlan() {
     pill.textContent = status.replace(/_/g, ' ');
     pill.className = `status-pill ${getStatusClass(status)}`;
 
-    // Past due alert — ONLY for PAST_DUE, never for TRIALING/ACTIVE
-    if (status === 'PAST_DUE') {
+    // ── PAST DUE BANNER — ONLY show when truly past due (extra safety) ──
+    const hasFutureRenewal = currentPeriodEnd && new Date(currentPeriodEnd) > new Date();
+    const isTrulyPastDue = status === 'PAST_DUE' && !hasFutureRenewal;
+
+    if (isTrulyPastDue) {
         $('pastDueBanner').style.display = 'flex';
+    } else {
+        $('pastDueBanner').style.display = 'none';   // ← this line fixes the bug
     }
 
-    // Trial banner — ONLY for TRIALING with a valid trial end date
+    // Trial banner
     if (status === 'TRIALING' && trialEndsAt) {
         const days = daysUntil(trialEndsAt);
         $('trialBanner').style.display = 'flex';
@@ -4726,25 +4737,24 @@ function renderCurrentPlan() {
             : `Renews ${formatDate(currentPeriodEnd)}`;
     }
 
-    // Cancel warning — always reset first, then conditionally show
-    $('cancelWarning').style.display  = 'none';
-    $('reactivateBtn').style.display  = 'none';
-    $('cancelBtn').style.display      = 'inline-flex';
+    // Cancel / reactivate buttons
+    $('cancelBtn').style.display = 'inline-flex';
     if (cancelAtPeriodEnd) {
-        $('cancelWarning').style.display  = 'inline';
-        $('cancelBtn').style.display      = 'none';
-        $('reactivateBtn').style.display  = 'inline-flex';
+        $('cancelWarning').style.display = 'inline';
+        $('cancelBtn').style.display = 'none';
+        $('reactivateBtn').style.display = 'inline-flex';
     }
 
-    // Sidebar badge — TRIALING users show TRIAL not plan name, to match other pages
+    // Sidebar badge
     if (status === 'TRIALING') {
         $('planBadge').textContent = 'TRIAL';
         $('planBadge').className = 'plan-badge plan-trial';
     } else {
         $('planBadge').textContent = plan.name.toUpperCase();
-        $('planBadge').className = `plan-badge plan-${plan.slug}`;
+        \( ('planBadge').className = `plan-badge plan- \){plan.slug}`;
     }
-}
+  }
+
 
 // ── Render: plans grid ────────────────────────────────────────────────────────
 function renderPlansGrid() {
@@ -5414,6 +5424,9 @@ function startMpesaPolling(checkoutRequestId) {
                 $('mpesaSendBtn').style.display  = 'none';
                 $('mpesaCancelBtn').textContent  = 'CLOSE';
                 $('mpesaCancelBtn').disabled     = false;
+              
+              $('pastDueBanner').style.display = 'none';
+              
                 toast(' M-Pesa payment confirmed! Subscription activated.', 'success', 12000);
                 setTimeout(() => { hideMpesaModal(); loadAll(); }, 2500);
             } else if (res?.status === 'FAILED') {
