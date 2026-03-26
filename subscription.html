@@ -4649,11 +4649,11 @@ function checkUrlParams() {
         // Reload subscription data to reflect new plan
         // BUG-2 FIX: loadData() does not exist — correct function is loadAll()
 
-      $('pastDueBanner').style.display = 'none';
-      
-        setTimeout(() => loadAll(), 600);
-        return;
-    }
+      if (pastDueBanner) pastDueBanner.style.display = 'none';
+
+    setTimeout(() => loadAll(), 600);
+    return;
+  }
 
     // ?cancelled=1 — user clicked "Back" on Stripe checkout page
     const isCancelled = params.get('cancelled') === '1' ||
@@ -4668,93 +4668,105 @@ function checkUrlParams() {
 
 // ── Render: current plan banner ───────────────────────────────────────────────
 
-  // ── Render: current plan banner ───────────────────────────────────────────────
 function renderCurrentPlan() {
-    // CRITICAL: always reset ALL banners first (prevents stale state)
-    $('pastDueBanner').style.display = 'none';
-    $('trialBanner').style.display   = 'none';
-    $('cancelWarning').style.display = 'none';
-    $('reactivateBtn').style.display = 'none';
-    $('cancelBtn').style.display     = 'none';
+    // Always reset banners first
+    const pastDueBanner = $('pastDueBanner');
+    if (pastDueBanner) pastDueBanner.style.display = 'none';
+
+    const trialBanner = $('trialBanner');
+    if (trialBanner) trialBanner.style.display = 'none';
+
+    if (!\( ('currentPlanName') || ! \)('statusPill')) return; // safety
 
     if (!currentSub) {
         $('currentPlanName').textContent = 'Free';
-        $('currentPlanIcon').textContent = '';
+        if ($('currentPlanIcon')) $('currentPlanIcon').textContent = '';
         $('statusPill').textContent = 'FREE';
         $('statusPill').className = 'status-pill status-expired';
-        $('renewalText').textContent = 'No active subscription';
-        $('planBadge').textContent = 'FREE';
-        $('planBadge').className = 'plan-badge plan-free';
+        if ($('renewalText')) $('renewalText').textContent = 'No active subscription';
+        if ($('planBadge')) {
+            $('planBadge').textContent = 'FREE';
+            $('planBadge').className = 'plan-badge plan-free';
+        }
         return;
     }
 
-    const { plan, status, trialEndsAt, currentPeriodEnd, cancelAtPeriodEnd, cancelledAt } = currentSub;
+    const { plan, status, trialEndsAt, currentPeriodEnd, cancelAtPeriodEnd } = currentSub;
 
-    // DEBUG: remove this line after you confirm the fix
-    console.log('%c[Subscription Banner] Status from server →', 'color:#D4AF37;font-weight:bold', status, currentSub);
+    console.log('[Banner Debug] Current status:', status, 'Plan:', plan?.name); // remove after fix
 
-    // ── Treat CANCELLED/EXPIRED as Free ──
-    if (status === 'CANCELLED' || status === 'EXPIRED' || status === 'INCOMPLETE_EXPIRED') {
+    // Treat cancelled/expired as Free
+    if (['CANCELLED', 'EXPIRED', 'INCOMPLETE_EXPIRED'].includes(status)) {
         $('currentPlanName').textContent = 'Free';
-        $('currentPlanIcon').textContent = '';
+        if ($('currentPlanIcon')) $('currentPlanIcon').textContent = '';
         $('statusPill').textContent = 'FREE';
         $('statusPill').className = 'status-pill status-expired';
-        $('renewalText').textContent = 'No active subscription';
-        $('planBadge').textContent = 'FREE';
-        $('planBadge').className = 'plan-badge plan-free';
+        if ($('renewalText')) $('renewalText').textContent = 'No active subscription';
+        if ($('planBadge')) {
+            $('planBadge').textContent = 'FREE';
+            $('planBadge').className = 'plan-badge plan-free';
+        }
         return;
     }
 
-    $('currentPlanIcon').textContent = planIcon(plan.slug);
-    $('currentPlanName').textContent = plan.name;
+    // Main plan info
+    if ($('currentPlanIcon')) $('currentPlanIcon').textContent = planIcon(plan?.slug || 'free');
+    $('currentPlanName').textContent = plan?.name || 'Unknown Plan';
 
     const pill = $('statusPill');
-    pill.textContent = status.replace(/_/g, ' ');
-    pill.className = `status-pill ${getStatusClass(status)}`;
+    pill.textContent = (status || 'ACTIVE').replace(/_/g, ' ');
+    pill.className = `status-pill ${getStatusClass(status || 'ACTIVE')}`;
 
-    // ── PAST DUE BANNER — ONLY show when truly past due (extra safety) ──
-    const hasFutureRenewal = currentPeriodEnd && new Date(currentPeriodEnd) > new Date();
-    const isTrulyPastDue = status === 'PAST_DUE' && !hasFutureRenewal;
+    // Past Due Banner — ONLY show when truly past due
+    const hasFutureRenewal = currentPeriodEnd && new Date(currentPeriodEnd) > Date.now();
+    const showPastDue = status === 'PAST_DUE' && !hasFutureRenewal;
 
-    if (isTrulyPastDue) {
-        $('pastDueBanner').style.display = 'flex';
-    } else {
-        $('pastDueBanner').style.display = 'none';   // ← this line fixes the bug
+    if (pastDueBanner) {
+        pastDueBanner.style.display = showPastDue ? 'flex' : 'none';
     }
 
     // Trial banner
-    if (status === 'TRIALING' && trialEndsAt) {
+    if (status === 'TRIALING' && trialEndsAt && $('trialBanner')) {
         const days = daysUntil(trialEndsAt);
         $('trialBanner').style.display = 'flex';
-        $('trialDaysLeft').textContent = days;
-        $('trialEndDate').textContent = formatDate(trialEndsAt);
+        if ($('trialDaysLeft')) $('trialDaysLeft').textContent = days;
+        if ($('trialEndDate')) $('trialEndDate').textContent = formatDate(trialEndsAt);
     }
 
     // Renewal text
-    if (currentPeriodEnd && ['ACTIVE','TRIALING','PAST_DUE'].includes(status)) {
-        $('renewalText').textContent = cancelAtPeriodEnd
-            ? `Ends ${formatDate(currentPeriodEnd)}`
+    if ($('renewalText') && currentPeriodEnd) {
+        $('renewalText').textContent = cancelAtPeriodEnd 
+            ? `Ends ${formatDate(currentPeriodEnd)}` 
             : `Renews ${formatDate(currentPeriodEnd)}`;
     }
 
-    // Cancel / reactivate buttons
-    $('cancelBtn').style.display = 'inline-flex';
+    // Cancel / Reactivate buttons
+    const cancelBtn = $('cancelBtn');
+    const reactivateBtn = $('reactivateBtn');
+    const cancelWarning = $('cancelWarning');
+
+    if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+    if (reactivateBtn) reactivateBtn.style.display = 'none';
+    if (cancelWarning) cancelWarning.style.display = 'none';
+
     if (cancelAtPeriodEnd) {
-        $('cancelWarning').style.display = 'inline';
-        $('cancelBtn').style.display = 'none';
-        $('reactivateBtn').style.display = 'inline-flex';
+        if (cancelWarning) cancelWarning.style.display = 'inline';
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        if (reactivateBtn) reactivateBtn.style.display = 'inline-flex';
     }
 
     // Sidebar badge
-    if (status === 'TRIALING') {
-        $('planBadge').textContent = 'TRIAL';
-        $('planBadge').className = 'plan-badge plan-trial';
-    } else {
-        $('planBadge').textContent = plan.name.toUpperCase();
-        \( ('planBadge').className = `plan-badge plan- \){plan.slug}`;
+    const planBadge = $('planBadge');
+    if (planBadge) {
+        if (status === 'TRIALING') {
+            planBadge.textContent = 'TRIAL';
+            planBadge.className = 'plan-badge plan-trial';
+        } else {
+            planBadge.textContent = (plan?.name || 'FREE').toUpperCase();
+            planBadge.className = `plan-badge plan-${(plan?.slug || 'free')}`;
+        }
     }
-  }
-
+}
 
 // ── Render: plans grid ────────────────────────────────────────────────────────
 function renderPlansGrid() {
@@ -5425,11 +5437,12 @@ function startMpesaPolling(checkoutRequestId) {
                 $('mpesaCancelBtn').textContent  = 'CLOSE';
                 $('mpesaCancelBtn').disabled     = false;
               
-              $('pastDueBanner').style.display = 'none';
-              
-                toast(' M-Pesa payment confirmed! Subscription activated.', 'success', 12000);
-                setTimeout(() => { hideMpesaModal(); loadAll(); }, 2500);
-            } else if (res?.status === 'FAILED') {
+              const pastDueBanner = $('pastDueBanner');
+    if (pastDueBanner) pastDueBanner.style.display = 'none';
+
+    toast('✅ Payment confirmed! Subscription activated.', 'success', 12000);
+    setTimeout(() => { hideMpesaModal(); loadAll(); }, 1800);
+            }else if (res?.status === 'FAILED') {
                 stopMpesaPolling();
                 $('mpesaStatusIcon').textContent = '❌';
                 $('mpesaStatusMsg').textContent  = res?.message || 'Payment was not completed. Please try again.';
