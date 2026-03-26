@@ -4668,7 +4668,7 @@ async function loadAll() {
 
 
 
- /* // ── Render: current plan banner ───────────────────────────────────────────────
+  // ── Render: current plan banner ───────────────────────────────────────────────
 function renderCurrentPlan() {
     // Always reset banners first
     const pastDueBanner = $('pastDueBanner');
@@ -4679,7 +4679,15 @@ function renderCurrentPlan() {
 
     // Safety guard
     if (!$('currentPlanName') || !$('statusPill')) return;
+const debugStatus = $('debugStatus');
+    const debugPlan = $('debugPlan');
+    const debugEnd = $('debugEnd');
+    const debugPastDue = $('debugPastDue');
 
+    if (debugStatus) debugStatus.textContent = 'NO currentSub';
+    if (debugPlan) debugPlan.textContent = '---';
+    if (debugEnd) debugEnd.textContent = '---';
+    if (debugPastDue) debugPastDue.textContent = 'false';
     if (!currentSub) {
         $('currentPlanName').textContent = 'Free';
         if ($('currentPlanIcon')) $('currentPlanIcon').textContent = '';
@@ -4789,127 +4797,12 @@ const showPastDue =
             planBadge.className = `plan-badge plan-${plan?.slug || 'free'}`;
         }
     }
-  }*/
+  }
 
 
-function renderCurrentPlan() {
-    // Reset banners
-    const pastDueBanner = $('pastDueBanner');
-    if (pastDueBanner) pastDueBanner.style.display = 'none';
 
-    const trialBanner = $('trialBanner');
-    if (trialBanner) trialBanner.style.display = 'none';
-
-    if (!( ('currentPlanName') || ! )('statusPill')) return;
-
-    // Fill debug panel
-    const debugStatus = $('debugStatus');
-    const debugPlan = $('debugPlan');
-    const debugEnd = $('debugEnd');
-    const debugPastDue = $('debugPastDue');
-
-    if (debugStatus) debugStatus.textContent = 'NO currentSub';
-    if (debugPlan) debugPlan.textContent = '---';
-    if (debugEnd) debugEnd.textContent = '---';
-    if (debugPastDue) debugPastDue.textContent = 'false';
-
-    if (!currentSub) {
-        $('currentPlanName').textContent = 'Free';
-        if ($('currentPlanIcon')) $('currentPlanIcon').textContent = '';
-        $('statusPill').textContent = 'FREE';
-        $('statusPill').className = 'status-pill status-expired';
-        if ($('renewalText')) $('renewalText').textContent = 'No active subscription';
-        if ($('planBadge')) {
-            $('planBadge').textContent = 'FREE';
-            $('planBadge').className = 'plan-badge plan-free';
-        }
-        return;
-    }
-
-    const { plan, status, trialEndsAt, currentPeriodEnd, cancelAtPeriodEnd } = currentSub;
-
-    // Update debug panel
-    if (debugStatus) debugStatus.textContent = status || 'UNKNOWN';
-    if (debugPlan) debugPlan.textContent = plan?.name || 'No plan';
-    if (debugEnd) debugEnd.textContent = currentPeriodEnd ? formatDate(currentPeriodEnd) : 'null';
-    if (debugPastDue) debugPastDue.textContent = 'false'; // will be updated below
-
-    // Treat cancelled as Free
-    if (['CANCELLED', 'EXPIRED', 'INCOMPLETE_EXPIRED'].includes(status)) {
-        $('currentPlanName').textContent = 'Free';
-        if ($('currentPlanIcon')) $('currentPlanIcon').textContent = '';
-        $('statusPill').textContent = 'FREE';
-        $('statusPill').className = 'status-pill status-expired';
-        if ($('renewalText')) $('renewalText').textContent = 'No active subscription';
-        if ($('planBadge')) {
-            $('planBadge').textContent = 'FREE';
-            $('planBadge').className = 'plan-badge plan-free';
-        }
-        return;
-    }
-
-    // Main plan info
-    if ($('currentPlanIcon')) $('currentPlanIcon').textContent = planIcon(plan?.slug || 'free');
-    $('currentPlanName').textContent = plan?.name || 'Unknown';
-
-    const pill = $('statusPill');
-    pill.textContent = (status || 'ACTIVE').replace(/_/g, ' ');
-    pill.className = `status-pill ${getStatusClass(status || 'ACTIVE')}`;
-
-    // Past Due Banner logic
-    const hasFutureRenewal = currentPeriodEnd && new Date(currentPeriodEnd) > Date.now();
-    const showPastDue = status === 'PAST_DUE' && !hasFutureRenewal;
-
-    if (debugPastDue) debugPastDue.textContent = showPastDue ? 'YES (showing)' : 'NO (hidden)';
-
-    if (pastDueBanner) {
-        pastDueBanner.style.display = showPastDue ? 'flex' : 'none';
-    }
-
-    // Trial banner
-    if (status === 'TRIALING' && trialEndsAt && $('trialBanner')) {
-        const days = daysUntil(trialEndsAt);
-        $('trialBanner').style.display = 'flex';
-        if ($('trialDaysLeft')) $('trialDaysLeft').textContent = days;
-        if ($('trialEndDate')) $('trialEndDate').textContent = formatDate(trialEndsAt);
-    }
-
-    // Renewal text
-    if ($('renewalText') && currentPeriodEnd) {
-        $('renewalText').textContent = cancelAtPeriodEnd 
-            ? `Ends ${formatDate(currentPeriodEnd)}` 
-            : `Renews ${formatDate(currentPeriodEnd)}`;
-    }
-
-    // Cancel / Reactivate buttons
-    const cancelBtn = $('cancelBtn');
-    const reactivateBtn = $('reactivateBtn');
-    const cancelWarning = $('cancelWarning');
-
-    if (cancelBtn) cancelBtn.style.display = 'inline-flex';
-    if (reactivateBtn) reactivateBtn.style.display = 'none';
-    if (cancelWarning) cancelWarning.style.display = 'none';
-
-    if (cancelAtPeriodEnd) {
-        if (cancelWarning) cancelWarning.style.display = 'inline';
-        if (cancelBtn) cancelBtn.style.display = 'none';
-        if (reactivateBtn) reactivateBtn.style.display = 'inline-flex';
-    }
-
-    // Sidebar badge
-    const planBadge = $('planBadge');
-    if (planBadge) {
-        if (status === 'TRIALING') {
-            planBadge.textContent = 'TRIAL';
-            planBadge.className = 'plan-badge plan-trial';
-        } else {
-            planBadge.textContent = (plan?.name || 'FREE').toUpperCase();
-            planBadge.className = `plan-badge plan-${(plan?.slug || 'free')}`;
-        }
-    }
-}
-
-  
+        
+            
     
     
 // ── Render: plans grid ────────────────────────────────────────────────────────
