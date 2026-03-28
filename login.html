@@ -548,7 +548,7 @@ body {
                 if (typeof Toast !== 'undefined') Toast.success('Login successful!');
                 const redirect = localStorage.getItem('redirectAfterLogin') || 'dashboard.html';
                 localStorage.removeItem('redirectAfterLogin');
-                setTimeout(() => { window.location.href = redirect; }, 400);
+                setTimeout(() => { window.location.href = redirect; }, 500);
             }
         } catch (err) {
             errEl.textContent = err.message || 'Login failed. Please check your credentials.';
