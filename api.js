@@ -209,11 +209,11 @@ const AuthAPI = {
 const WorkoutsAPI = {
     getExercises: async (filters = {}) => {
         const params = new URLSearchParams(filters);
-        const res = await apiRequest(`/exercises?${params}`);
+        const res = await apiRequest(`/workouts?${params}`);
         if (res && res.success) {
             const d = res.data;
             if      (Array.isArray(d))               res.data = d;
-            else if (Array.isArray(d?.exercises))    res.data = d.exercises;
+            else if (Array.isArray(d?. workouts))    res.data = d.workouts;
             else if (Array.isArray(d?.data))         res.data = d.data;
             else if (Array.isArray(d?.items))        res.data = d.items;
             else res.data = [];
@@ -222,23 +222,23 @@ const WorkoutsAPI = {
     },
     searchExercises: async (query) => {
         try {
-            const r = await apiRequest(`/exercises/search?q=${encodeURIComponent(query)}`);
+            const r = await apiRequest(`/workouts/search?q=${encodeURIComponent(query)}`);
             if (r && r.success) {
-                if (Array.isArray(r.data?.exercises)) r.data = r.data.exercises;
+                if (Array.isArray(r.data?. workouts)) r.data = r.data.workouts;
                 else if (!Array.isArray(r.data))      r.data = [];
                 return r;
             }
         } catch {}
-        const r2 = await apiRequest(`/exercises?search=${encodeURIComponent(query)}&limit=50`);
+        const r2 = await apiRequest(`/workouts?search=${encodeURIComponent(query)}&limit=50`);
         if (r2 && r2.success) {
-            if (Array.isArray(r2.data?.exercises)) r2.data = r2.data.exercises;
+            if (Array.isArray(r2.data?. workouts)) r2.data = r2.data.workouts;
             else if (!Array.isArray(r2.data))      r2.data = [];
         }
         return r2;
     },
     getExerciseById: async (id) => {
-        const r = await apiRequest(`/exercises/${id}`);
-        if (r && r.success && r.data?.exercise) r.data = r.data.exercise;
+        const r = await apiRequest(`/workouts/${id}`);
+        if (r && r.success && r.data?. workout) r.data = r.data.workout;
         return r;
     },
 };
@@ -258,7 +258,7 @@ const ProgramsAPI = {
     }),
 };
 
-;
+
 
 // ── PROGRESS ──────────────────────────────────────────────────────────────────
 const ProgressAPI = {
@@ -568,7 +568,7 @@ function updateNavigation() {
 // FIX #9/#14: Populate sidebar user info from real stored user — call on every dashboard page
 function populateSidebarUser() {
     const user = TokenManager.getUser();
-    if (!user) return;
+    if (!user) return;!
     const name = user.name || user.email || 'User';
     const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     document.querySelectorAll('.user-avatar').forEach(el => { el.textContent = initials; });
@@ -622,7 +622,44 @@ async _refreshBadgeFromAPI() {
             if (slug) SidebarUser._applyBadgeFromStr(slug);
         }
     } catch (_) { /* silent — badge stays as token value */ }
-}
+}'''
+
+
+const SidebarUser = {
+    // Call on every dashboard page load to populate name + badge
+    populate() {
+        const user = TokenManager.getUser();
+        if (!user) return;
+        const name = user.name || user.email || 'User';
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        document.querySelectorAll('.user-avatar').forEach(el => { el.textContent = initials; });
+        document.querySelectorAll('#userName').forEach(el => { el.textContent = name; });
+        document.querySelectorAll('.user-info h4').forEach(el => { el.textContent = name; });
+        // Show badge from stored token immediately (no flicker), then refresh from live API
+        SidebarUser._applyBadgeFromStr(
+            user?.subscription || user?.subscriptionData?.plan || user?.role || 'FREE'
+        );
+        SidebarUser._refreshBadgeFromAPI();
+    },
+
+    // Apply badge classes/label from a raw plan string (slug, status, or role)
+    _applyBadgeFromStr(raw) {
+        const s = String(raw).toUpperCase();
+        let cls = 'plan-free', label = 'FREE';
+        if (s.includes('ELITE'))                        { cls = 'plan-elite';   label = 'ELITE'; }
+        else if (s.includes('PREMIUM'))                 { cls = 'plan-premium'; label = 'PREMIUM'; }
+        else if (s.includes('PRO'))                     { cls = 'plan-pro';     label = 'PRO'; }
+        else if (s.includes('TRIAL') || s === 'TRIALING') { cls = 'plan-trial'; label = 'TRIAL'; }
+        else if (s === 'ADMIN')                         { cls = 'plan-premium'; label = 'ADMIN'; }
+        document.querySelectorAll('#planBadge').forEach(el => {
+            el.className = 'plan-badge ' + cls;
+            el.textContent = label;
+        });
+    },
+    
+    // Convenience wrapper — kept for backward compat with pages that call populateSidebarUser()
+function populateSidebarUser() { SidebarUser.populate(); }'''
+                
 
 async function handleLogout() {
     // FIX: removed browser confirm() — each page overrides this with its own
