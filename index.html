@@ -1719,37 +1719,42 @@ function closeAIModal() {
 document.getElementById('generateBtn').addEventListener('click', async () => {
   const btn = document.getElementById('generateBtn');
   const originalText = btn.textContent;
+  
   btn.disabled = true;
   btn.textContent = 'Asking Grok AI...';
 
   _LM.show();
 
   try {
-    const equipmentChecks = document.querySelectorAll('input[name="equipment"]:checked');
-    const equipment = Array.from(equipmentChecks).map(el => el.value);
+    const equipment = Array.from(document.querySelectorAll('input[name="equipment"]:checked'))
+                         .map(el => el.value);
 
     const payload = {
       goal: document.getElementById('goal').value,
       fitnessLevel: document.getElementById('fitnessLevel').value,
       equipment: equipment,
-      sessionDuration: parseInt(document.getElementById('sessionDuration').value),
-      trainingDaysPerWeek: parseInt(document.getElementById('trainingDays').value),
+      sessionDuration: parseInt(document.getElementById('sessionDuration').value) || 45,
+      trainingDaysPerWeek: parseInt(document.getElementById('trainingDays').value) || 4,
       limitations: document.getElementById('limitations').value.trim() || undefined
     };
 
+    console.log('Sending payload to AI:', payload);   // ← Add this for debugging
+
     const response = await apiRequest('/api/ai/generate-workout', 'POST', payload);
 
-    if (response.success && response.plan) {
-      currentAIPlan = response.plan;   // global or use a better state
+    console.log('AI Response received:', response);   // ← Add this
+
+    if (response?.success && response.plan) {
+      currentAIPlan = response.plan;
       renderAIPlan(response.plan);
     } else {
-      alert("Couldn't generate plan right now. Please try again.");
+      alert('Failed to generate plan: ' + (response?.message || 'Unknown error'));
     }
   } catch (error) {
-    console.error(error);
-    alert("Failed to connect to AI. Check your subscription or try later.");
+    console.error('AI Generation Error:', error);
+    alert('Failed to connect to AI. Please check console (F12) and try again.\n\n' + error.message);
   } finally {
-    _LM.hide();
+    _LM.hide();                    // ← This is critical
     btn.disabled = false;
     btn.textContent = originalText;
   }
