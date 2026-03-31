@@ -1719,10 +1719,9 @@ function closeAIModal() {
 document.getElementById('generateBtn').addEventListener('click', async () => {
   const btn = document.getElementById('generateBtn');
   const originalText = btn.textContent;
-  
+
   btn.disabled = true;
   btn.textContent = 'Asking Grok AI...';
-
   _LM.show();
 
   try {
@@ -1732,29 +1731,30 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
     const payload = {
       goal: document.getElementById('goal').value,
       fitnessLevel: document.getElementById('fitnessLevel').value,
-      equipment: equipment,
+      equipment,
       sessionDuration: parseInt(document.getElementById('sessionDuration').value) || 45,
       trainingDaysPerWeek: parseInt(document.getElementById('trainingDays').value) || 4,
       limitations: document.getElementById('limitations').value.trim() || undefined
     };
+    
 
-    console.log('Sending payload to AI:', payload);   // ← Add this for debugging
+    console.log('→ Sending to AI:', payload);   // Check this in console
 
     const response = await apiRequest('/api/ai/generate-workout', 'POST', payload);
 
-    console.log('AI Response received:', response);   // ← Add this
+    console.log('← AI Response:', response);
 
     if (response?.success && response.plan) {
       currentAIPlan = response.plan;
       renderAIPlan(response.plan);
     } else {
-      alert('Failed to generate plan: ' + (response?.message || 'Unknown error'));
+      alert('AI returned error: ' + (response?.message || 'Unknown'));
     }
-  } catch (error) {
-    console.error('AI Generation Error:', error);
-    alert('Failed to connect to AI. Please check console (F12) and try again.\n\n' + error.message);
+  } catch (err) {
+    console.error('AI Request Failed:', err);
+    alert('Connection error. Check console (F12) for details.');
   } finally {
-    _LM.hide();                    // ← This is critical
+    _LM.hide();
     btn.disabled = false;
     btn.textContent = originalText;
   }
