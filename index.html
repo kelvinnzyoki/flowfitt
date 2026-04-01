@@ -916,153 +916,671 @@ footer {
 
 
   /* AI Modal Styles - Matches your gold/dark theme */
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ULTRA-PREMIUM AI WORKOUT GENERATOR MODAL
+     Enhanced with glassmorphism, animations, and intelligent UX
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+  
+/* ═══ MODAL OVERLAY ═══ */
 .ai-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(7,6,12,0.95);
-  backdrop-filter: blur(20px);
+  background: rgba(7, 6, 12, 0.97);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
   z-index: 9999;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 1.5rem;
+  opacity: 0;
+  animation: fadeInModal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.ai-modal.active {
+  display: flex;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ═══ MODAL CONTENT CONTAINER ═══ */
 .ai-modal-content {
-  background: var(--g-card);
-  border: 1px solid rgba(201,168,76,0.35);
-  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(20, 18, 32, 0.98), rgba(14, 13, 22, 0.98));
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  border-radius: 28px;
   width: 100%;
-  max-width: 620px;
-  max-height: 92vh;
-  overflow-y: auto;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+  max-width: 680px;
+  max-height: 94vh;
+  overflow: hidden;
+  box-shadow: 
+    0 50px 100px rgba(0, 0, 0, 0.8),
+    0 0 80px rgba(201, 168, 76, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: slideUpModal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: relative;
 }
 
+/* Animated border glow */
+.ai-modal-content::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, 
+    rgba(201, 168, 76, 0.6) 0%, 
+    rgba(232, 201, 106, 0.3) 25%,
+    rgba(142, 110, 40, 0.4) 50%,
+    rgba(201, 168, 76, 0.6) 100%
+  );
+  border-radius: 28px;
+  opacity: 0;
+  z-index: -1;
+  filter: blur(20px);
+  animation: borderPulse 3s ease-in-out infinite;
+}
+
+@keyframes slideUpModal {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes borderPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* ═══ MODAL HEADER ═══ */
 .ai-modal-header {
-  padding: 1.8rem 2rem 1rem;
-  border-bottom: 1px solid rgba(201,168,76,0.2);
+  padding: 2.2rem 2.5rem 1.2rem;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.25);
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: sticky;
   top: 0;
-  background: var(--g-card);
+  background: linear-gradient(145deg, rgba(20, 18, 32, 0.98), rgba(14, 13, 22, 0.95));
+  backdrop-filter: blur(20px);
   z-index: 10;
 }
 
 .ai-modal-header h2 {
   margin: 0;
-  color: var(--Au);
+  background: linear-gradient(135deg, #E8C96A 0%, #C9A84C 50%, #F5D97A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-family: 'Lora', serif;
-  font-size: 1.65rem;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.ai-modal-header h2::before {
+  content: '✨';
+  font-size: 1.8rem;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: rotate(0deg) scale(1); }
+  50% { opacity: 0.7; transform: rotate(20deg) scale(1.1); }
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 1.8rem;
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  font-size: 1.4rem;
   color: var(--t2);
   cursor: pointer;
-  padding: 0.2rem 0.6rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1;
 }
 
+.close-btn:hover {
+  background: rgba(201, 168, 76, 0.2);
+  border-color: rgba(201, 168, 76, 0.4);
+  color: var(--Au);
+  transform: rotate(90deg);
+}
+
+/* ═══ MODAL BODY WITH SCROLL ═══ */
+.ai-modal-body {
+  padding: 2rem 2.5rem 2.5rem;
+  overflow-y: auto;
+  max-height: calc(94vh - 100px);
+}
+
+/* Custom scrollbar */
+.ai-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ai-modal-body::-webkit-scrollbar-track {
+  background: rgba(201, 168, 76, 0.05);
+  border-radius: 10px;
+}
+
+.ai-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.3);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.ai-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 168, 76, 0.5);
+}
+
+/* ═══ FORM GRID ═══ */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.4rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ═══ FORM GROUPS ═══ */
+.form-group {
+  position: relative;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.6rem;
-  color: var(--t2);
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
-}
-
-.ai-input, .ai-input textarea {
-  width: 100%;
-  padding: 0.95rem 1.3rem;
-  background: #111019;
-  border: 1px solid rgba(201,168,76,0.28);
-  border-radius: 14px;
-  color: var(--t1);
-  font-size: 1rem;
-}
-
-.checkbox-group {
+  margin-bottom: 0.7rem;
+  color: var(--t4);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.form-group label::before {
+  content: '▸';
+  color: var(--Au);
+  font-size: 0.7rem;
+}
+
+/* ═══ INPUT STYLING ═══ */
+.ai-input, 
+.ai-input select,
+.ai-input textarea {
+  width: 100%;
+  padding: 1.1rem 1.5rem;
+  background: rgba(17, 16, 25, 0.8);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 16px;
+  color: var(--t1);
+  font-size: 1.05rem;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.ai-input:focus,
+.ai-input select:focus,
+.ai-input textarea:focus {
+  outline: none;
+  border-color: rgba(201, 168, 76, 0.6);
+  background: rgba(17, 16, 25, 0.95);
+  box-shadow: 
+    0 0 0 3px rgba(201, 168, 76, 0.1),
+    0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Select dropdown arrow */
+.ai-input select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23C9A84C' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.2rem center;
+  padding-right: 3rem;
+  cursor: pointer;
+}
+
+/* Number inputs */
+.ai-input[type="number"] {
+  font-family: var(--f-mono);
+  font-size: 1.1rem;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* Textarea */
+.ai-input textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+/* ═══ CHECKBOX GROUP ═══ */
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
+  padding: 1.2rem;
+  background: rgba(201, 168, 76, 0.04);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  border-radius: 16px;
 }
 
 .check-label {
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.95rem;
   color: var(--t2);
+  cursor: pointer;
+  padding: 0.7rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.btn-generate {
-  background: linear-gradient(135deg, #E8C96A, #C9A84C);
-  color: #0a0800;
-  font-weight: 600;
-  padding: 1.1rem 2.5rem;
-  border: none;
-  border-radius: 9999px;
+.check-label:hover {
+  background: rgba(201, 168, 76, 0.08);
+  color: var(--t1);
+}
+
+.check-label input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(201, 168, 76, 0.4);
+  border-radius: 6px;
+  background: rgba(17, 16, 25, 0.5);
   cursor: pointer;
-  font-size: 1.05rem;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.check-label input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #E8C96A, #C9A84C);
+  border-color: #C9A84C;
+  transform: scale(1.05);
+}
+
+.check-label input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #0a0800;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* ═══ GENERATE BUTTON ═══ */
+.btn-generate {
+  background: linear-gradient(135deg, #E8C96A 0%, #C9A84C 50%, #B8942F 100%);
+  color: #0a0800;
+  font-weight: 700;
+  padding: 1.3rem 2.8rem;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 1.1rem;
   width: 100%;
   margin-top: 2rem;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 
+    0 10px 30px rgba(201, 168, 76, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-generate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.4), 
+    transparent
+  );
+  transition: left 0.5s ease;
 }
 
 .btn-generate:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(201,168,76,0.5);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 15px 40px rgba(201, 168, 76, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-.plan-result { padding: 1.5rem 0; }
+.btn-generate:hover::before {
+  left: 100%;
+}
+
+.btn-generate:active {
+  transform: translateY(-1px);
+}
+
+.btn-generate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading state */
+.btn-generate.loading {
+  pointer-events: none;
+}
+
+.btn-generate.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #0a0800;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* ═══ PLAN RESULT SECTION ═══ */
+.plan-result {
+  padding: 1.5rem 0;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 .plan-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.plan-header h3 {
+  font-family: 'Lora', serif;
+  font-size: 1.8rem;
+  color: var(--t1);
+  margin-bottom: 0.8rem;
+  background: linear-gradient(135deg, #F0EBE0 0%, #C9A84C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .plan-focus {
-  background: rgba(201,168,76,0.15);
+  display: inline-block;
+  background: rgba(201, 168, 76, 0.18);
   color: var(--Au);
-  padding: 0.3rem 1rem;
-  border-radius: 9999px;
-  font-size: 0.85rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  letter-spacing: 0.05em;
 }
 
+/* ═══ SECTION BOXES ═══ */
 .section-box, .tips-box {
-  background: rgba(201,168,76,0.06);
-  border: 1px solid rgba(201,168,76,0.2);
-  border-radius: 16px;
-  padding: 1.4rem;
-  margin: 1.2rem 0;
+  background: linear-gradient(135deg, 
+    rgba(201, 168, 76, 0.08) 0%, 
+    rgba(201, 168, 76, 0.04) 100%
+  );
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 18px;
+  padding: 1.8rem;
+  margin: 1.5rem 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.exercises-list .exercise-item {
-  background: rgba(15,14,24,0.9);
+.section-box::before, .tips-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #E8C96A, #C9A84C, #8E6E28);
+}
+
+.section-box strong, .tips-box strong {
+  display: block;
+  color: var(--Au);
+  font-size: 1.05rem;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+}
+
+/* ═══ EXERCISES LIST ═══ */
+.exercises-list {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.exercise-item {
+  background: linear-gradient(135deg, 
+    rgba(15, 14, 24, 0.95) 0%, 
+    rgba(20, 18, 30, 0.95) 100%
+  );
   border-left: 5px solid var(--Au);
-  padding: 1.2rem;
-  margin-bottom: 1rem;
-  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 0;
+  border-radius: 14px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+.exercise-item:hover {
+  transform: translateX(5px);
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(201, 168, 76, 0.15);
+  border-left-width: 7px;
+}
+
+.exercise-item strong {
+  display: block;
+  color: var(--Au);
+  font-size: 1.15rem;
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+}
+
+.exercise-item small {
+  display: block;
+  color: var(--t2);
+  font-size: 0.88rem;
+  margin-top: 0.6rem;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ═══ MODAL ACTIONS ═══ */
 .modal-actions {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(201, 168, 76, 0.15);
 }
 
 .modal-actions button {
   flex: 1;
-  min-width: 140px;
+  min-width: 160px;
+  padding: 1.1rem 1.8rem;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: none;
 }
+
+.btn-primary {
+  background: linear-gradient(135deg, #E8C96A, #C9A84C);
+  color: #0a0800;
+  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(201, 168, 76, 0.5);
+}
+
+.btn-ghost {
+  background: rgba(201, 168, 76, 0.08);
+  color: var(--Au);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+}
+
+.btn-ghost:hover {
+  background: rgba(201, 168, 76, 0.15);
+  border-color: rgba(201, 168, 76, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ═══ MOBILE RESPONSIVE ═══ */
+@media (max-width: 640px) {
+  .ai-modal-content {
+    border-radius: 20px;
+    max-height: 96vh;
+  }
+
+  .ai-modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+
+  .ai-modal-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .ai-modal-body {
+    padding: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* ═══ PREMIUM FEATURES ═══ */
+
+/* Info tooltip */
+.info-tooltip {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.3rem;
+  color: var(--Au);
+  cursor: help;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.info-tooltip:hover {
+  opacity: 1;
+}
+
+.info-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.6rem 1rem;
+  background: rgba(20, 18, 32, 0.98);
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  border-radius: 10px;
+  color: var(--t1);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+.info-tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Progress indicator */
+.form-progress {
+  height: 3px;
+  background: rgba(201, 168, 76, 0.15);
+  border-radius: 999px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.form-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #E8C96A, #C9A84C);
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+
+
+        
+
+      
   
+
+
+  
+
+
+
 
   
 </style>
@@ -1239,14 +1757,16 @@ footer {
       <path d="M0,50 C240,100 480,0 720,50 C960,100 1200,10 1440,50 L1440,100 L0,100 Z" fill="#07060c"/>
     </svg>
   </div>
+
+  <button onclick="openAIModal()" class="btn btn-primary">
+  ✨ Generate AI Workout Plan
+  </button>
 </section>
 
 
 
 
-<button onclick="openAIModal()" class="btn btn-primary">
-  ✨ Generate AI Workout Plan
-</button>
+
   
 
   
@@ -1530,64 +2050,107 @@ footer {
 
 
   <!-- AI Workout Generator Modal -->
-<div id="aiGeneratorModal" class="ai-modal" style="display: none;">
+<!-- ═══════════════════════════════════════════════════════════════════════
+     MODAL HTML STRUCTURE
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<div id="aiGeneratorModal" class="ai-modal">
   <div class="ai-modal-content">
     <div class="ai-modal-header">
       <h2>AI Personal Trainer</h2>
-      <button onclick="closeAIModal()" class="close-btn">✕</button>
+      <button onclick="closeAIModal()" class="close-btn" aria-label="Close">✕</button>
     </div>
 
     <div class="ai-modal-body">
+      <!-- Progress indicator -->
+      <div class="form-progress">
+        <div class="form-progress-bar" id="formProgress" style="width: 0%"></div>
+      </div>
+
       <form id="aiForm">
         <div class="form-grid">
           <div class="form-group">
-            <label>Your Goal</label>
-            <select id="goal" class="ai-input">
-              <option value="muscle gain">Muscle Gain (Hypertrophy)</option>
-              <option value="fat loss">Fat Loss &amp; Conditioning</option>
-              <option value="strength">Strength &amp; Power</option>
-              <option value="endurance">Endurance &amp; Stamina</option>
-              <option value="general fitness" selected>General Fitness</option>
+            <label>
+              Your Goal
+              <span class="info-tooltip" data-tooltip="What do you want to achieve?">ℹ</span>
+            </label>
+            <select id="goal" class="ai-input" onchange="updateFormProgress()">
+              <option value="muscle gain">💪 Muscle Gain (Hypertrophy)</option>
+              <option value="fat loss">🔥 Fat Loss & Conditioning</option>
+              <option value="strength">⚡ Strength & Power</option>
+              <option value="endurance">🏃 Endurance & Stamina</option>
+              <option value="general fitness" selected>✨ General Fitness</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Fitness Level</label>
-            <select id="fitnessLevel" class="ai-input">
-              <option value="beginner">Beginner</option>
-              <option value="intermediate" selected>Intermediate</option>
-              <option value="advanced">Advanced</option>
+            <label>
+              Fitness Level
+              <span class="info-tooltip" data-tooltip="Be honest for best results">ℹ</span>
+            </label>
+            <select id="fitnessLevel" class="ai-input" onchange="updateFormProgress()">
+              <option value="beginner">🌱 Beginner (0-6 months)</option>
+              <option value="intermediate" selected>💫 Intermediate (6+ months)</option>
+              <option value="advanced">🏆 Advanced (2+ years)</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label>Session Duration (minutes)</label>
-            <input type="number" id="sessionDuration" value="45" min="20" max="90" class="ai-input">
+            <label>
+              Session Duration
+              <span class="info-tooltip" data-tooltip="Minutes per workout">ℹ</span>
+            </label>
+            <input type="number" id="sessionDuration" value="45" min="20" max="90" 
+                   class="ai-input" onchange="updateFormProgress()">
           </div>
 
           <div class="form-group">
-            <label>Training Days per Week</label>
-            <input type="number" id="trainingDays" value="4" min="2" max="7" class="ai-input">
+            <label>
+              Training Days / Week
+              <span class="info-tooltip" data-tooltip="How often can you train?">ℹ</span>
+            </label>
+            <input type="number" id="trainingDays" value="4" min="2" max="7" 
+                   class="ai-input" onchange="updateFormProgress()">
           </div>
         </div>
 
         <div class="form-group" style="margin-top: 1.5rem;">
-          <label>Available Equipment (select all)</label>
+          <label>
+            Available Equipment
+            <span class="info-tooltip" data-tooltip="Select all that apply">ℹ</span>
+          </label>
           <div class="checkbox-group">
-            <label class="check-label"><input type="checkbox" name="equipment" value="bodyweight" checked> Bodyweight Only</label>
-            <label class="check-label"><input type="checkbox" name="equipment" value="dumbbells"> Dumbbells</label>
-            <label class="check-label"><input type="checkbox" name="equipment" value="resistance bands"> Resistance Bands</label>
-            <label class="check-label"><input type="checkbox" name="equipment" value="pull-up bar"> Pull-up Bar / Rings</label>
+            <label class="check-label">
+              <input type="checkbox" name="equipment" value="bodyweight" checked onchange="updateFormProgress()">
+              Bodyweight Only
+            </label>
+            <label class="check-label">
+              <input type="checkbox" name="equipment" value="dumbbells" onchange="updateFormProgress()">
+              Dumbbells
+            </label>
+            <label class="check-label">
+              <input type="checkbox" name="equipment" value="resistance bands" onchange="updateFormProgress()">
+              Resistance Bands
+            </label>
+            <label class="check-label">
+              <input type="checkbox" name="equipment" value="pull-up bar" onchange="updateFormProgress()">
+              Pull-up Bar / Rings
+            </label>
           </div>
         </div>
 
         <div class="form-group" style="margin-top: 1.5rem;">
-          <label>Any limitations or preferences? (optional)</label>
-          <textarea id="limitations" rows="3" class="ai-input" placeholder="e.g. wrist pain, no jumping, prefer shorter rest periods..."></textarea>
+          <label>
+            Limitations or Preferences
+            <span class="info-tooltip" data-tooltip="Help us customize for you">ℹ</span>
+          </label>
+          <textarea id="limitations" rows="3" class="ai-input" 
+                    placeholder="e.g. wrist pain, no jumping, prefer shorter rest periods, shoulder injury..."
+                    onchange="updateFormProgress()"></textarea>
         </div>
 
         <button type="button" id="generateBtn" class="btn-generate">
-          Generate Personalized Workout with Grok
+          ✨ Generate My Perfect Workout
         </button>
       </form>
 
@@ -1600,17 +2163,27 @@ footer {
 
         <div id="warmUpSection" class="section-box"></div>
 
-        <h4 style="margin: 2rem 0 1rem; color: var(--Au);">Exercises</h4>
+        <h4 style="margin: 2.5rem 0 1.5rem; color: var(--Au); font-size: 1.3rem; text-align: center;">
+          💪 Your Exercise Plan
+        </h4>
         <div id="exercisesList" class="exercises-list"></div>
 
         <div id="coolDownSection" class="section-box"></div>
 
         <div id="progressionTips" class="tips-box"></div>
 
+        <div id="scienceNotes" class="tips-box" style="background: rgba(91, 156, 246, 0.08); border-color: rgba(91, 156, 246, 0.25);"></div>
+
         <div class="modal-actions">
-          <button onclick="saveGeneratedPlan()" class="btn-primary">Save to My Programs</button>
-          <button onclick="regenerateFromModal()" class="btn-ghost">Regenerate</button>
-          <button onclick="closeAIModal()" class="btn-ghost">Close</button>
+          <button onclick="saveGeneratedPlan()" class="btn-primary">
+            💾 Save to My Programs
+          </button>
+          <button onclick="regenerateFromModal()" class="btn-ghost">
+            🔄 Regenerate
+          </button>
+          <button onclick="closeAIModal()" class="btn-ghost">
+            ✕ Close
+          </button>
         </div>
       </div>
     </div>
@@ -1703,17 +2276,50 @@ footer {
 
 
   <script>
-// Open AI Modal from anywhere (e.g. sidebar button)
-function openAIModal() {
-  document.getElementById('aiGeneratorModal').style.display = 'flex';
-  document.getElementById('planResult').style.display = 'none';
-  document.getElementById('aiForm').reset();
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ENHANCED JAVASCRIPT
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+
+// Form progress tracking
+function updateFormProgress() {
+  const fields = [
+    document.getElementById('goal').value,
+    document.getElementById('fitnessLevel').value,
+    document.getElementById('sessionDuration').value,
+    document.getElementById('trainingDays').value,
+    document.querySelectorAll('input[name="equipment"]:checked').length > 0
+  ];
+
+  const completed = fields.filter(f => f).length;
+  const progress = (completed / fields.length) * 100;
+  
+  document.getElementById('formProgress').style.width = progress + '%';
 }
 
-// Close Modal
+// Open AI Modal
 function closeAIModal() {
-  document.getElementById('aiGeneratorModal').style.display = 'none';
+  const modal = document.getElementById('aiGeneratorModal');
+  modal.classList.remove('active');
+  setTimeout(() => {
+    modal.style.display = 'none';
+    document.body.style.overflow = ''; // Restore scroll
+  }, 300);
 }
+
+// Close on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('aiGeneratorModal').classList.contains('active')) {
+    closeAIModal();
+  }
+});
+
+// Close on backdrop click
+document.getElementById('aiGeneratorModal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'aiGeneratorModal') {
+    closeAIModal();
+  }
+});
 
 // Generate Plan
 document.getElementById('generateBtn').addEventListener('click', async () => {
@@ -1721,11 +2327,13 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   const originalText = btn.textContent;
 
   btn.disabled = true;
-  btn.textContent = 'Asking Grok AI...';
+  btn.classList.add('loading');
+  btn.textContent = '🤖 AI is thinking...';
 
   // Use LoadingManager from api.js if available
-  if (typeof LoadingManager !== 'undefined') LoadingManager.show('Generating your workout...');
-
+  if (typeof LoadingManager !== 'undefined') {
+    LoadingManager.show('🧠 AI is analyzing your profile and generating the perfect workout...');
+    }
   try {
     const equipment = Array.from(document.querySelectorAll('input[name="equipment"]:checked'))
                          .map(el => el.value);
@@ -1741,9 +2349,6 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
     console.log('→ Sending to AI:', payload);
 
-    // Use apiRequest from api.js with the correct signature: (endpoint, options)
-    // Endpoint is relative to API_CONFIG.baseURL (/api/v1), so '/ai/generate-workout'
-    // becomes https://fit.cctamcc.site/api/v1/ai/generate-workout
     const response = await apiRequest('/ai/generate-workout', {
       method: 'POST',
       body:   JSON.stringify(payload),
@@ -1753,70 +2358,142 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
 
     if (response?.success && response.plan) {
       currentAIPlan = response.plan;
-      renderAIPlan(response.plan);
+      renderEnhancedPlan(response.plan);
+      
+      if (typeof Toast !== 'undefined') {
+        Toast.success('🎉 Your personalized workout is ready!', 5000);
+      }
     } else {
-      alert('AI returned an error: ' + (response?.message || 'Unknown error'));
+      throw new Error(response?.message || 'AI returned an error');
     }
   } catch (err) {
     console.error('AI Request Failed:', err);
     const msg = err?.message || '';
+    
+    let errorMessage = 'Failed to generate workout. Please try again.';
+    
     if (msg.includes('401') || msg.includes('expired') || msg.includes('token')) {
-      alert('Please log in to generate a workout plan.');
-      window.location.href = 'login.html';
+      errorMessage = 'Please log in to generate a workout plan.';
+      setTimeout(() => window.location.href = 'login.html', 2000);
     } else if (msg.includes('Network') || msg.includes('fetch')) {
-      alert('Cannot reach the server. Please check your connection and try again.');
+      errorMessage = 'Cannot reach the server. Please check your connection.';
+    }
+    
+    if (typeof Toast !== 'undefined') {
+      Toast.error(errorMessage, 8000);
     } else {
-      alert('Failed to generate workout: ' + (msg || 'Unknown error. Check console (F12).'));
+      alert(errorMessage);
     }
   } finally {
     if (typeof LoadingManager !== 'undefined') LoadingManager.hide();
     btn.disabled = false;
+    btn.classList.remove('loading');
     btn.textContent = originalText;
   }
 });
 
-let currentAIPlan = null;
+    let currentAIPlan = null;
 
-function renderAIPlan(plan) {
+function renderEnhancedPlan(plan) {
   document.getElementById('aiForm').style.display = 'none';
   const resultDiv = document.getElementById('planResult');
   resultDiv.style.display = 'block';
 
+  // Scroll to top of modal
+  document.querySelector('.ai-modal-body').scrollTop = 0;
+
+  // Plan header
   document.getElementById('planName').textContent = plan.workoutName || "Your Custom Workout";
   document.getElementById('planFocus').textContent = plan.focus || "Full Body";
 
+  // Warm-up section
   document.getElementById('warmUpSection').innerHTML = `
-    <strong>Warm-up</strong><br>
-    ${plan.warmUp || "5-10 minutes light cardio + dynamic stretches"}
+    <strong>🔥 Warm-up (${Math.ceil(plan.estimatedDurationMinutes * 0.15)} min)</strong><br>
+    <div style="margin-top: 0.8rem; line-height: 1.7; color: var(--t2);">
+      ${plan.warmUp || "5-10 minutes light cardio + dynamic stretches"}
+    </div>
   `;
-
+        
+  // Exercises list
   const exercisesContainer = document.getElementById('exercisesList');
   exercisesContainer.innerHTML = '';
 
-  (plan.exercises || []).forEach(ex => {
+  (plan.exercises || []).forEach((ex, idx) => {
     const item = document.createElement('div');
     item.className = 'exercise-item';
+    item.style.animationDelay = `${idx * 0.1}s`;
+    
+    // Build muscles display
+    let musclesDisplay = '';
+    if (ex.primaryMuscles && ex.primaryMuscles.length > 0) {
+      musclesDisplay = `<div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--Au); opacity: 0.8;">
+        Target: ${ex.primaryMuscles.join(', ')}
+      </div>`;
+    }
+    
     item.innerHTML = `
-      <strong>${ex.name}</strong><br>
-      ${ex.sets} sets × ${ex.reps} • Rest ${ex.restSeconds}s<br>
+      <strong>${idx + 1}. ${ex.name}</strong>
+      <div style="margin: 0.6rem 0; color: var(--t1); font-size: 1rem;">
+        <span style="background: rgba(201,168,76,0.15); padding: 0.3rem 0.8rem; border-radius: 8px; margin-right: 0.5rem;">
+          ${ex.sets} sets
+        </span>
+        <span style="background: rgba(201,168,76,0.15); padding: 0.3rem 0.8rem; border-radius: 8px; margin-right: 0.5rem;">
+          ${ex.reps} reps
+        </span>
+        <span style="background: rgba(201,168,76,0.15); padding: 0.3rem 0.8rem; border-radius: 8px;">
+          ${ex.restSeconds}s rest
+        </span>
+      </div>
+      ${musclesDisplay}
       <small>${ex.notes || ''}</small>
     `;
     exercisesContainer.appendChild(item);
   });
 
+  // Cool-down section
   document.getElementById('coolDownSection').innerHTML = `
-    <strong>Cool-down</strong><br>
-    ${plan.coolDown || "Static stretching for all major muscle groups"}
+    <strong>❄️ Cool-down (${Math.ceil(plan.estimatedDurationMinutes * 0.12)} min)</strong><br>
+    <div style="margin-top: 0.8rem; line-height: 1.7; color: var(--t2);">
+      ${plan.coolDown || "Static stretching for all major muscle groups"}
+    </div>
   `;
 
+  
+  // Progression tips
   document.getElementById('progressionTips').innerHTML = `
-    <strong>Progression Tips:</strong><br>
-    ${plan.progressionTips || "Increase weight or reps gradually every 1–2 weeks"}
+    <strong>📈 Progression Strategy</strong><br>
+    <div style="margin-top: 0.8rem; line-height: 1.7; color: var(--t2);">
+      ${plan.progressionTips || "Increase weight or reps gradually every 1–2 weeks"}
+    </div>
+    ${plan.weeklyRecommendations ? `
+      <div style="margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid rgba(201,168,76,0.15);">
+        <strong style="font-size: 0.9rem;">📅 Weekly Plan</strong><br>
+        <div style="margin-top: 0.5rem; color: var(--t2); font-size: 0.92rem;">
+          ${plan.weeklyRecommendations}
+        </div>
+      </div>
+    ` : ''}
   `;
+
+  // Science notes (if available)
+  if (plan.scienceNotes) {
+    document.getElementById('scienceNotes').innerHTML = `
+      <strong style="color: #5B9CF6;">📚 Science Behind Your Plan</strong><br>
+      <div style="margin-top: 0.8rem; line-height: 1.7; color: var(--t2); font-size: 0.92rem;">
+        ${plan.scienceNotes}
+      </div>
+    `;
+  }
 }
 
 async function saveGeneratedPlan() {
   if (!currentAIPlan) return;
+  
+  const btn = event.target;
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = '💾 Saving...';
+  
   try {
     await apiRequest('/programs', {
       method: 'POST',
@@ -1826,18 +2503,42 @@ async function saveGeneratedPlan() {
         data: currentAIPlan,
       }),
     });
-    alert('Plan saved successfully to your programs!');
-    closeAIModal();
+    
+    if (typeof Toast !== 'undefined') {
+      Toast.success('🎉 Workout saved to your programs!', 5000);
+    } else {
+      alert('Plan saved successfully to your programs!');
+    }
+    
+    setTimeout(() => closeAIModal(), 1500);
   } catch (e) {
-    alert('Plan generated but failed to save. You can still use it.');
+    console.error('Save failed:', e);
+    if (typeof Toast !== 'undefined') {
+      Toast.warning('Plan generated but failed to save. You can still use it!', 6000);
+    } else {
+      alert('Plan generated but failed to save. You can still use it.');
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
   }
 }
 
 function regenerateFromModal() {
   document.getElementById('planResult').style.display = 'none';
   document.getElementById('aiForm').style.display = 'block';
+  document.querySelector('.ai-modal-body').scrollTop = 0;
 }
+
+// Initialize form progress on load
+document.addEventListener('DOMContentLoaded', () => {
+  updateFormProgress();
+});
+    
+    
   </script>
+
 
 </body>
 </html>
+    
