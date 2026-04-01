@@ -2292,6 +2292,17 @@ function updateFormProgress() {
 }
 
 // Open AI Modal
+function openAIModal() {
+  const modal = document.getElementById('aiGeneratorModal');
+  modal.style.display = 'flex';
+  modal.classList.add('active');
+  document.getElementById('planResult').style.display = 'none';
+  document.getElementById('aiForm').style.display = 'block';
+  document.getElementById('aiForm').reset();
+  updateFormProgress();
+  document.body.style.overflow = 'hidden'; // Prevent background scroll
+}
+    
 function closeAIModal() {
   const modal = document.getElementById('aiGeneratorModal');
   modal.classList.remove('active');
