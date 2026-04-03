@@ -6,6 +6,8 @@
 <title>FlowFit — Transform Your Body at Home</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="theme.css">
+<script src="theme.js" defer></script>
 <!--
   Josefin Sans  100–400  : ultra-thin geometric sans — headings & labels
   Lora          300–400  : elegant serif — display text, price
@@ -1569,49 +1571,7 @@ footer {
 
 
         
-/* Theme Toggle Button */
-.theme-toggle-btn {
-  background: rgba(201,168,76,0.1);
-  border: 1px solid rgba(201,168,76,0.4);
-  color: var(--Au);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  cursor: pointer;
-  transition: all 0.4s ease;
-}
 
-.theme-toggle-btn:hover {
-  background: rgba(201,168,76,0.25);
-  transform: rotate(25deg);
-}
-
-/* Light Mode */
-body.light-mode {
-  --ink: #f8f6f0;
-  --ink-1: #f0ede4;
-  --t1: #1a170f;
-  --t2: #555148;
-  --Au: #8E6E28;
-  background: var(--ink);
-  color: var(--t1);
-}
-
-/* Make sure important elements adapt */
-body.light-mode .nav,
-body.light-mode .ai-modal,
-body.light-mode .ai-coach-content,
-body.light-mode .pricing-card,
-body.light-mode .feature-card {
-  background: #fff;
-  color: #1a170f;
-  border-color: rgba(142,110,40,0.3);
-}
-  
 
 
   
@@ -2580,52 +2540,13 @@ function regenerateFromModal() {
   document.querySelector('.ai-modal-body').scrollTop = 0;
 }
 
-// Initialize form progress on load
-document.addEventListener('DOMContentLoaded', () => {
-  updateFormProgress();
-});
+
     
     
   </script>
 
 
-<script>
-// Global Theme Toggle - Works Across All Pages
-function initThemeToggle() {
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
-  const body = document.body;
 
-  // Load saved preference
-  const savedTheme = localStorage.getItem('flowfit-theme') || 'dark';
-  if (savedTheme === 'light') {
-    body.classList.add('light-mode');
-    if (themeIcon) themeIcon.textContent = '🌙';
-  } else {
-    if (themeIcon) themeIcon.textContent = '☀️';
-  }
-
-  // Toggle handler
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      body.classList.toggle('light-mode');
-      
-      const isLight = body.classList.contains('light-mode');
-      
-      if (isLight) {
-        if (themeIcon) themeIcon.textContent = '🌙';
-        localStorage.setItem('flowfit-theme', 'light');
-      } else {
-        if (themeIcon) themeIcon.textContent = '☀️';
-        localStorage.setItem('flowfit-theme', 'dark');
-      }
-    });
-  }
-}
-
-// Initialize on every page
-document.addEventListener('DOMContentLoaded', initThemeToggle);
-</script>
 
 </body>
 </html>
