@@ -3675,12 +3675,68 @@ const ThemeManager = (() => {
 
   
 <script>
+let currentCoachContext = null;
+  
 
+function openCoachModal(exerciseName = null) {
+  currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
+  document.getElementById('aiCoachModal').style.display = 'flex';
+  document.getElementById('chatMessages').innerHTML = '';
+
+  // Welcome message from the intelligent coach
+  setTimeout(() => {
+    addCoachMessage("Hi 👋 I'm your AI Coach. I can help with form, substitutions, adjustments, motivation, or even predict your future progress. What’s on your mind today?", "assistant");
+  }, 300);
+}
+  
 function closeCoachModal() {
   document.getElementById('aiCoachModal').style.display = 'none';
 }
 
-async function sendCoachMessage() { /* keep the previous sendCoachMessage code you already have */ }
+
+async function sendCoachMessage() {
+  const input = document.getElementById('coachInput') as HTMLInputElement;
+  const text = input.value.trim();
+  if (!text) return;
+
+  addCoachMessage(text, "user");
+  input.value = '';
+
+  _LM.show();
+
+  try {
+    const res = await apiRequest('/api/ai/coach', 'POST', {
+      message: text,
+      currentExercise: currentCoachContext?.currentExercise
+    });
+
+    if (res.success) {
+      addCoachMessage(res.reply, "assistant");
+
+      // Handle rich responses from the intelligent coach
+      if (res.alternatives && res.alternatives.length) {
+        const html = res.alternatives.map(a => 
+          `<div class="suggestion-chip" onclick="quickAsk('\( {a}')"> \){a}</div>`
+        ).join('');
+        const div = document.createElement('div');
+        div.innerHTML = `<div style="margin:12px 0 8px;display:flex;gap:8px;flex-wrap:wrap">${html}</div>`;
+        document.getElementById('chatMessages').appendChild(div);
+      }
+
+      if (res.suggestion) {
+        const tip = document.createElement('div');
+        tip.style.cssText = 'margin-top:10px;padding:10px 14px;background:rgba(201,168,76,0.1);border-radius:12px;font-size:0.9rem;';
+        tip.innerHTML = `<strong>💡 Coach Tip:</strong> ${res.suggestion}`;
+        document.getElementById('chatMessages').appendChild(tip);
+      }
+    }
+  } catch (e) {
+    addCoachMessage("Sorry, I'm having a quick rest. Try again in a moment.", "assistant");
+  } finally {
+    _LM.hide();
+  }
+}
+
 
 function quickAsk(question) {
   const input = document.getElementById('coachInput');
