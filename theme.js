@@ -1,37 +1,39 @@
-// theme-toggle.js - Global Dark/Light Mode for FlowFit
+// ====================== PRELOAD THEME (NO FLASH) ======================
+(function () {
+  const savedTheme = localStorage.getItem('flowfit-theme');
+  if (savedTheme === 'light') {
+    document.documentElement.classList.add('light-mode');
+  }
+})();
 
+// ====================== MAIN TOGGLE ======================
 function initThemeToggle() {
   const themeToggle = document.getElementById('themeToggle');
   const themeIcon = document.getElementById('themeIcon');
-  const body = document.body;
 
-  // Load saved preference
-  const savedTheme = localStorage.getItem('flowfit-theme') || 'dark';
+  const root = document.documentElement;
 
-  if (savedTheme === 'light') {
-    body.classList.add('light-mode');
-    if (themeIcon) themeIcon.textContent = '🌙';
-  } else {
-    if (themeIcon) themeIcon.textContent = '☀️';
+  // Set initial icon
+  const isLight = root.classList.contains('light-mode');
+  if (themeIcon) {
+    themeIcon.textContent = isLight ? '🌙' : '☀️';
   }
 
   // Toggle handler
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
-      body.classList.toggle('light-mode');
-      
-      const isLight = body.classList.contains('light-mode');
-      
-      if (isLight) {
-        if (themeIcon) themeIcon.textContent = '🌙';
-        localStorage.setItem('flowfit-theme', 'light');
-      } else {
-        if (themeIcon) themeIcon.textContent = '☀️';
-        localStorage.setItem('flowfit-theme', 'dark');
+      root.classList.toggle('light-mode');
+
+      const isLightNow = root.classList.contains('light-mode');
+
+      if (themeIcon) {
+        themeIcon.textContent = isLightNow ? '🌙' : '☀️';
       }
+
+      localStorage.setItem('flowfit-theme', isLightNow ? 'light' : 'dark');
     });
   }
 }
 
-// Auto-initialize when the script loads
+// ====================== INIT ======================
 document.addEventListener('DOMContentLoaded', initThemeToggle);
