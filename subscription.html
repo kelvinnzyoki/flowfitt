@@ -2850,6 +2850,14 @@ const PLAN_CATALOG = [
     },
 ];
 
+    // ═══ HTML Escape Function - Prevents XSS ═══
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+                   }
+
 async function loadAll() {
     $('loadingOverlay').style.display = 'flex';
     try {
