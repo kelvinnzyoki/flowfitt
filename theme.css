@@ -83,3 +83,124 @@ html.light-mode .sidebar .user-info h4 {
   background: rgba(201,168,76,0.25);
   transform: scale(1.1);
 }
+
+/* =====================================================================
+   THE SKELETON KEY: FORCED LIGHT MODE OVERRIDES
+   These rules override the hardcoded rgba() !important values in the HTML
+   ===================================================================== */
+
+/* 1. Main Backgrounds, Sidebars, and Navs */
+html.light-mode body {
+  background-image: none !important; /* Removes the dark radial glow */
+  background-color: var(--ink) !important;
+}
+
+html.light-mode .sidebar,
+html.light-mode nav,
+html.light-mode .top-nav {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: var(--b1) !important;
+}
+
+/* 2. Stubborn Cards, Grids, and Panels */
+html.light-mode .main-content > .card,
+html.light-mode .main-content > .section,
+html.light-mode .content-grid .card,
+html.light-mode .content-grid > div,
+html.light-mode .section,
+html.light-mode .wpoints-card,
+html.light-mode .stat-card,
+html.light-mode .chart-card,
+html.light-mode .panel-card,
+html.light-mode .workout-preview,
+html.light-mode .pricing-card.featured,
+html.light-mode .continue-banner {
+  background: var(--g-card) !important;
+  border-color: var(--b1) !important;
+}
+
+/* 3. Inner Items (Workout rows, achievements, quick nav) */
+html.light-mode .workout-item,
+html.light-mode .wp-hist-row,
+html.light-mode .quick-nav-card,
+html.light-mode .achievement-badge,
+html.light-mode .exercise-item {
+  background: #ffffff !important;
+  border-color: var(--b1) !important;
+  color: var(--t1) !important;
+}
+
+/* 4. Text inside stubborn dark items */
+html.light-mode .workout-info h4,
+html.light-mode .achievement-info h4,
+html.light-mode .wp-hist-label,
+html.light-mode .ff-confirm-title {
+  color: var(--t1) !important;
+}
+
+html.light-mode .qn-label,
+html.light-mode .wp-key {
+  color: var(--t2) !important;
+}
+
+/* 5. Headers & Banners */
+html.light-mode .header,
+html.light-mode .page-header {
+  background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 50%, transparent 100%) !important;
+}
+
+html.light-mode .empty-state,
+html.light-mode .empty-section {
+  color: var(--t2) !important;
+  background: #ffffff !important;
+}
+
+/* 6. AI Coach & Confirm Modals */
+html.light-mode .ai-modal,
+html.light-mode .ff-confirm-backdrop {
+  background: rgba(255, 255, 255, 0.75) !important;
+}
+
+html.light-mode .ai-coach-content,
+html.light-mode .ai-modal-content,
+html.light-mode .ff-confirm-box {
+  background: var(--g-card) !important;
+  border-color: var(--b1) !important;
+}
+
+html.light-mode .chat-messages {
+  background: #f8f9fa !important;
+}
+
+html.light-mode .quick-suggestions {
+  background: #ffffff !important;
+  border-color: var(--b1) !important;
+}
+
+html.light-mode .chat-input-area {
+  background: #ffffff !important;
+  border-color: var(--b1) !important;
+}
+
+html.light-mode .chat-input-area input,
+html.light-mode .ai-input {
+  background: #f1f5f9 !important;
+  color: var(--t1) !important;
+  border-color: var(--b1) !important;
+}
+
+html.light-mode .ai-coach-header,
+html.light-mode .ai-modal-header {
+  background: #ffffff !important;
+}
+
+/* 7. W-Points specific fixes */
+html.light-mode .wpoints-circle {
+  background: #ffffff !important;
+}
+html.light-mode .wp-row {
+  border-bottom-color: rgba(0,0,0,0.05) !important;
+}
+html.light-mode .wpoints-rule {
+  background: rgba(0,0,0,0.03) !important;
+}
