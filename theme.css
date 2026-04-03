@@ -1,15 +1,15 @@
 /* ====================== THEME SYSTEM ====================== */
 
-/* -------- DEFAULT: DARK MODE -------- */
+/* DARK MODE DEFAULT */
 :root {
-  --ink: #0f1115;          /* Main background */
-  --ink-1: #171a21;        /* Cards */
-  --ink-2: #1f2430;        /* Elevated surfaces */
+  --ink: #0f1115;
+  --ink-1: #171a21;
+  --ink-2: #1f2430;
 
-  --t1: #f5f5f5;           /* Primary text */
-  --t2: #a1a1a1;           /* Secondary text */
+  --t1: #f5f5f5;
+  --t2: #a1a1a1;
 
-  --Au: #C9A84C;           /* Accent gold */
+  --Au: #C9A84C;
 
   --b1: rgba(201,168,76,0.25);
 
@@ -17,8 +17,8 @@
   --surface-bg: #1f2430;
 }
 
-/* -------- LIGHT MODE -------- */
-body.light-mode {
+/* LIGHT MODE */
+html.light-mode {
   --ink: #f8f6f0;
   --ink-1: #f0ede4;
   --ink-2: #e8e4d9;
@@ -32,20 +32,15 @@ body.light-mode {
 
   --card-bg: #ffffff;
   --surface-bg: #ffffff;
-
-  background: var(--ink);
-  color: var(--t1);
 }
 
-/* ====================== GLOBAL RESET ====================== */
-
+/* GLOBAL */
 body {
   background: var(--ink);
   color: var(--t1);
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* Ensure all elements inherit correct color */
 body * {
   color: inherit;
 }
@@ -59,9 +54,7 @@ p, span, small, li {
   color: var(--t2);
 }
 
-/* ====================== COMPONENT SYSTEM ====================== */
-
-/* Cards & surfaces */
+/* Components */
 .pricing-card,
 .feature-card,
 .workout-preview,
@@ -73,76 +66,54 @@ p, span, small, li {
   background: var(--card-bg);
   color: var(--t1);
   border: 1px solid var(--b1);
-  transition: all 0.3s ease;
-}
-
-/* Sections */
-section {
-  background: transparent;
-}
-
-/* Grids / containers */
-.stats-grid,
-.features-grid,
-.pricing-grid {
-  background: rgba(201,168,76,0.08);
-}
-
-body.light-mode .stats-grid,
-body.light-mode .features-grid,
-body.light-mode .pricing-grid {
-  background: rgba(142,110,40,0.08);
 }
 
 /* Navigation */
 .nav {
   background: var(--ink);
   border-bottom: 1px solid var(--b1);
-  transition: all 0.3s ease;
 }
 
-body.light-mode .nav {
+html.light-mode .nav {
   background: rgba(248,246,240,0.95);
 }
 
-/* Hero overlay fix */
+/* Grids */
+.stats-grid,
+.features-grid,
+.pricing-grid {
+  background: rgba(201,168,76,0.08);
+}
+
+html.light-mode .stats-grid,
+html.light-mode .features-grid,
+html.light-mode .pricing-grid {
+  background: rgba(142,110,40,0.08);
+}
+
+/* Hero overlay */
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     108deg,
-    rgba(15,17,21,0.9) 0%,
-    rgba(15,17,21,0.6) 50%,
-    rgba(15,17,21,0.9) 100%
+    rgba(15,17,21,0.9),
+    rgba(15,17,21,0.6),
+    rgba(15,17,21,0.9)
   );
 }
 
-body.light-mode .hero::before {
+html.light-mode .hero::before {
   background: linear-gradient(
     108deg,
-    rgba(248,246,240,0.96) 0%,
-    rgba(248,246,240,0.65) 50%,
-    rgba(248,246,240,0.92) 100%
+    rgba(248,246,240,0.96),
+    rgba(248,246,240,0.65),
+    rgba(248,246,240,0.92)
   );
 }
 
-/* Pills / badges */
-.status-pill,
-.plan-badge {
-  color: var(--t1);
-  background: var(--surface-bg);
-  border: 1px solid var(--b1);
-}
-
-/* Accent elements */
-.logo-flow,
-.logo-fit {
-  color: var(--Au);
-}
-
-/* ====================== BUTTON ====================== */
-
+/* Buttons */
 .theme-toggle-btn {
   background: rgba(201,168,76,0.1);
   border: 1px solid rgba(201,168,76,0.4);
@@ -163,15 +134,7 @@ body.light-mode .hero::before {
   transform: rotate(25deg);
 }
 
-/* ====================== FORCE FIXES ====================== */
-
-/* Kill hardcoded dark backgrounds */
-body.light-mode [style*="background"] {
+/* HARD FIXES */
+html.light-mode [style*="background"] {
   background: var(--card-bg) !important;
-}
-
-/* Prevent random dark sections */
-body.light-mode div,
-body.light-mode section {
-  background-color: transparent;
 }
