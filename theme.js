@@ -1,4 +1,4 @@
-// ====================== PRELOAD THEME (NO FLASH) ======================
+// PRELOAD (prevents flash)
 (function () {
   const savedTheme = localStorage.getItem('flowfit-theme');
   if (savedTheme === 'light') {
@@ -6,34 +6,28 @@
   }
 })();
 
-// ====================== MAIN TOGGLE ======================
 function initThemeToggle() {
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
-
+  const btn = document.getElementById('themeToggle');
+  const icon = document.getElementById('themeIcon');
   const root = document.documentElement;
 
-  // Set initial icon
-  const isLight = root.classList.contains('light-mode');
-  if (themeIcon) {
-    themeIcon.textContent = isLight ? '🌙' : '☀️';
+  function updateIcon() {
+    if (!icon) return;
+    icon.textContent = root.classList.contains('light-mode') ? '🌙' : '☀️';
   }
 
-  // Toggle handler
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
+  updateIcon();
+
+  if (btn) {
+    btn.addEventListener('click', () => {
       root.classList.toggle('light-mode');
 
-      const isLightNow = root.classList.contains('light-mode');
+      const isLight = root.classList.contains('light-mode');
+      localStorage.setItem('flowfit-theme', isLight ? 'light' : 'dark');
 
-      if (themeIcon) {
-        themeIcon.textContent = isLightNow ? '🌙' : '☀️';
-      }
-
-      localStorage.setItem('flowfit-theme', isLightNow ? 'light' : 'dark');
+      updateIcon();
     });
   }
 }
 
-// ====================== INIT ======================
 document.addEventListener('DOMContentLoaded', initThemeToggle);
