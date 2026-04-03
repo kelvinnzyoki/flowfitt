@@ -2794,6 +2794,96 @@ a.btn,
     flex-shrink: 0;
 }
 
+
+
+    
+    
+    /* AI Coach */
+    
+.ai-modal {
+  position: fixed; inset: 0; background: rgba(7,6,12,0.96);
+  backdrop-filter: blur(20px); z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.ai-coach-content {
+  background: var(--g-card);
+  border: 1px solid rgba(201,168,76,0.4);
+  border-radius: 24px;
+  width: 100%; max-width: 420px; height: 85vh; max-height: 620px;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+}
+
+.ai-coach-header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid rgba(201,168,76,0.25);
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(7,6,12,0.6);
+}
+
+.coach-avatar {
+  font-size: 28px; width: 42px; height: 42px;
+  background: rgba(201,168,76,0.15); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.chat-messages {
+  flex: 1; padding: 1.5rem; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+  background: rgba(15,14,24,0.6);
+}
+
+.coach-message, .user-message {
+  max-width: 80%; padding: 14px 18px; border-radius: 20px;
+  line-height: 1.5; font-size: 0.98rem;
+}
+
+.coach-message {
+  align-self: flex-start;
+  background: rgba(201,168,76,0.12);
+  border-bottom-left-radius: 6px;
+}
+
+.user-message {
+  align-self: flex-end;
+  background: var(--g-Au);
+  color: #0a0800;
+  border-bottom-right-radius: 6px;
+}
+
+.quick-suggestions {
+  padding: 12px 1.5rem; display: flex; flex-wrap: wrap; gap: 8px;
+  background: rgba(7,6,12,0.7); border-top: 1px solid rgba(201,168,76,0.2);
+}
+
+.quick-suggestions div {
+  background: rgba(201,168,76,0.1); color: var(--Au);
+  padding: 6px 14px; border-radius: 9999px; font-size: 0.82rem;
+  cursor: pointer; white-space: nowrap;
+}
+
+.quick-suggestions div:hover {
+  background: var(--Au); color: #0a0800;
+}
+
+.chat-input-area {
+  padding: 1rem; display: flex; gap: 8px; background: var(--g-card);
+  border-top: 1px solid rgba(201,168,76,0.2);
+}
+
+.chat-input-area input {
+  flex: 1; padding: 14px 20px; border-radius: 9999px;
+  background: #111019; border: 1px solid rgba(201,168,76,0.3);
+  color: var(--t1); font-size: 1rem;
+}
+
+.send-btn {
+  background: var(--g-Au); color: #0a0800; border: none;
+  padding: 0 24px; border-radius: 9999px; font-weight: 600;
+}
+    
+
 </style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></head>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -2945,6 +3035,11 @@ a.btn,
               </a>
           </div>
 
+        <button onclick="openCoachModal()" class="btn btn-ghost" style="gap:8px;">
+  🤖 AI Coach
+        </button>
+        
+
           <!-- CONTENT -->
           <div class="content-grid">
               <div class="card">
@@ -2982,6 +3077,39 @@ a.btn,
 
       </main>
   </div>
+
+  
+  
+  
+  <!-- AI COACH MODAL - Upgraded Version -->
+<div id="aiCoachModal" class="ai-modal" style="display: none;">
+  <div class="ai-coach-content">
+    <div class="ai-coach-header">
+      <div class="coach-avatar">🤖</div>
+      <div>
+        <h2>AI Coach</h2>
+        <p>Your personal trainer • Always here</p>
+      </div>
+      <button onclick="closeCoachModal()" class="close-btn">✕</button>
+    </div>
+
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <!-- Quick suggestions -->
+    <div class="quick-suggestions">
+      <div onclick="quickAsk('How do I fix my push-up form?')">Push-up form</div>
+      <div onclick="quickAsk('Wrist hurts during planks')">Wrist pain</div>
+      <div onclick="quickAsk('I feel tired today')">Lighter session</div>
+      <div onclick="quickAsk('Motivate me')">Motivate me</div>
+    </div>
+
+    <div class="chat-input-area">
+      <input id="coachInput" type="text" placeholder="Ask anything... (form, pain, adjustments...)" 
+             onkeypress="if(event.key === 'Enter') sendCoachMessage()">
+      <button onclick="sendCoachMessage()" class="send-btn">Send</button>
+    </div>
+  </div>
+</div>
 
   <div id="toastArea"></div>
 <script src="api.js"></script>
@@ -3351,6 +3479,84 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
     window.toggleSidebar = toggleSidebar;
 }());
 
+</script>
+
+<script>
+  // AI Coach Modal Integration - Final Version
+let currentCoachContext = null;
+
+function openCoachModal(exerciseName = null) {
+  currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
+  document.getElementById('aiCoachModal').style.display = 'flex';
+  document.getElementById('chatMessages').innerHTML = '';
+
+  // Welcome message from the intelligent coach
+  setTimeout(() => {
+    addCoachMessage("Hi 👋 I'm your AI Coach. I can help with form, substitutions, adjustments, motivation, or even predict your future progress. What’s on your mind today?", "assistant");
+  }, 300);
+}
+
+function closeCoachModal() {
+  document.getElementById('aiCoachModal').style.display = 'none';
+}
+
+async function sendCoachMessage() {
+  const input = document.getElementById('coachInput') as HTMLInputElement;
+  const text = input.value.trim();
+  if (!text) return;
+
+  addCoachMessage(text, "user");
+  input.value = '';
+
+  _LM.show();
+
+  try {
+    const res = await apiRequest('/api/ai/coach', 'POST', {
+      message: text,
+      currentExercise: currentCoachContext?.currentExercise
+    });
+
+    if (res.success) {
+      addCoachMessage(res.reply, "assistant");
+
+      // Handle rich responses from the intelligent coach
+      if (res.alternatives && res.alternatives.length) {
+        const html = res.alternatives.map(a => 
+          `<div class="suggestion-chip" onclick="quickAsk('\( {a}')"> \){a}</div>`
+        ).join('');
+        const div = document.createElement('div');
+        div.innerHTML = `<div style="margin:12px 0 8px;display:flex;gap:8px;flex-wrap:wrap">${html}</div>`;
+        document.getElementById('chatMessages').appendChild(div);
+      }
+
+      if (res.suggestion) {
+        const tip = document.createElement('div');
+        tip.style.cssText = 'margin-top:10px;padding:10px 14px;background:rgba(201,168,76,0.1);border-radius:12px;font-size:0.9rem;';
+        tip.innerHTML = `<strong>💡 Coach Tip:</strong> ${res.suggestion}`;
+        document.getElementById('chatMessages').appendChild(tip);
+      }
+    }
+  } catch (e) {
+    addCoachMessage("Sorry, I'm having a quick rest. Try again in a moment.", "assistant");
+  } finally {
+    _LM.hide();
+  }
+}
+
+function quickAsk(question) {
+  const input = document.getElementById('coachInput') as HTMLInputElement;
+  input.value = question;
+  sendCoachMessage();
+}
+
+function addCoachMessage(text: string, sender: 'user' | 'assistant') {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = sender === 'user' ? 'user-message' : 'coach-message';
+  div.innerHTML = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
 </script>
 </body>
 </html>
