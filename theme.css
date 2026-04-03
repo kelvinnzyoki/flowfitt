@@ -90,8 +90,8 @@ html.light-mode .sidebar .user-info h4 {
    ===================================================================== */
 
 /* 1. Main Backgrounds, Sidebars, and Navs */
-html.light-mode body {
-  background-image: none !important; /* Removes the dark radial glow */
+/*html.light-mode body {
+  background-image: none !important; 
   background-color: var(--ink) !important;
 }
 
@@ -103,7 +103,7 @@ html.light-mode .top-nav {
 }
 
 /* 2. Stubborn Cards, Grids, and Panels */
-html.light-mode .main-content > .card,
+/*html.light-mode .main-content > .card,
 html.light-mode .main-content > .section,
 html.light-mode .content-grid .card,
 html.light-mode .content-grid > div,
@@ -120,7 +120,7 @@ html.light-mode .continue-banner {
 }
 
 /* 3. Inner Items (Workout rows, achievements, quick nav) */
-html.light-mode .workout-item,
+/*html.light-mode .workout-item,
 html.light-mode .wp-hist-row,
 html.light-mode .quick-nav-card,
 html.light-mode .achievement-badge,
@@ -131,7 +131,7 @@ html.light-mode .exercise-item {
 }
 
 /* 4. Text inside stubborn dark items */
-html.light-mode .workout-info h4,
+/*html.light-mode .workout-info h4,
 html.light-mode .achievement-info h4,
 html.light-mode .wp-hist-label,
 html.light-mode .ff-confirm-title {
@@ -144,7 +144,7 @@ html.light-mode .wp-key {
 }
 
 /* 5. Headers & Banners */
-html.light-mode .header,
+/*html.light-mode .header,
 html.light-mode .page-header {
   background: linear-gradient(135deg, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 50%, transparent 100%) !important;
 }
@@ -156,7 +156,7 @@ html.light-mode .empty-section {
 }
 
 /* 6. AI Coach & Confirm Modals */
-html.light-mode .ai-modal,
+/*html.light-mode .ai-modal,
 html.light-mode .ff-confirm-backdrop {
   background: rgba(255, 255, 255, 0.75) !important;
 }
@@ -195,7 +195,7 @@ html.light-mode .ai-modal-header {
 }
 
 /* 7. W-Points specific fixes */
-html.light-mode .wpoints-circle {
+/*html.light-mode .wpoints-circle {
   background: #ffffff !important;
 }
 html.light-mode .wp-row {
@@ -203,4 +203,4 @@ html.light-mode .wp-row {
 }
 html.light-mode .wpoints-rule {
   background: rgba(0,0,0,0.03) !important;
-}
+}*/
