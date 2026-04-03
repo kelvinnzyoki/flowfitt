@@ -1,4 +1,4 @@
-/* theme.css - Dark/Light Mode for FlowFit */
+/* theme.css - Improved Dark/Light Mode for FlowFit */
 
 .theme-toggle-btn {
   background: rgba(201,168,76,0.1);
@@ -20,24 +20,70 @@
   transform: rotate(25deg);
 }
 
-/* Light Mode Variables */
+/* ====================== LIGHT MODE ====================== */
 body.light-mode {
-  --ink: #f8f6f0;
-  --ink-1: #f0ede4;
-  --t1: #1a170f;
-  --t2: #555148;
-  --Au: #8E6E28;
+  --ink: #f8f6f0;           /* Main background */
+  --ink-1: #f0ede4;         /* Cards & surfaces */
+  --ink-2: #e8e4d9;         /* Deeper surfaces */
+  --t1: #1a170f;            /* Primary text */
+  --t2: #555148;            /* Secondary text */
+  --Au: #8E6E28;            /* Gold accent (darker for light bg) */
+  --b1: rgba(142,110,40,0.25); /* Borders */
   background: var(--ink);
   color: var(--t1);
 }
 
-/* Adapt common elements */
-body.light-mode .nav,
-body.light-mode .ai-modal,
-body.light-mode .ai-coach-content,
+/* Fix common dark-only elements */
+body.light-mode .nav {
+  background: rgba(248,246,240,0.98);
+  border-bottom: 1px solid rgba(142,110,40,0.3);
+}
+
 body.light-mode .pricing-card,
-body.light-mode .feature-card {
+body.light-mode .feature-card,
+body.light-mode .workout-preview,
+body.light-mode .ai-coach-content,
+body.light-mode .ai-modal .ai-coach-content {
   background: #fff;
+  border-color: rgba(142,110,40,0.35);
+  color: var(--t1);
+}
+
+body.light-mode .stats-grid,
+body.light-mode .features-grid,
+body.light-mode .pricing-grid {
+  background: rgba(142,110,40,0.15);
+}
+
+body.light-mode .stat-item,
+body.light-mode .feature-card,
+body.light-mode .pricing-card {
+  background: #fff;
+}
+
+body.light-mode .hero::before {
+  background: linear-gradient(108deg, rgba(248,246,240,0.96) 0%, rgba(248,246,240,0.65) 46%, rgba(248,246,240,0.92) 100%);
+}
+
+/* Text visibility fixes */
+body.light-mode .status-pill,
+body.light-mode .plan-badge {
   color: #1a170f;
-  border-color: rgba(142,110,40,0.3);
+}
+
+body.light-mode .t2 {
+  color: var(--t2);
+}
+
+/* Make sure gold still pops */
+body.light-mode .logo-flow,
+body.light-mode .logo-fit {
+  color: var(--Au);
+}
+
+/* Fix any remaining dark backgrounds */
+body.light-mode .g-card,
+body.light-mode .surface {
+  background: #fff !important;
+  color: var(--t1) !important;
 }
