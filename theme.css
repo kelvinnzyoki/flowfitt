@@ -1,4 +1,147 @@
-/* theme.css - Improved Dark/Light Mode for FlowFit */
+/* ====================== THEME SYSTEM ====================== */
+
+/* -------- DEFAULT: DARK MODE -------- */
+:root {
+  --ink: #0f1115;          /* Main background */
+  --ink-1: #171a21;        /* Cards */
+  --ink-2: #1f2430;        /* Elevated surfaces */
+
+  --t1: #f5f5f5;           /* Primary text */
+  --t2: #a1a1a1;           /* Secondary text */
+
+  --Au: #C9A84C;           /* Accent gold */
+
+  --b1: rgba(201,168,76,0.25);
+
+  --card-bg: #171a21;
+  --surface-bg: #1f2430;
+}
+
+/* -------- LIGHT MODE -------- */
+body.light-mode {
+  --ink: #f8f6f0;
+  --ink-1: #f0ede4;
+  --ink-2: #e8e4d9;
+
+  --t1: #1a170f;
+  --t2: #555148;
+
+  --Au: #8E6E28;
+
+  --b1: rgba(142,110,40,0.25);
+
+  --card-bg: #ffffff;
+  --surface-bg: #ffffff;
+
+  background: var(--ink);
+  color: var(--t1);
+}
+
+/* ====================== GLOBAL RESET ====================== */
+
+body {
+  background: var(--ink);
+  color: var(--t1);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Ensure all elements inherit correct color */
+body * {
+  color: inherit;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5 {
+  color: var(--t1);
+}
+
+p, span, small, li {
+  color: var(--t2);
+}
+
+/* ====================== COMPONENT SYSTEM ====================== */
+
+/* Cards & surfaces */
+.pricing-card,
+.feature-card,
+.workout-preview,
+.ai-coach-content,
+.ai-modal .ai-coach-content,
+.stat-item,
+.g-card,
+.surface {
+  background: var(--card-bg);
+  color: var(--t1);
+  border: 1px solid var(--b1);
+  transition: all 0.3s ease;
+}
+
+/* Sections */
+section {
+  background: transparent;
+}
+
+/* Grids / containers */
+.stats-grid,
+.features-grid,
+.pricing-grid {
+  background: rgba(201,168,76,0.08);
+}
+
+body.light-mode .stats-grid,
+body.light-mode .features-grid,
+body.light-mode .pricing-grid {
+  background: rgba(142,110,40,0.08);
+}
+
+/* Navigation */
+.nav {
+  background: var(--ink);
+  border-bottom: 1px solid var(--b1);
+  transition: all 0.3s ease;
+}
+
+body.light-mode .nav {
+  background: rgba(248,246,240,0.95);
+}
+
+/* Hero overlay fix */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    108deg,
+    rgba(15,17,21,0.9) 0%,
+    rgba(15,17,21,0.6) 50%,
+    rgba(15,17,21,0.9) 100%
+  );
+}
+
+body.light-mode .hero::before {
+  background: linear-gradient(
+    108deg,
+    rgba(248,246,240,0.96) 0%,
+    rgba(248,246,240,0.65) 50%,
+    rgba(248,246,240,0.92) 100%
+  );
+}
+
+/* Pills / badges */
+.status-pill,
+.plan-badge {
+  color: var(--t1);
+  background: var(--surface-bg);
+  border: 1px solid var(--b1);
+}
+
+/* Accent elements */
+.logo-flow,
+.logo-fit {
+  color: var(--Au);
+}
+
+/* ====================== BUTTON ====================== */
 
 .theme-toggle-btn {
   background: rgba(201,168,76,0.1);
@@ -20,70 +163,15 @@
   transform: rotate(25deg);
 }
 
-/* ====================== LIGHT MODE ====================== */
-body.light-mode {
-  --ink: #f8f6f0;           /* Main background */
-  --ink-1: #f0ede4;         /* Cards & surfaces */
-  --ink-2: #e8e4d9;         /* Deeper surfaces */
-  --t1: #1a170f;            /* Primary text */
-  --t2: #555148;            /* Secondary text */
-  --Au: #8E6E28;            /* Gold accent (darker for light bg) */
-  --b1: rgba(142,110,40,0.25); /* Borders */
-  background: var(--ink);
-  color: var(--t1);
+/* ====================== FORCE FIXES ====================== */
+
+/* Kill hardcoded dark backgrounds */
+body.light-mode [style*="background"] {
+  background: var(--card-bg) !important;
 }
 
-/* Fix common dark-only elements */
-body.light-mode .nav {
-  background: rgba(248,246,240,0.98);
-  border-bottom: 1px solid rgba(142,110,40,0.3);
-}
-
-body.light-mode .pricing-card,
-body.light-mode .feature-card,
-body.light-mode .workout-preview,
-body.light-mode .ai-coach-content,
-body.light-mode .ai-modal .ai-coach-content {
-  background: #fff;
-  border-color: rgba(142,110,40,0.35);
-  color: var(--t1);
-}
-
-body.light-mode .stats-grid,
-body.light-mode .features-grid,
-body.light-mode .pricing-grid {
-  background: rgba(142,110,40,0.15);
-}
-
-body.light-mode .stat-item,
-body.light-mode .feature-card,
-body.light-mode .pricing-card {
-  background: #fff;
-}
-
-body.light-mode .hero::before {
-  background: linear-gradient(108deg, rgba(248,246,240,0.96) 0%, rgba(248,246,240,0.65) 46%, rgba(248,246,240,0.92) 100%);
-}
-
-/* Text visibility fixes */
-body.light-mode .status-pill,
-body.light-mode .plan-badge {
-  color: #1a170f;
-}
-
-body.light-mode .t2 {
-  color: var(--t2);
-}
-
-/* Make sure gold still pops */
-body.light-mode .logo-flow,
-body.light-mode .logo-fit {
-  color: var(--Au);
-}
-
-/* Fix any remaining dark backgrounds */
-body.light-mode .g-card,
-body.light-mode .surface {
-  background: #fff !important;
-  color: var(--t1) !important;
+/* Prevent random dark sections */
+body.light-mode div,
+body.light-mode section {
+  background-color: transparent;
 }
