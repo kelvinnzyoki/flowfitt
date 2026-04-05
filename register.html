@@ -770,6 +770,157 @@ body {
             .notif-panel{ left:0; width:100vw; }
             .notif-overlay{ left:0; }
         }
+
+
+        ‎.theme-toggle-btn {
+‎  width: 28px;
+‎  height: 28px;
+‎  border-radius: 50%;
+‎  background: var(--Au-12);
+‎  border: 1px solid var(--Au-rim);
+‎  color: var(--Au);
+‎  display: flex;
+‎  align-items: center;
+‎  justify-content: center;
+‎  font-size: 0.85rem;
+‎  cursor: pointer;
+‎  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+‎  padding: 0;
+‎  flex-shrink: 0;
+‎}
+‎
+‎.theme-toggle-btn:hover {
+‎  background: var(--Au-25);
+‎  transform: scale(1.15);
+‎  box-shadow: 0 2px 8px rgba(201,168,76,0.25);
+‎}
+‎
+‎.theme-toggle-btn:active {
+‎  transform: scale(0.95);
+‎}
+‎
+‎
+‎/* ═══ LIGHT MODE TEXT VISIBILITY FIXES ════════════════════════ */
+‎html.light-mode h1,
+‎html.light-mode h2,
+‎html.light-mode h3,
+‎html.light-mode h4,
+‎html.light-mode h5,
+‎html.light-mode h6,
+‎html.light-mode .page-title,
+‎html.light-mode .section-title,
+‎html.light-mode .card-title {
+‎  color: #0a0a0a !important;
+‎  background: none !important;
+‎  -webkit-text-fill-color: unset !important;
+‎}
+‎
+‎html.light-mode p,
+‎html.light-mode label,
+‎html.light-mode span:not(.nav-icon):not([class*="badge"]),
+‎html.light-mode .text-body {
+‎  color: #404040 !important;
+‎}
+‎
+‎html.light-mode .text-secondary,
+‎html.light-mode .text-muted,
+‎html.light-mode .meta {
+‎  color: #737373 !important;
+‎}
+‎
+‎/* Cards & Backgrounds */
+‎html.light-mode body {
+‎  background: #fafafa !important;
+‎}
+‎
+‎html.light-mode .card,
+‎html.light-mode .panel,
+‎html.light-mode .section,
+‎html.light-mode [class*="card"] {
+‎  background: #ffffff !important;
+‎  border: 1px solid rgba(0,0,0,0.08) !important;
+‎  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+‎}
+‎
+‎/* Inputs */
+‎html.light-mode input,
+‎html.light-mode select,
+‎html.light-mode textarea {
+‎  background: #ffffff !important;
+‎  color: #0a0a0a !important;
+‎  border: 1px solid rgba(0,0,0,0.12) !important;
+‎}
+‎
+‎html.light-mode input::placeholder,
+‎html.light-mode textarea::placeholder {
+‎  color: #a3a3a3 !important;
+‎}
+‎
+‎/* Sidebar */
+‎html.light-mode .sidebar {
+‎  background: rgba(255,255,255,0.98) !important;
+‎  border-right: 1px solid rgba(0,0,0,0.08) !important;
+‎}
+‎
+‎html.light-mode .sidebar .nav-link {
+‎  color: #404040 !important;
+‎}
+‎
+‎html.light-mode .sidebar .nav-link:hover {
+‎  color: #B8860B !important;
+‎  background: rgba(0,0,0,0.04) !important;
+‎}
+‎
+‎html.light-mode .sidebar .nav-link.active {
+‎  color: #ffffff !important;
+‎  background: linear-gradient(135deg, #B8860B, #D4AF37) !important;
+‎}
+‎
+‎/* Tables */
+‎html.light-mode table th {
+‎  background: #fafafa !important;
+‎  color: #0a0a0a !important;
+‎  border-bottom: 2px solid rgba(0,0,0,0.08) !important;
+‎}
+‎
+‎html.light-mode table td {
+‎  color: #404040 !important;
+‎  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+‎}
+‎
+‎html.light-mode table tr:hover {
+‎  background: rgba(0,0,0,0.02) !important;
+‎}
+‎
+‎/* Buttons */
+‎html.light-mode .btn-primary {
+‎  background: linear-gradient(135deg, #B8860B, #D4AF37) !important;
+‎  color: #ffffff !important;
+‎}
+‎
+‎html.light-mode .btn-ghost,
+‎html.light-mode .btn-outline {
+‎  background: transparent !important;
+‎  color: #404040 !important;
+‎  border: 1px solid rgba(0,0,0,0.12) !important;
+‎}
+‎
+‎html.light-mode .btn-ghost:hover,
+‎html.light-mode .btn-outline:hover {
+‎  background: rgba(0,0,0,0.04) !important;
+‎  border-color: rgba(0,0,0,0.20) !important;
+‎}
+‎
+‎/* Remove yellow hue from any background elements */
+‎html.light-mode .blob-1,
+‎html.light-mode .blob-2,
+‎html.light-mode .blob-3,
+‎html.light-mode [class*="blob"],
+‎html.light-mode .hero::after {
+‎  opacity: 0 !important;
+‎  display: none !important;
+‎}
+        
 </style>
 </head>
 <body>
