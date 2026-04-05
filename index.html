@@ -1893,22 +1893,7 @@ footer {
      NAVIGATION
 ══════════════════════════════════════ -->
 <nav id="mainNav">
-
-  <!--
-  ╔══════════════════════════════════════════════════╗
-  ║  FLOWFIT LOGO                                    ║
-  ║                                                  ║
-  ║  Mark: A stylized flame/motion glyph.            ║
-  ║  Three stacked chevrons pointing right —         ║
-  ║  each progressively smaller, creating a          ║
-  ║  sense of forward acceleration and flow.         ║
-  ║  The gap between chevrons echoes the letter F.   ║
-  ║                                                  ║
-  ║  Wordmark: "FLOW" thin 100wt + "FIT" 400wt       ║
-  ║  stacked vertically, all-caps, wide-tracked.     ║
-  ╚══════════════════════════════════════════════════╝
-  -->
-  <a class="logo-wrap" aria-label="FlowFit">
+  <a href="index.html" class="logo-wrap" aria-label="FlowFit">
     <div class="logo-mark">
       <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -1922,33 +1907,30 @@ footer {
             <stop offset="100%" stop-color="#0d0b18"/>
           </linearGradient>
         </defs>
-        <!-- Outer circle ring — dashed arc suggests "progress/orbit" -->
         <circle cx="19" cy="19" r="17.5" fill="url(#bgA)"/>
-        <circle cx="19" cy="19" r="16"
-          stroke="url(#pulseA)" stroke-width="1.6" fill="none"
-          stroke-dasharray="68 32" stroke-dashoffset="20"
-          stroke-linecap="round" opacity=".55"/>
-        <!-- ECG heartbeat line — flat→rise→fall→rise→flat -->
-        <polyline
-          points="3,19  8,19  11,9  14,27  17,13  20,22  23,19  35,19"
-          stroke="url(#pulseA)"
-          stroke-width="2.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          fill="none"/>
+        <circle cx="19" cy="19" r="16" stroke="url(#pulseA)" stroke-width="1.6" fill="none" stroke-dasharray="68 32" stroke-dashoffset="20" stroke-linecap="round" opacity=".55"/>
+        <polyline points="3,19  8,19  11,9  14,27  17,13  20,22  23,19  35,19" stroke="url(#pulseA)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
     </div>
     <div class="logo-wordmark">
       <span class="logo-flow">Flow</span>
       <span class="logo-fit">Fit</span>
-
     </div>
-
-          <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle dark/light mode">
-  <span id="themeIcon">☀️</span>
-          </button>
   </a>
 
+  <div style="display: flex; align-items: center; gap: 1.5rem;">
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="login.html" class="btn btn-ghost">Login</a></li>
+      <li><a href="register.html" class="btn btn-primary">Sign Up</a></li>
+    </ul>
+    
+    <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle dark/light mode">
+      <span id="themeIcon">☀️</span>
+    </button>
+  </div>
+                                                                   </nav>
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
