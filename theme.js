@@ -1,6 +1,4 @@
 // FLOWFIT — Theme System
-// Uses .light-mode class on <html>. localStorage key: 'flowfit-theme'
-
 // PRELOAD: prevent flash of wrong theme before JS runs
 (function () {
     const saved = localStorage.getItem('flowfit-theme');
@@ -21,7 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateIcon();
 
     if (btn) {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             root.classList.toggle('light-mode');
             const isLight = root.classList.contains('light-mode');
             localStorage.setItem('flowfit-theme', isLight ? 'light' : 'dark');
