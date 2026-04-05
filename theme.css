@@ -1,0 +1,300 @@
+/* =====================================================================
+   FLOWFIT — THEME SYSTEM
+   
+   Dark mode is the default (:root in each page's <style> block).
+   This file only defines what changes in light mode.
+   
+   theme.js toggles the 'light-mode' class on <html>.
+   localStorage key: 'flowfit-theme'
+   ===================================================================== */
+
+/* ── LIGHT MODE ROOT OVERRIDES ─────────────────────────────────────── */
+html.light-mode {
+    /* Backgrounds */
+    --ink:          #f4f4f5;
+    --ink-1:        #ffffff;
+    --ink-2:        #e4e4e7;
+    --g-card:       linear-gradient(145deg, #ffffff, #f8f9fa);
+    --surface:      rgba(255,255,255,0.96);
+    --surface-deep: rgba(248,248,250,0.98);
+    --surface-2:    rgba(240,240,244,0.90);
+    --card:         rgba(255,255,255,0.97);
+    --bg-card:      linear-gradient(145deg, #ffffff, #f8f9fa);
+    --bg-deep:      #f4f4f5;
+    --bg-primary:   #f4f4f5;
+    --bg-surface:   #ffffff;
+    --bg-sidebar:   #ffffff;
+    --bg-elevated:  #e4e4e7;
+    --bg-dark:      #f4f4f5;
+    --sid:          #ffffff;
+
+    /* Text */
+    --t1:           #0f172a;
+    --t2:           #475569;
+    --t3:           #94a3b8;
+    --t4:           #334155;
+    --text-primary: #0f172a;
+    --text-secondary:#475569;
+    --text-dim:     #475569;
+    --text-muted:   #94a3b8;
+    --s:            #475569;
+    --smoke:        #475569;
+
+    /* Borders */
+    --b1:           rgba(142,110,40,0.20);
+    --b2:           rgba(142,110,40,0.35);
+    --b3:           rgba(0,0,0,0.05);
+    --b4:           rgba(0,0,0,0.08);
+    --border:       rgba(142,110,40,0.20);
+    --border-gold:  rgba(142,110,40,0.20);
+    --border-gold-hover: rgba(142,110,40,0.40);
+    --border-subtle: rgba(0,0,0,0.05);
+
+    /* Gold — slightly richer for contrast on white */
+    --Au:           #B8860B;
+    --Au-hi:        #D4AF37;
+    --Au-lo:        #7A5C08;
+
+    /* Au alpha tints → neutral on white (prevents yellow hue) */
+    --Au-04:        rgba(0,0,0,0.02);
+    --Au-06:        rgba(0,0,0,0.03);
+    --Au-07:        rgba(0,0,0,0.03);
+    --Au-mist:      rgba(0,0,0,0.03);
+    --Au-09:        rgba(0,0,0,0.04);
+    --Au-10:        rgba(0,0,0,0.04);
+    --Au-12:        rgba(0,0,0,0.05);
+    --Au-14:        rgba(0,0,0,0.05);
+    --Au-15:        rgba(0,0,0,0.05);
+    --Au-20:        rgba(0,0,0,0.06);
+    --Au-25:        rgba(142,110,40,0.12);
+    --Au-28:        rgba(142,110,40,0.14);
+    --Au-30:        rgba(142,110,40,0.15);
+    --Au-35:        rgba(142,110,40,0.18);
+    --Au-38:        rgba(142,110,40,0.20);
+    --Au-40:        rgba(142,110,40,0.22);
+    --Au-44:        rgba(142,110,40,0.24);
+    --Au-50:        rgba(142,110,40,0.28);
+    --Au-60:        rgba(142,110,40,0.35);
+    --Au-glow:      rgba(142,110,40,0.10);
+    --Au-rim:       rgba(142,110,40,0.22);
+
+    /* White overlays → dark on light bg */
+    --white-02:     rgba(0,0,0,0.02);
+    --white-03:     rgba(0,0,0,0.03);
+    --white-04:     rgba(0,0,0,0.04);
+    --white-05:     rgba(0,0,0,0.05);
+    --white-06:     rgba(0,0,0,0.05);
+    --white-08:     rgba(0,0,0,0.06);
+    --white-10:     rgba(0,0,0,0.07);
+    --white-12:     rgba(0,0,0,0.08);
+    --white-15:     rgba(0,0,0,0.10);
+    --white-20:     rgba(0,0,0,0.12);
+    --white-22:     rgba(0,0,0,0.14);
+    --white-28:     rgba(0,0,0,0.16);
+    --white-38:     rgba(0,0,0,0.20);
+
+    /* Shadows */
+    --shadow-card:       0 4px 20px rgba(0,0,0,0.10);
+    --shadow-gold-glow:  0 0 20px rgba(142,110,40,0.08);
+
+    /* Gradients update */
+    --gradient-gold-soft: linear-gradient(135deg,rgba(142,110,40,0.08),rgba(142,110,40,0.04));
+}
+
+/* ── THEME TOGGLE BUTTON ───────────────────────────────────────────── */
+.theme-toggle-btn {
+    background: var(--Au-12);
+    border: 1px solid var(--Au-rim);
+    color: var(--Au);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    padding: 0;
+    flex-shrink: 0;
+}
+.theme-toggle-btn:hover {
+    background: var(--Au-25);
+    transform: scale(1.1);
+}
+
+/* ── LIGHT MODE FORCED OVERRIDES ───────────────────────────────────── */
+/* Body background */
+html.light-mode body {
+    background-image: none !important;
+    background-color: var(--ink) !important;
+}
+
+/* Sidebar */
+html.light-mode .sidebar,
+html.light-mode nav,
+html.light-mode .top-nav {
+    background: rgba(255,255,255,0.97) !important;
+    border-color: var(--b1) !important;
+}
+
+html.light-mode .sidebar .nav-link {
+    color: var(--t2) !important;
+}
+html.light-mode .sidebar .nav-link:hover {
+    color: var(--Au) !important;
+    background: var(--Au-12) !important;
+}
+html.light-mode .sidebar .nav-link.active {
+    color: #000 !important;
+    background: linear-gradient(135deg,var(--Au),var(--Au-hi)) !important;
+}
+html.light-mode .sidebar .user-info h4,
+html.light-mode .sidebar .logo,
+html.light-mode .sidebar .nav-link span {
+    color: var(--t1) !important;
+}
+
+/* Cards */
+html.light-mode .stat-card,
+html.light-mode .chart-card,
+html.light-mode .panel-card,
+html.light-mode .workout-preview,
+html.light-mode .pricing-card,
+html.light-mode .plan-card,
+html.light-mode .continue-banner,
+html.light-mode .wpoints-card,
+html.light-mode .section,
+html.light-mode .content-grid .card {
+    background: var(--g-card) !important;
+    border-color: var(--b1) !important;
+}
+
+/* Inner items */
+html.light-mode .workout-item,
+html.light-mode .wp-hist-row,
+html.light-mode .quick-nav-card,
+html.light-mode .achievement-badge,
+html.light-mode .exercise-item,
+html.light-mode .plan-feature-list li {
+    background: #ffffff !important;
+    border-color: var(--b1) !important;
+    color: var(--t1) !important;
+}
+
+/* Text that needs explicit color in light mode */
+html.light-mode .workout-info h4,
+html.light-mode .achievement-info h4,
+html.light-mode .wp-hist-label,
+html.light-mode .ff-confirm-title,
+html.light-mode h1, html.light-mode h2, html.light-mode h3,
+html.light-mode h4, html.light-mode h5, html.light-mode h6 {
+    color: var(--t1) !important;
+}
+html.light-mode .qn-label,
+html.light-mode .wp-key,
+html.light-mode p,
+html.light-mode label,
+html.light-mode span:not(.nav-icon):not(.plan-badge):not([class*="badge"]) {
+    color: var(--t2);
+}
+
+/* Gradient text (hero, greeting) — make visible on light bg */
+html.light-mode .greeting,
+html.light-mode .hero-text h1,
+html.light-mode .page-title {
+    background: linear-gradient(to right, var(--t1) 0%, var(--t2) 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* Hero background */
+html.light-mode .hero::before {
+    background: linear-gradient(
+        108deg,
+        rgba(244,244,245,0.96) 0%,
+        rgba(244,244,245,0.65) 46%,
+        rgba(255,255,255,0.90) 100%
+    ) !important;
+}
+
+/* Headers */
+html.light-mode .header,
+html.light-mode .page-header {
+    background: linear-gradient(135deg,
+        rgba(142,110,40,0.08) 0%,
+        rgba(142,110,40,0.03) 50%,
+        transparent 100%
+    ) !important;
+}
+
+/* Empty states */
+html.light-mode .empty-state,
+html.light-mode .empty-section {
+    color: var(--t2) !important;
+    background: #ffffff !important;
+}
+
+/* Modals */
+html.light-mode .ai-modal,
+html.light-mode .ff-confirm-backdrop {
+    background: rgba(255,255,255,0.75) !important;
+}
+html.light-mode .ai-coach-content,
+html.light-mode .ai-modal-content,
+html.light-mode .ff-confirm-box {
+    background: var(--g-card) !important;
+    border-color: var(--b1) !important;
+}
+html.light-mode .chat-messages { background: #f8f9fa !important; }
+html.light-mode .quick-suggestions,
+html.light-mode .chat-input-area {
+    background: #ffffff !important;
+    border-color: var(--b1) !important;
+}
+html.light-mode .chat-input-area input,
+html.light-mode .ai-input {
+    background: #f1f5f9 !important;
+    color: var(--t1) !important;
+    border-color: var(--b1) !important;
+}
+html.light-mode .ai-coach-header,
+html.light-mode .ai-modal-header { background: #ffffff !important; }
+
+/* WPoints */
+html.light-mode .wpoints-circle { background: #ffffff !important; }
+html.light-mode .wp-row { border-bottom-color: rgba(0,0,0,0.05) !important; }
+html.light-mode .wpoints-rule { background: rgba(0,0,0,0.03) !important; }
+
+/* Inputs */
+html.light-mode input,
+html.light-mode select,
+html.light-mode textarea {
+    background: #ffffff !important;
+    color: var(--t1) !important;
+    border-color: var(--b1) !important;
+}
+html.light-mode input::placeholder,
+html.light-mode textarea::placeholder {
+    color: var(--t3) !important;
+}
+
+/* Tables */
+html.light-mode table th {
+    background: rgba(0,0,0,0.04) !important;
+    color: var(--t1) !important;
+}
+html.light-mode table td { color: var(--t2) !important; }
+
+/* Notification panel */
+html.light-mode .notif-panel {
+    background: #ffffff !important;
+    border-color: var(--b1) !important;
+}
+html.light-mode .notif-item { border-bottom-color: rgba(0,0,0,0.05) !important; }
+html.light-mode .notif-item:hover { background: rgba(0,0,0,0.02) !important; }
+html.light-mode .notif-item.unread { background: rgba(142,110,40,0.04) !important; }
+html.light-mode .notif-title { color: var(--t1) !important; }
+html.light-mode .notif-body { color: var(--t2) !important; }
+html.light-mode .notif-panel-title { color: var(--t1) !important; }
