@@ -10,7 +10,27 @@
     
     
   <style>
-:root,
+
+    
+:root,/* ═══ GLOBAL OVERFLOW PREVENTION ═════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100%;
+}
+
+    
 [data-theme="dark"] {
     /* ── Ink (backgrounds) ─────────────────────────── */
     --ink:          #07060c;
