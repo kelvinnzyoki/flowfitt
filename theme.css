@@ -298,3 +298,50 @@ html.light-mode .notif-item.unread { background: rgba(142,110,40,0.04) !importan
 html.light-mode .notif-title { color: var(--t1) !important; }
 html.light-mode .notif-body { color: var(--t2) !important; }
 html.light-mode .notif-panel-title { color: var(--t1) !important; }
+
+
+/* =====================================================================
+   LAYOUT & OVERFLOW FIXES
+   ===================================================================== */
+body, html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure grids never push out of bounds */
+.stats-grid,
+.features-grid,
+.pricing-grid,
+.hero-content,
+.footer-content {
+    width: 100% !important;
+    max-width: var(--col-max) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* =====================================================================
+   LIGHT MODE: HERO HUE & BLOB NEUTRALIZER
+   ===================================================================== */
+/* Make the hero overlay a clean, icy white-to-transparent gradient */
+html.light-mode .hero::before {
+    background: linear-gradient(
+        108deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.40) 50%,
+        rgba(255, 255, 255, 0.95) 100%
+    ) !important;
+}
+
+/* Drastically tone down the floating background blobs in light mode 
+   so they don't cast a dirty yellow/blue hue over the white background */
+html.light-mode .blob-1,
+html.light-mode .blob-2,
+html.light-mode .blob-3 {
+    opacity: 0.15 !important;
+    filter: blur(150px) !important;
+}
