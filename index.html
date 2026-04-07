@@ -344,7 +344,7 @@ nav.scrolled {
   align-items: center;
   gap: 0.75rem;
   text-decoration: none;
-  transition: transform 0.2s ease;
+  
 }
 
 .logo-wrap:hover {
@@ -689,7 +689,8 @@ nav.scrolled {
   background-color: var(--ink); 
   /* Image styling: zoomed out effect */
   background-image: url('fit.webp');
-  background-position: center center; 
+  background-position: center center;
+  background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed; /* Keeps the parallax effect */
 }
@@ -702,9 +703,9 @@ nav.scrolled {
   z-index: 1;
   background: linear-gradient(
     108deg,
-    rgba(7,6,12,0.85) 0%, /* Darker on the left for text readability */
-    rgba(7,6,12,0.45) 50%, /* Lighter in the middle */
-    rgba(7,6,12,0.75) 100%
+    rgba(7,6,12,0.82) 0%, /* Darker on the left for text readability */
+    rgba(7,6,12,0.38) 50%, /* Lighter in the middle */
+    rgba(7,6,12,0.72) 100%
   );
 }
 
@@ -712,9 +713,9 @@ nav.scrolled {
 html.light-mode .hero::before {
   background: linear-gradient(
     108deg,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.50) 50%,
-    rgba(255, 255, 255, 0.85) 100%
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.42) 50%,
+    rgba(255, 255, 255, 0.80) 100%
   ) !important;
 }
 
@@ -823,7 +824,10 @@ html.light-mode .hero-text p {
 
 /* ✅ LIGHT MODE: Remove yellow hue completely */
 html.light-mode .hero {
-  background: #fafafa !important;
+  background-image: url('fit.webp') !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-color: transparent !important;
 }
 
 
