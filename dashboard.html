@@ -3935,22 +3935,7 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
 </script>
 
 
-<script>
-// AI Coach Functions
-let currentCoachContext = null;
-
-function openCoachModal(exerciseName = null) {
-  console.log("🟢 openCoachModal called");   // ← Debug line
-  currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
-  const modal = document.getElementById('aiCoachModal');
-  if (modal) {
-    modal.style.display = 'flex';
-    document.getElementById('chatMessages').innerHTML = '';
-    setTimeout(() => {
-      addCoachMessage("Hi 👋 I'm your AI Coach. What can I help you with today?", "assistant");
-    }, 300);
-  } else {
-    alert("Modal not found in DOM. Check if HTML is added before 
+ 
 
 
   
