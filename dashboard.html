@@ -3977,7 +3977,7 @@ async function sendCoachMessage() {
     if (typeof _LM !== 'undefined') _LM.show();
 
     try {
-        const res = await apiRequest('/api/ai/coach', 'POST', {
+        const res = await apiRequest('ai/coach', 'POST', {
             message: text,
             currentExercise: currentCoachContext?.currentExercise
         });
