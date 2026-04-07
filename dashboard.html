@@ -3972,10 +3972,17 @@ async function sendCoachMessage() {
 
     try {
         // CORRECT ENDPOINT based on your routing
-        const res = await apiRequest('/api/v1/ai/coach', 'POST', {
-            message: text,
-            currentExercise: currentCoachContext?.currentExercise
-        });
+        const res = await fetch('/api/v1/ai/coach', {
+    method: 'POST',
+    credentials: 'include', 
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        message,
+        currentExercise
+    })
+});
 
         if (res?.success && res?.reply) {
             addCoachMessage(res.reply, "assistant");
