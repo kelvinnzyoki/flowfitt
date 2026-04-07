@@ -3939,25 +3939,20 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
 
 
   <script>
-// ── AI COACH MODAL (clean & working) ─────────────────────────────────────
+// ── AI COACH (Correct endpoint + better error handling) ─────────────────────
 let currentCoachContext = null;
 
 function openCoachModal(exerciseName = null) {
     currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
-    
     const modal = document.getElementById('aiCoachModal');
-    if (!modal) {
-        console.error("❌ AI Coach modal not found in DOM");
-        return;
-    }
+    if (!modal) return console.error("Modal not found");
     
     modal.style.display = 'flex';
     document.getElementById('chatMessages').innerHTML = '';
     
-    // Welcome message
     setTimeout(() => {
-        addCoachMessage("Hi 👋 I'm your AI Coach. I can help with form, substitutions, adjustments, motivation, or even predict your future progress. What’s on your mind today?", "assistant");
-    }, 300);
+        addCoachMessage("Hi 👋 I'm your AI Coach. Ask me about form, substitutions, motivation, pain adjustments — anything fitness related!", "assistant");
+    }, 400);
 }
 
 function closeCoachModal() {
@@ -3973,23 +3968,23 @@ async function sendCoachMessage() {
     addCoachMessage(text, "user");
     input.value = '';
 
-    // Show loading if LoadingManager exists
     if (typeof _LM !== 'undefined') _LM.show();
 
     try {
+        // CORRECT ENDPOINT based on your routing
         const res = await apiRequest('/api/v1/ai/coach', 'POST', {
             message: text,
             currentExercise: currentCoachContext?.currentExercise
         });
 
-        if (res.success && res.reply) {
+        if (res?.success && res?.reply) {
             addCoachMessage(res.reply, "assistant");
         } else {
-            addCoachMessage("Sorry, I'm having a quick rest. Try again in a moment.", "assistant");
+            addCoachMessage("Sorry, something went wrong. Please try again.", "assistant");
         }
     } catch (e) {
-        console.error(e);
-        addCoachMessage("Sorry, I'm having a quick rest. Try again in a moment.", "assistant");
+        console.error("AI Coach request failed:", e);
+        addCoachMessage("Sorry, I'm having a quick rest. Please try again in a moment.", "assistant");
     } finally {
         if (typeof _LM !== 'undefined') _LM.hide();
     }
@@ -4006,7 +4001,6 @@ function quickAsk(question) {
 function addCoachMessage(text, sender) {
     const container = document.getElementById('chatMessages');
     if (!container) return;
-    
     const div = document.createElement('div');
     div.className = sender === 'user' ? 'user-message' : 'coach-message';
     div.innerHTML = text;
@@ -4015,10 +4009,11 @@ function addCoachMessage(text, sender) {
 }
 
 // Close modal when clicking outside
-document.getElementById('aiCoachModal').addEventListener('click', function(e) {
+document.getElementById('aiCoachModal').addEventListener('click', e => {
     if (e.target.id === 'aiCoachModal') closeCoachModal();
 });
   </script>
+
 
 
 
