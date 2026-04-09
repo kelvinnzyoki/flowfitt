@@ -4,77 +4,169 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blog — FlowFit</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="theme.css">
   <script src="theme.js" defer></script>
+  
   <style>
-    .legal-container {
-      max-width: 1100px;
-      margin: 120px auto 4rem;
-      padding: 0 2rem;
+    body {
+      background-color: var(--ink, #07060c);
+      color: var(--t1, #F0EBE0);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.7;
     }
-    .legal-container h1 {
-      font-family: 'Lora', serif;
-      font-size: 3.2rem;
-      color: var(--Au);
-      margin-bottom: 1.5rem;
+    
+    .simple-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(7, 6, 12, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--b1, rgba(201,168,76,0.15));
+      z-index: 1000;
     }
-    .blog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
+    .logo-text {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 1.1rem; font-weight: 600; letter-spacing: 0.25em;
+      color: var(--t1, #fff); text-decoration: none; text-transform: uppercase;
     }
-    .blog-card {
-      background: var(--g-card);
-      border: 1px solid var(--b1);
-      border-radius: 20px;
-      padding: 2rem;
+    .logo-text span { color: var(--Au, #C9A84C); }
+    .back-link {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--t2, #8A8590); text-decoration: none;
+      border: 1px solid var(--b1, rgba(201,168,76,0.15)); 
+      padding: 0.6rem 1.2rem; border-radius: 8px;
       transition: all 0.3s ease;
     }
-    .blog-card:hover {
-      transform: translateY(-8px);
-      border-color: var(--Au);
+    .back-link:hover { color: var(--Au, #C9A84C); border-color: var(--Au); background: rgba(201,168,76,0.05); }
+
+    .blog-container {
+      max-width: 1100px;
+      margin: 130px auto 5rem;
+      padding: 0 2rem;
     }
+    
+    .blog-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .blog-header h1 {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--t1, #fff);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .blog-header p {
+      color: var(--t2, #8A8590);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .blog-card {
+      background: var(--g-card, linear-gradient(145deg, rgba(20,18,32,0.95), rgba(14,13,22,0.95)));
+      border: 1px solid var(--b1, rgba(201,168,76,0.15));
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .blog-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--Au, #C9A84C);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    
     .blog-card h3 {
-      color: var(--Au);
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--Au, #C9A84C);
+      line-height: 1.4;
       margin-bottom: 1rem;
     }
+    
+    .blog-card p {
+      color: var(--t2, #8A8590);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      flex-grow: 1;
+    }
+    
+    .blog-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--t3, #44404A);
+      border-top: 1px solid var(--b3, rgba(255,255,255,0.05));
+      padding-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    footer { text-align: center; padding: 2rem; border-top: 1px solid var(--b3, rgba(255,255,255,0.05)); color: var(--t3, #44404A); font-size: 0.85rem; }
   </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a href="index.html" class="logo-wrap">FlowFit</a>
-  <a href="index.html" class="btn btn-ghost">Back to Home</a>
+<nav class="simple-nav">
+  <a href="index.html" class="logo-text">Flow<span>Fit</span></a>
+  <a href="index.html" class="back-link">Back to Home</a>
 </nav>
 
-<div class="legal-container">
-  <h1>FlowFit Blog</h1>
-  <p style="color:var(--t2); max-width:700px;">Expert training tips, workout science, nutrition advice, and real success stories from the FlowFit community.</p>
+<div class="blog-container">
+  <div class="blog-header">
+    <h1>FlowFit Blog</h1>
+    <p>Expert training tips, workout science, nutrition advice, and real success stories from the community.</p>
+  </div>
 
   <div class="blog-grid">
     <div class="blog-card">
       <h3>How to Break Through a Strength Plateau</h3>
-      <p style="color:var(--t2);">The science-backed strategies that actually work when your progress stalls.</p>
-      <small style="color:#8A8590;">March 28, 2026 • 6 min read</small>
+      <p>The science-backed strategies that actually work when your progress stalls. Learn how to adjust volume, intensity, and recovery.</p>
+      <div class="blog-meta">
+        <span>March 28, 2026</span>
+        <span>6 min read</span>
+      </div>
     </div>
+    
     <div class="blog-card">
       <h3>Why Progressive Overload Is the Only Thing That Matters</h3>
-      <p style="color:var(--t2);">How to apply it correctly in your home workouts for maximum results.</p>
-      <small style="color:#8A8590;">March 25, 2026 • 8 min read</small>
+      <p>Forget the fitness fads. Discover how to apply the fundamental law of muscle growth correctly in your home workouts for maximum results.</p>
+      <div class="blog-meta">
+        <span>March 25, 2026</span>
+        <span>8 min read</span>
+      </div>
     </div>
+    
     <div class="blog-card">
       <h3>Best At-Home Exercises for Busy Professionals</h3>
-      <p style="color:var(--t2);">Time-efficient workouts that deliver real results even with limited time.</p>
-      <small style="color:#8A8590;">March 20, 2026 • 5 min read</small>
+      <p>Time-efficient, high-yield workouts that deliver real physiological adaptations even when you only have 20 minutes to spare.</p>
+      <div class="blog-meta">
+        <span>March 20, 2026</span>
+        <span>5 min read</span>
+      </div>
     </div>
   </div>
 </div>
 
-<footer class="footer">
-  <div class="container">
-    <p>© 2026 FlowFit. All rights reserved.</p>
-  </div>
+<footer>
+  <p>© 2026 FlowFit. All rights reserved.</p>
 </footer>
 
 </body>
