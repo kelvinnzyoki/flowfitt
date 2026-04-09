@@ -4,63 +4,150 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Us — FlowFit</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="theme.css">
   <script src="theme.js" defer></script>
+  
   <style>
-    .legal-container {
-      max-width: 900px;
-      margin: 120px auto 4rem;
-      padding: 0 2rem;
+    body {
+      background-color: var(--ink, #07060c);
+      color: var(--t1, #F0EBE0);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.7;
     }
-    .legal-container h1 {
-      font-family: 'Lora', serif;
-      font-size: 3.2rem;
-      color: var(--Au);
-      margin-bottom: 1.5rem;
+    
+    .simple-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(7, 6, 12, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--b1, rgba(201,168,76,0.15));
+      z-index: 1000;
     }
-    .contact-info {
-      margin: 3rem 0;
+    .logo-text {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 1.1rem; font-weight: 600; letter-spacing: 0.25em;
+      color: var(--t1, #fff); text-decoration: none; text-transform: uppercase;
     }
-    .contact-info a {
-      color: var(--Au);
+    .logo-text span { color: var(--Au, #C9A84C); }
+    .back-link {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--t2, #8A8590); text-decoration: none;
+      border: 1px solid var(--b1, rgba(201,168,76,0.15)); 
+      padding: 0.6rem 1.2rem; border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .back-link:hover { color: var(--Au, #C9A84C); border-color: var(--Au); background: rgba(201,168,76,0.05); }
+
+    .legal-container { 
+      max-width: 700px; 
+      margin: 120px auto 5rem; 
+      padding: 0 2rem; 
+      text-align: center;
+    }
+    .legal-container h1 { 
+      font-family: 'Josefin Sans', sans-serif; 
+      font-size: 2.8rem; 
+      font-weight: 300;
+      color: var(--t1, #fff); 
+      margin-bottom: 1rem; 
+      letter-spacing: 0.02em;
+    }
+    .subtitle {
+      color: var(--t2, #8A8590);
+      font-size: 1.1rem;
+      margin-bottom: 4rem;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      text-align: left;
+    }
+
+    .contact-card {
+      background: var(--g-card, linear-gradient(145deg, rgba(20,18,32,0.95), rgba(14,13,22,0.95)));
+      border: 1px solid var(--b1, rgba(201,168,76,0.15));
+      border-radius: 16px;
+      padding: 2rem;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .contact-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--Au, #C9A84C);
+    }
+
+    .contact-card h2 {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--Au, #C9A84C);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.8rem;
+    }
+    
+    .contact-card p {
+      color: var(--t2, #8A8590);
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-card a {
+      color: var(--t1, #fff);
       text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid var(--Au, #C9A84C);
+      padding-bottom: 2px;
+      transition: color 0.2s;
     }
+    .contact-card a:hover { color: var(--Au-hi, #E8C96A); }
+    
+    footer { text-align: center; padding: 2rem; border-top: 1px solid var(--b3, rgba(255,255,255,0.05)); color: var(--t3, #44404A); font-size: 0.85rem; margin-top: 4rem;}
   </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a href="index.html" class="logo-wrap">FlowFit</a>
-  <a href="index.html" class="btn btn-ghost">Back to Home</a>
+<nav class="simple-nav">
+  <a href="index.html" class="logo-text">Flow<span>Fit</span></a>
+  <a href="index.html" class="back-link">Back to Home</a>
 </nav>
 
 <div class="legal-container">
-  <h1>Contact Us</h1>
-  <p>We’d love to hear from you.</p>
+  <h1>Get in Touch</h1>
+  <p class="subtitle">Have a question or need assistance? We’d love to hear from you.</p>
 
-  <div class="contact-info">
-    <h2>Support</h2>
-    <p>Email: <a href="mailto:support@flowfit.cctamcc.site">support@flowfit.cctamcc.site</a></p>
-    <p>We usually reply within 12 hours (Monday – Friday).</p>
+  <div class="contact-grid">
+    <div class="contact-card">
+      <h2>Technical Support</h2>
+      <p>Having trouble with your account, workouts, or billing? Reach out to our support team.</p>
+      <p>Email: <a href="mailto:support@flowfit.cctamcc.site">support@flowfit.cctamcc.site</a></p>
+      <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 1rem;">Replies typically within 12 hours (Mon–Fri).</p>
+    </div>
+
+    <div class="contact-card">
+      <h2>Business & Partnerships</h2>
+      <p>Interested in collaborating or discussing business opportunities?</p>
+      <p>Email: <a href="mailto:hello@flowfit.cctamcc.site">hello@flowfit.cctamcc.site</a></p>
+    </div>
+
+    <div class="contact-card">
+      <h2>Follow Our Journey</h2>
+      <p>Stay updated on new features and fitness tips.</p>
+      <p>Twitter/X: <a href="https://twitter.com/Kelvinmaitha2" target="_blank" rel="noopener">@Kelvinmaitha2</a></p>
+    </div>
   </div>
-
-  <div class="contact-info">
-    <h2>Business & Partnerships</h2>
-    <p>Email: <a href="mailto:hello@flowfit.cctamcc.site">hello@flowfit.cctamcc.site</a></p>
-  </div>
-
-  <div class="contact-info">
-    <h2>Follow Our Journey</h2>
-    <p>Twitter/X (@Kelvinmaitha2)</p>
-  </div>
-
-  <p style="margin-top:4rem;color:var(--t2);">Thank you for being part of the FlowFit family.</p>
 </div>
 
-<footer class="footer">
-  <div class="container">
-    <p>© 2026 FlowFit. All rights reserved.</p>
-  </div>
+<footer>
+  <p>© 2026 FlowFit. All rights reserved.</p>
 </footer>
 
 </body>
