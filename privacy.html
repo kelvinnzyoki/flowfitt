@@ -4,51 +4,140 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy — FlowFit</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="theme.css">
   <script src="theme.js" defer></script>
+  
   <style>
-    .legal-container { max-width: 900px; margin: 120px auto 4rem; padding: 0 2rem; }
-    .legal-container h1 { font-family: 'Lora', serif; font-size: 3.2rem; color: var(--Au); margin-bottom: 1.5rem; }
-    .legal-container h2 { font-family: 'Lora', serif; font-size: 1.9rem; color: var(--Au); margin: 3rem 0 1.2rem; }
-    .legal-container p, .legal-container li { color: var(--t2); font-size: 1.05rem; line-height: 1.85; }
+    body {
+      background-color: var(--ink, #07060c);
+      color: var(--t1, #F0EBE0);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.7;
+    }
+    
+    /* Clean Minimal Nav */
+    .simple-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(7, 6, 12, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--b1, rgba(201,168,76,0.15));
+      z-index: 1000;
+    }
+    .logo-text {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 1.1rem; font-weight: 600; letter-spacing: 0.25em;
+      color: var(--t1, #fff); text-decoration: none; text-transform: uppercase;
+    }
+    .logo-text span { color: var(--Au, #C9A84C); }
+    .back-link {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--t2, #8A8590); text-decoration: none;
+      border: 1px solid var(--b1, rgba(201,168,76,0.15)); 
+      padding: 0.6rem 1.2rem; border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .back-link:hover {
+      color: var(--Au, #C9A84C);
+      border-color: var(--Au, #C9A84C);
+      background: rgba(201,168,76,0.05);
+    }
+
+    /* Page Content */
+    .legal-container { 
+      max-width: 800px; 
+      margin: 120px auto 5rem; 
+      padding: 0 2rem; 
+    }
+    .legal-container h1 { 
+      font-family: 'Josefin Sans', sans-serif; 
+      font-size: 2.4rem; 
+      font-weight: 400;
+      color: var(--Au, #C9A84C); 
+      margin-bottom: 0.5rem; 
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .last-updated {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--t2, #8A8590);
+      margin-bottom: 3rem;
+      display: block;
+    }
+    .legal-container h2 { 
+      font-family: 'Josefin Sans', sans-serif; 
+      font-size: 1.4rem; 
+      font-weight: 400;
+      color: var(--Au-hi, #E8C96A); 
+      margin: 2.5rem 0 1rem; 
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--b3, rgba(255,255,255,0.05));
+      padding-bottom: 0.5rem;
+    }
+    .legal-container p { 
+      color: var(--t2, #8A8590); 
+      font-size: 1rem; 
+      line-height: 1.8; 
+      margin-bottom: 1.2rem;
+    }
+    .legal-container strong {
+      color: var(--t1, #F0EBE0);
+      font-weight: 600;
+    }
+    .legal-container a {
+      color: var(--Au, #C9A84C);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .legal-container a:hover {
+      border-bottom-color: var(--Au, #C9A84C);
+    }
+    
+    footer { text-align: center; padding: 2rem; border-top: 1px solid var(--b3, rgba(255,255,255,0.05)); color: var(--t3, #44404A); font-size: 0.85rem; }
   </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a href="index.html" class="logo-wrap">FlowFit</a>
-  <a href="index.html" class="btn btn-ghost">Back to Home</a>
+<nav class="simple-nav">
+  <a href="index.html" class="logo-text">Flow<span>Fit</span></a>
+  <a href="index.html" class="back-link">Back to Home</a>
 </nav>
 
 <div class="legal-container">
   <h1>Privacy Policy</h1>
-  <p><strong>Last updated: April 3, 2026</strong></p>
+  <span class="last-updated">Last updated: April 3, 2026</span>
 
   <p>FlowFit is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your information.</p>
 
   <h2>1. Information We Collect</h2>
-  <p>Personal Information: name, email, hashed password, subscription and payment data.</p>
-  <p>Fitness Data: workout logs, progress, streaks, and achievements.</p>
-  <p>Technical Data: device information, IP address, usage analytics.</p>
+  <p><strong>Personal Information:</strong> name, email, hashed password, subscription and payment data.</p>
+  <p><strong>Fitness Data:</strong> workout logs, progress, streaks, and achievements.</p>
+  <p><strong>Technical Data:</strong> device information, IP address, usage analytics.</p>
 
   <h2>2. How We Use Your Information</h2>
-  <p>To provide and improve the Service, process payments, send important updates, and ensure security.</p>
-  <p>We <strong>do not sell</strong> your personal data to third parties.</p>
+  <p>To provide and improve the Service, process payments, send important updates, and ensure security. We <strong>do not sell</strong> your personal data to third parties.</p>
 
   <h2>3. Data Sharing</h2>
-  <p>We only share data with trusted partners (Stripe, M-Pesa, hosting providers) under strict agreements.</p>
+  <p>We only share data with trusted partners (Stripe, M-Pesa, hosting providers) under strict agreements to facilitate payment and host our application securely.</p>
 
   <h2>4. Your Rights</h2>
   <p>You can access, correct, or delete your data at any time by contacting us.</p>
 
   <h2>Contact Us</h2>
-  <p>Email: <a href="mailto:support@flowfit.cctamcc.site" style="color:var(--Au)">support@flowfit.cctamcc.site</a></p>
+  <p>Email us at <a href="mailto:support@flowfit.cctamcc.site">support@flowfit.cctamcc.site</a>.</p>
 </div>
 
-<footer class="footer">
-  <div class="container">
-    <p>© 2026 FlowFit. All rights reserved.</p>
-  </div>
+<footer>
+  <p>© 2026 FlowFit. All rights reserved.</p>
 </footer>
 
 </body>
