@@ -1205,71 +1205,82 @@ body {
     }
 
     async function submitStep1() {
-        clearStep1Error();
-        const name     = document.getElementById('name').value.trim();
-        const email    = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const confirm  = document.getElementById('confirmPassword').value;
-        const terms    = document.getElementById('terms').checked;
+  clearStep1Error();
+  const name     = document.getElementById('name').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const confirm  = document.getElementById('confirmPassword').value;
+  const terms    = document.getElementById('terms').checked;
 
-        if (!name || name.length < 2) {
-            showStep1Error('Please enter your full name (at least 2 characters).');
-            return;
-        }
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            showStep1Error('Please enter a valid email address.');
-            return;
-        }
-        if (emailChecked && !emailAvailable) {
-            showStep1Error('This email is already registered. Please login instead.');
-            return;
-        }
-        if (password.length < 8) {
-            showStep1Error('Password must be at least 8 characters.');
-            return;
-        }
-        if (password !== confirm) {
-            showStep1Error('Passwords do not match.');
-            return;
-        }
-        if (!terms) {
-            showStep1Error('Please accept the terms and conditions.');
-            return;
-        }
+  if (!name || name.length < 2) {
+    showStep1Error('Please enter your full name (at least 2 characters).');
+    return;
+  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showStep1Error('Please enter a valid email address.');
+    return;
+  }
+  if (emailChecked && !emailAvailable) {
+    showStep1Error('This email is already registered. Please login instead.');
+    return;
+  }
+  if (password.length < 8) {
+    showStep1Error('Password must be at least 8 characters.');
+    return;
+  }
+  if (password !== confirm) {
+    showStep1Error('Passwords do not match.');
+    return;
+  }
+  if (!terms) {
+    showStep1Error('Please accept the terms and conditions.');
+    return;
+  }
 
-        const btn = document.getElementById('step1Btn');
-        btn.disabled    = true;
-        btn.textContent = 'Sending Code...';
+  const btn = document.getElementById('step1Btn');
+  btn.disabled    = true;
+  btn.textContent = 'Creating account & sending code...';
 
-        try {
-            // First check if email is taken (if not checked yet) by attempting to send OTP.
-            // The backend send-otp endpoint should reject already-registered emails.
-            await sendOtp(email);
+  try {
+    // === NEW: Register FIRST (creates unverified user) ===
+    const registerResult = await AuthAPI.register({
+      name,
+      email,
+      password,
+    });
 
-            pendingEmail    = email;
-            pendingName     = name;
-            pendingPassword = password;
+    if (!registerResult?.success) {
+      throw new Error(registerResult?.error || 'Registration failed');
+    }
 
-            document.getElementById('emailDisplay').textContent = email;
-            showStep(2);
-            setupOtpInputs();
-            startResendTimer(60);
+    // Now send OTP
+    await sendOtp(email);
 
-        } catch (err) {
-            const msg = err.message || '';
-            if (msg.toLowerCase().includes('exist') || msg.toLowerCase().includes('register') ||
-                msg.toLowerCase().includes('taken') || msg.toLowerCase().includes('already')) {
-                showStep1Error('This email is already registered. Please login instead.');
-                document.getElementById('email').classList.add('error-field');
-                document.getElementById('emailStatus').textContent = 'Email already registered.';
-                document.getElementById('emailStatus').className   = 'email-status taken';
-            } else {
-                showStep1Error(err.message || 'Failed to send code. Please try again.');
-            }
-        } finally {
-            btn.disabled    = false;
-            btn.textContent = 'Send Verification Code';
-        }
+    pendingEmail = email;
+    // We no longer need these (user is already created)
+    pendingName = '';
+    pendingPassword = '';
+
+    document.getElementById('emailDisplay').textContent = email;
+    showStep(2);
+    setupOtpInputs();
+    startResendTimer(60);
+
+  } catch (err) {
+    const msg = err.message || '';
+    if (msg.toLowerCase().includes('exist') || msg.toLowerCase().includes('already') ||
+        msg.toLowerCase().includes('taken') || msg.toLowerCase().includes('register')) {
+      showStep1Error('This email is already registered. Please login instead.');
+      document.getElementById('email').classList.add('error-field');
+      document.getElementById('emailStatus').textContent = 'Email already registered.';
+      document.getElementById('emailStatus').className = 'email-status taken';
+    } else {
+      showStep1Error(err.message || 'Failed to send code. Please try again.');
+    }
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Send Verification Code';
+  }
     }
 
     /* ── Send OTP via API ────────────────────────────────────────────────── */
@@ -1331,67 +1342,58 @@ body {
     }
 
     /* ── Verify OTP then register ────────────────────────────────────────── */
-    async function verifyOtp() {
-        const otp  = getOtpValue();
-        const err2 = document.getElementById('step2Error');
-        const ok2  = document.getElementById('step2Success');
-        err2.classList.remove('show');
-        ok2.classList.remove('show');
+async function verifyOtp() {
+  const otp  = getOtpValue();
+  const err2 = document.getElementById('step2Error');
+  const ok2  = document.getElementById('step2Success');
+  err2.classList.remove('show');
+  ok2.classList.remove('show');
 
-        if (otp.length !== 6) {
-            err2.textContent = 'Please enter all 6 digits.';
-            err2.classList.add('show');
-            return;
-        }
+  if (otp.length !== 6) {
+    err2.textContent = 'Please enter all 6 digits.';
+    err2.classList.add('show');
+    return;
+  }
 
-        const btn = document.getElementById('step2Btn');
-        btn.disabled    = true;
-        btn.textContent = 'Verifying...';
+  const btn = document.getElementById('step2Btn');
+  btn.disabled    = true;
+  btn.textContent = 'Verifying...';
 
-        try {
-            // Step 1: verify the OTP with the backend
-            const vRes  = await fetch('https://fit.cctamcc.site/api/v1/auth/verify-otp', {
-                method:      'POST',
-                headers:     { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body:        JSON.stringify({ email: pendingEmail, otp, purpose: 'registration' }),
-            });
-            const vData = await vRes.json().catch(() => ({}));
-            if (!vRes.ok) throw new Error(vData.error || vData.message || 'Incorrect code. Please try again.');
+  try {
+    // Only verify the OTP — user was already created in step 1
+    const vRes  = await fetch('https://fit.cctamcc.site/api/v1/auth/verify-otp', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({ email: pendingEmail, otp, purpose: 'registration' }),
+    });
+    const vData = await vRes.json().catch(() => ({}));
 
-            // Step 2: create the account (OTP verified — safe to register)
-            btn.textContent = 'Creating Account...';
-            const result = await AuthAPI.register({
-                name:     pendingName,
-                email:    pendingEmail,
-                password: pendingPassword,
-            });
+    if (!vRes.ok) throw new Error(vData.error || vData.message || 'Incorrect code. Please try again.');
 
-            if (result.success) {
-                ok2.textContent = 'Email verified! Account created.';
-                ok2.classList.add('show');
-                showStep(3);
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
-            }
+    // Success!
+    ok2.textContent = 'Email verified! Account created.';
+    ok2.classList.add('show');
+    showStep(3);
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
 
-        } catch (err) {
-            const msg = err.message || '';
-            if (msg.toLowerCase().includes('exist') || msg.toLowerCase().includes('taken')) {
-                err2.textContent = 'This email is already registered. Please login.';
-            } else {
-                err2.textContent = msg || 'Verification failed. Please try again.';
-            }
-            err2.classList.add('show');
+  } catch (err) {
+    const msg = err.message || '';
+    if (msg.toLowerCase().includes('exist') || msg.toLowerCase().includes('taken')) {
+      err2.textContent = 'This email is already registered. Please login.';
+    } else {
+      err2.textContent = msg || 'Verification failed. Please try again.';
+    }
+    err2.classList.add('show');
 
-            // Shake the OTP boxes
-            document.getElementById('otpInputs').style.animation = 'none';
-            setTimeout(() => {
-                document.getElementById('otpInputs').style.animation = 'shake 0.4s ease';
-            }, 10);
-        } finally {
-            btn.disabled    = false;
-            btn.textContent = 'Verify & Create Account';
-        }
+    // Shake animation
+    const inputs = document.getElementById('otpInputs');
+    inputs.style.animation = 'none';
+    setTimeout(() => { inputs.style.animation = 'shake 0.4s ease'; }, 10);
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Verify & Create Account';
+  }
     }
 
     /* ── Resend OTP with countdown ───────────────────────────────────────── */
