@@ -4637,7 +4637,208 @@ function handleLogout() {
 <script>
 // ── Notification System ─────────────────────────────────────────────────────
 
+(function () {
+  const BASE = (typeof API_CONFIG !== 'undefined' && API_CONFIG.baseURL)
+    ? API_CONFIG.baseURL
+    : 'https://fit.cctamcc.site/api/v1';
 
+  let _open   = false;
+  let _data   = [];
+  let _timer  = null;
+
+  function _token() {
+    return (typeof TokenManager !== 'undefined' && TokenManager.getAccessToken)
+      ? TokenManager.getAccessToken()
+      : (localStorage.getItem('accessToken') || '');
+  }
+  function _auth() {
+    return typeof isAuthenticated !== 'undefined'
+      ? isAuthenticated()
+      : !!_token();
+  }
+
+  /* ── Public API ─────────────────────────────────────────────────────── */
+  window.toggleNotifPanel = function () { _open ? closeNotifPanel() : openNotifPanel(); };
+
+  window.openNotifPanel = function () {
+    _open = true;
+    document.getElementById('notifPanel')?.classList.add('open');
+    document.getElementById('notifOverlay')?.classList.add('open');
+    _fetchFull();
+  };
+
+  window.closeNotifPanel = function () {
+    _open = false;
+    document.getElementById('notifPanel')?.classList.remove('open');
+    document.getElementById('notifOverlay')?.classList.remove('open');
+  };
+
+  /* ── Fetch ──────────────────────────────────────────────────────────── */
+  async function _fetchFull() {
+    if (!_auth()) return;
+    try {
+      const r = await fetch(BASE + '/notifications?limit=30', {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _token() },
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      _data = d.notifications || [];
+      _render(_data);
+      _updateBadge(d.unreadCount || 0);
+    } catch { /* non-critical */ }
+  }
+
+  async function _fetchCount() {
+    if (!_auth()) return;
+    try {
+      const r = await fetch(BASE + '/notifications/unread', {
+        credentials: 'include',
+        headers: { 'Authorization': 'Bearer ' + _token() },
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      _updateBadge(d.count || 0);
+      if (_open) _fetchFull();
+    } catch { /* non-critical */ }
+  }
+
+  /* ── Render ─────────────────────────────────────────────────────────── */
+  function _render(items) {
+    const list    = document.getElementById('notifList');
+    const markBtn = document.getElementById('markAllBtn');
+    if (!list) return;
+
+    const hasUnread = items.some(n => !n.readAt);
+    if (markBtn) markBtn.style.display = hasUnread ? 'block' : 'none';
+
+    if (!items.length) {
+      list.innerHTML = `
+        <div class="notif-empty">
+          <div class="notif-empty-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="22" stroke="#C9A84C" stroke-width="1.5" stroke-opacity="0.4"/>
+              <path d="M16 24a8 8 0 0 1 16 0c0 5 2 7.5 2.5 8h-21C14 31.5 16 29 16 24Z"
+                    fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linejoin="round" stroke-opacity="0.6"/>
+              <path d="M21 32a3 3 0 0 0 6 0" fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
+              <line x1="24" y1="13" x2="24" y2="16" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
+            </svg>
+          </div>
+          <p>All caught up!<br>Notifications about your plan,<br>progress, and milestones appear here.</p>
+        </div>`;
+      return;
+    }
+
+    const ICON_BG = {
+      welcome:       'rgba(201,168,76,0.14)',
+      sub_activated: 'rgba(59,191,138,0.12)',
+      sub_trial:     'rgba(251,191,36,0.12)',
+      sub_expired:   'rgba(156,163,175,0.10)',
+      sub_cancelled: 'rgba(224,84,84,0.12)',
+      sub_renewed:   'rgba(59,191,138,0.12)',
+      sub_failed:    'rgba(224,84,84,0.12)',
+      milestone:     'rgba(201,168,76,0.18)',
+      achievement:   'rgba(201,168,76,0.18)',
+      system:        'rgba(91,156,246,0.12)',
+    };
+
+    list.innerHTML = items.map(n => {
+      const bg  = ICON_BG[n.type] || 'rgba(255,255,255,0.05)';
+      const ago = _timeAgo(new Date(n.createdAt));
+      const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return `
+        <div class="notif-item${n.readAt ? '' : ' unread'}"
+             onclick="handleNotifClick('${n.id}','${esc(n.link || '')}')"
+             data-id="${n.id}">
+          <div class="notif-icon-wrap" style="background:${bg}">${esc(n.icon)}</div>
+          <div class="notif-content">
+            <div class="notif-title">${esc(n.title)}</div>
+            <div class="notif-body">${esc(n.body)}</div>
+            <div class="notif-time">${ago}</div>
+          </div>
+          <button class="notif-delete-btn"
+                  onclick="deleteNotif(event,'${n.id}')"
+                  aria-label="Dismiss">✕</button>
+        </div>`;
+    }).join('');
+  }
+
+  /* ── Badge ──────────────────────────────────────────────────────────── */
+  function _updateBadge(count) {
+    const badge = document.getElementById('sidebarNotifBadge');
+    const btn   = document.getElementById('sidebarNotifBtn');
+    const dot   = document.querySelector('.bell-pulse-dot');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 99 ? '99+' : String(count);
+      badge.classList.add('visible');
+      btn?.classList.add('has-unread');
+      dot?.classList.add('active');
+      // Trigger shake on new unread
+      if (btn) { btn.classList.remove('has-unread'); void btn.offsetWidth; btn.classList.add('has-unread'); }
+    } else {
+      badge.classList.remove('visible');
+      btn?.classList.remove('has-unread');
+      dot?.classList.remove('active');
+    }
+  }
+
+  /* ── Actions ────────────────────────────────────────────────────────── */
+  window.handleNotifClick = async function (id, link) {
+    await _call('/' + id + '/read', 'PUT');
+    const n = _data.find(x => x.id === id);
+    if (n) { n.readAt = new Date().toISOString(); _render(_data); _updateBadge(_data.filter(x => !x.readAt).length); }
+    if (link) { closeNotifPanel(); window.location.href = link; }
+  };
+
+  window.deleteNotif = async function (e, id) {
+    e.stopPropagation();
+    await _call('/' + id, 'DELETE');
+    _data = _data.filter(x => x.id !== id);
+    _render(_data);
+    _updateBadge(_data.filter(x => !x.readAt).length);
+  };
+
+  window.markAllNotifsRead = async function () {
+    await _call('/read-all', 'PUT');
+    _data = _data.map(n => ({ ...n, readAt: n.readAt || new Date().toISOString() }));
+    _render(_data);
+    _updateBadge(0);
+  };
+
+  async function _call(path, method) {
+    try {
+      await fetch(BASE + '/notifications' + path, {
+        method, credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _token() },
+      });
+    } catch { /* silent */ }
+  }
+
+  /* ── Time helper ────────────────────────────────────────────────────── */
+  function _timeAgo(d) {
+    const s = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (s < 60)    return 'just now';
+    if (s < 3600)  return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    const days = Math.floor(s / 86400);
+    return days === 1 ? 'yesterday' : days + 'd ago';
+  }
+
+  /* ── Polling ────────────────────────────────────────────────────────── */
+  function _startPolling() {
+    if (_timer) clearInterval(_timer);
+    _fetchCount(); // immediate check
+    _timer = setInterval(_fetchCount, 90_000); // every 90s
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (_auth()) _startPolling();
+    // Re-check auth after possible login within the page
+    setTimeout(() => { if (_auth() && !_timer) _startPolling(); }, 2000);
+  });
+})();
+  
     
             
     
