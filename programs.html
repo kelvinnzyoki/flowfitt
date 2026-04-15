@@ -10,8 +10,7 @@
   
     
     <link rel="stylesheet" href="theme.css">
-</script>
-    
+<script src="theme.js" defer></script>
   <style>
 
     /* ═══ GLOBAL OVERFLOW PREVENTION ═════════════════════════════ */
@@ -3770,9 +3769,10 @@ html.light-mode .difficulty-badge {
     }
     html.light-mode .notif-panel-header {
       border-bottom: 1px solid rgba(0,0,0,0.08);
+      
     }
-
-    </style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></head>
+    </style>
+</head>
 <body>
 <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
 
@@ -4516,18 +4516,6 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
     });
 })();
 </script>
-<script>
-(function(){
-  if(localStorage.getItem('flowfit-theme')==='light'){document.documentElement.classList.add('light-mode');document.documentElement.dataset.theme='light';}
-  document.addEventListener('DOMContentLoaded',function(){
-    var b=document.getElementById('themeToggle'); if(!b) return;
-    b.addEventListener('click',function(){
-      var isLight = document.documentElement.classList.toggle('light-mode');
-      document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
-      localStorage.setItem('flowfit-theme', isLight ? 'light' : 'dark');
-    });
-  });
-})();
-</script>
+
 </body>
 </html>
