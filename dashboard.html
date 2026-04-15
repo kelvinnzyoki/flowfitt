@@ -3357,7 +3357,9 @@ a.btn,
       border-bottom: 1px solid rgba(0,0,0,0.08);
     }
 
-    </style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></head>
+    </style>
+
+</head>
 <body>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">&#9776;</button>
@@ -3981,50 +3983,8 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
 </script>
 
 
-<script>
-// AI Coach Functions
-let currentCoachContext = null;
+ 
 
-function openCoachModal(exerciseName = null) {
-  console.log("🟢 openCoachModal called");   // ← Debug line
-  currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
-  const modal = document.getElementById('aiCoachModal');
-  if (modal) {
-    modal.style.display = 'flex';
-    document.getElementById('chatMessages').innerHTML = '';
-    setTimeout(() => {
-      addCoachMessage("Hi 👋 I'm your AI Coach. What can I help you with today?", "assistant");
-    }, 300);
-  } else {
-    alert("Modal not found in DOM. Check if HTML is added before 
-<script>
-/* ── FlowFit Theme Manager ────────────────────────────────────────────────────
-   ThemeManager.toggle()        switch dark ↔ light
-   ThemeManager.set("light")    set explicitly
-   ThemeManager.current()       returns "dark" | "light"
-   Toggle button: <button onclick="ThemeManager.toggle()"><span data-theme-icon></span></button>
-   Preference persisted in localStorage("ff-theme"). Respects system preference on first load.
-──────────────────────────────────────────────────────────────────────────── */
-const ThemeManager = (() => {
-    const KEY  = 'ff-theme';
-    const root = document.documentElement;
-    const apply = t => {
-        root.dataset.theme = t;
-        localStorage.setItem(KEY, t);
-        document.querySelectorAll('[data-theme-icon]').forEach(el => {
-            el.textContent = t === 'dark' ? '☀️' : '🌙';
-        });
-    };
-    const saved = localStorage.getItem(KEY);
-    const sys   = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-    apply(saved || sys);
-    return {
-        toggle:  ()  => apply(root.dataset.theme === 'dark' ? 'light' : 'dark'),
-        set:     t   => apply(t),
-        current: ()  => root.dataset.theme || 'dark',
-    };
-})();
-</script>
 
   
 <script>
@@ -4122,6 +4082,9 @@ function addCoachMessage(text, sender) {
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
 }
+</script>
+
+  <script>
 
 /* ══ NOTIFICATION PANEL ════════════════════════════════════════════════════
    Full notification system: fetch, render, badge, mark-read, delete, poll.
@@ -4328,19 +4291,10 @@ function addCoachMessage(text, sender) {
     // Re-check auth after possible login within the page
     setTimeout(() => { if (_auth() && !_timer) _startPolling(); }, 2000);
   });
-})();</script>
-
-<script>
-(function(){
-  if(localStorage.getItem('flowfit-theme')==='light') document.documentElement.classList.add('light-mode');
-  document.addEventListener('DOMContentLoaded',function(){
-    var b=document.getElementById('themeToggle'); if(!b) return;
-    b.addEventListener('click',function(){
-      document.documentElement.classList.toggle('light-mode');
-      localStorage.setItem('flowfit-theme',document.documentElement.classList.contains('light-mode')?'light':'dark');
-    });
-  });
 })();
-</script>
+  
+  </script>
+
+
 </body>
 </html>
