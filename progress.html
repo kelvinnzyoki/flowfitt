@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="theme.css">
-</script>
+<script src="theme.js" defer></script>
     
   <style>
 
@@ -4119,8 +4119,12 @@ html.light-mode .hero::after {
       border-bottom: 1px solid rgba(0,0,0,0.08);
     }
 
-    </style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></head>
-<body><div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  </style>
+</head>
+
+  <body>
+  
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
 <div class="dashboard-container">
   <aside class="sidebar" id="sidebar">
@@ -5137,18 +5141,6 @@ function showConfirm(opts) {
     });
 })();
 </script>
-<script>
-(function(){
-  if(localStorage.getItem('flowfit-theme')==='light'){document.documentElement.classList.add('light-mode');document.documentElement.dataset.theme='light';}
-  document.addEventListener('DOMContentLoaded',function(){
-    var b=document.getElementById('themeToggle'); if(!b) return;
-    b.addEventListener('click',function(){
-      var isLight = document.documentElement.classList.toggle('light-mode');
-      document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
-      localStorage.setItem('flowfit-theme', isLight ? 'light' : 'dark');
-    });
-  });
-})();
-</script>
+
 </body>
 </html>
