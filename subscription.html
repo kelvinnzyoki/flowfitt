@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;200;300;400&family=Lora:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet"/>
     <!-- Theme System -->
 <link rel="stylesheet" href="theme.css">
-</script>
+<script src="theme.js" defer></script>
     <style>
 
         /* ═══ GLOBAL OVERFLOW PREVENTION ═════════════════════════════ */
@@ -3195,7 +3195,7 @@ html.light-mode .hero::after {
 
     </style>
     
-    </script>
+    
 </head>
 <body>
 
@@ -3470,6 +3470,21 @@ html.light-mode .hero::after {
         </div>
     </div>
 </div>
+<!-- Payment method chooser modal -->
+<div class="modal-backdrop" id="paymentModal">
+    <div class="modal-box">
+        <div class="modal-icon" id="pmIcon"></div>
+        <div class="modal-title" id="pmTitle">Subscribe</div>
+        <div class="modal-body" id="pmBody"></div>
+        <div class="modal-actions" id="pmActions" style="flex-direction:column;gap:0.6rem">
+            <!-- Populated by initPlanAction -->
+        </div>
+        <div style="text-align:center;margin-top:0.5rem">
+            <button class="btn-modal btn-modal-ghost" onclick="hideModal('paymentModal')" style="width:100%">Cancel</button>
+        </div>
+    </div>
+</div>
+    
 
 <script src="api.js"></script>
 <script>
@@ -4651,20 +4666,7 @@ document.addEventListener('visibilitychange', () => {
 }());
 </script>
 
-<!-- Payment method chooser modal -->
-<div class="modal-backdrop" id="paymentModal">
-    <div class="modal-box">
-        <div class="modal-icon" id="pmIcon"></div>
-        <div class="modal-title" id="pmTitle">Subscribe</div>
-        <div class="modal-body" id="pmBody"></div>
-        <div class="modal-actions" id="pmActions" style="flex-direction:column;gap:0.6rem">
-            <!-- Populated by initPlanAction -->
-        </div>
-        <div style="text-align:center;margin-top:0.5rem">
-            <button class="btn-modal btn-modal-ghost" onclick="hideModal('paymentModal')" style="width:100%">Cancel</button>
-        </div>
-    </div>
-</div>
+
 
 <script>
 // ── Notification System ─────────────────────────────────────────────────────
@@ -4815,18 +4817,6 @@ document.addEventListener('visibilitychange', () => {
     });
 })();
 </script>
-<script>
-(function(){
-  if(localStorage.getItem('flowfit-theme')==='light'){document.documentElement.classList.add('light-mode');document.documentElement.dataset.theme='light';}
-  document.addEventListener('DOMContentLoaded',function(){
-    var b=document.getElementById('themeToggle'); if(!b) return;
-    b.addEventListener('click',function(){
-      var isLight = document.documentElement.classList.toggle('light-mode');
-      document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
-      localStorage.setItem('flowfit-theme', isLight ? 'light' : 'dark');
-    });
-  });
-})();
-</script>
+
 </body>
 </html>
