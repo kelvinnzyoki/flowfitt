@@ -518,46 +518,7 @@ html.light-mode select:focus,
 html.light-mode textarea:focus {
     outline: 2px solid #B8860B !important;
     outline-offset: 2px !important;
-}
-
-</style>
-<script>
-// FLOWFIT — Theme System (inline)
-(function () {
-    const saved = localStorage.getItem('flowfit-theme');
-    if (saved === 'light') {
-        document.documentElement.classList.add('light-mode');
-        document.documentElement.dataset.theme = 'light';
-    } else {
-        document.documentElement.dataset.theme = 'dark';
-    }
-})();
-
-document.addEventListener('DOMContentLoaded', () => {
-    const btn  = document.getElementById('themeToggle');
-    const icon = document.getElementById('themeIcon');
-    const root = document.documentElement;
-
-    function updateIcon() {
-        if (icon) {
-            icon.textContent = root.classList.contains('light-mode') ? '\u{1F319}' : '\u2600\uFE0F';
-        }
-    }
-
-    updateIcon();
-
-    if (btn) {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const isLight = root.classList.toggle('light-mode');
-            root.dataset.theme = isLight ? 'light' : 'dark';
-            localStorage.setItem('flowfit-theme', isLight ? 'light' : 'dark');
-            updateIcon();
-        });
-    }
-});
-</script>
-  <style>
+  
 :root,
 [data-theme="dark"] {
     /* ── Ink (backgrounds) ─────────────────────────── */
