@@ -1,0 +1,4104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - FlowFit Elite</title>
+    
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="theme.css">
+<script src="theme.js" defer></script>
+  
+<style>
+:root,
+[data-theme="dark"] {
+    /* ── Ink (backgrounds) ─────────────────────────── */
+    --ink:          #07060c;
+    --ink-1:        #0c0b12;
+    --ink-2:        #111019;
+    --g-card:       linear-gradient(145deg,rgba(20,18,32,0.95),rgba(14,13,22,0.95));
+    --surface:      rgba(15,14,24,0.88);
+    --surface-deep: rgba(3,3,3,0.92);
+    --surface-2:    rgba(20,18,32,0.72);
+
+    /* ── Gold (Au) ─────────────────────────────────── */
+    --Au:           #C9A84C;
+    --Au-hi:        #E8C96A;
+    --Au-lo:        #8E6E28;
+    --Au-mist:      rgba(212,175,55,0.08);
+    --Au-rim:       rgba(212,175,55,0.22);
+    --Au-glow:      rgba(212,175,55,0.18);
+    --Au-04:        rgba(212,175,55,0.04);
+    --Au-06:        rgba(212,175,55,0.06);
+    --Au-07:        rgba(212,175,55,0.07);
+    --Au-09:        rgba(212,175,55,0.09);
+    --Au-10:        rgba(212,175,55,0.10);
+    --Au-12:        rgba(212,175,55,0.12);
+    --Au-14:        rgba(212,175,55,0.14);
+    --Au-15:        rgba(212,175,55,0.15);
+    --Au-20:        rgba(212,175,55,0.20);
+    --Au-25:        rgba(212,175,55,0.25);
+    --Au-28:        rgba(212,175,55,0.28);
+    --Au-30:        rgba(212,175,55,0.30);
+    --Au-35:        rgba(212,175,55,0.35);
+    --Au-38:        rgba(212,175,55,0.38);
+    --Au-40:        rgba(212,175,55,0.40);
+    --Au-44:        rgba(212,175,55,0.44);
+    --Au-50:        rgba(212,175,55,0.50);
+    --Au-60:        rgba(212,175,55,0.60);
+    --g-Au:         linear-gradient(135deg,#E8C96A 0%,#C9A84C 50%,#8E6E28 100%);
+    --g-Au2:        linear-gradient(180deg,#E8C96A 0%,#C9A84C 100%);
+    --ga:           linear-gradient(135deg,var(--Au) 0%,var(--Au-hi) 50%,var(--Au-lo) 100%);
+
+    /* ── Accent colours ────────────────────────────── */
+    --sage:         #3BBF8A;
+    --sage-dim:     rgba(59,191,138,0.12);
+    --sage-15:      rgba(59,191,138,0.15);
+    --sage-20:      rgba(59,191,138,0.20);
+    --sage-25:      rgba(59,191,138,0.25);
+    --sage-30:      rgba(59,191,138,0.30);
+    --sky:          #5B9CF6;
+    --sky-dim:      rgba(0,242,254,0.08);
+    --sky-10:       rgba(0,242,254,0.10);
+    --sky-15:       rgba(0,242,254,0.15);
+    --sky-20:       rgba(0,242,254,0.20);
+    --sky-25:       rgba(91,156,246,0.25);
+    --sky-30:       rgba(0,242,254,0.30);
+    --coral:        #E07B54;
+    --red:          #E05454;
+    --red-04:       rgba(224,84,84,0.04);
+    --red-06:       rgba(224,84,84,0.06);
+    --red-08:       rgba(224,84,84,0.08);
+    --red-10:       rgba(224,84,84,0.10);
+    --red-12:       rgba(224,84,84,0.12);
+    --red-20:       rgba(224,84,84,0.20);
+    --red-25:       rgba(224,84,84,0.25);
+    --red-28:       rgba(224,84,84,0.28);
+    --red-30:       rgba(224,84,84,0.30);
+    --red-40:       rgba(224,84,84,0.40);
+    --red-50:       rgba(224,84,84,0.50);
+    --red-60:       rgba(224,84,84,0.60);
+    --red-70:       rgba(224,84,84,0.70);
+    --red-80:       rgba(224,84,84,0.80);
+
+    /* ── Text ──────────────────────────────────────── */
+    --t1:           #F0EBE0;
+    --t2:           #8A8590;
+    --t3:           #44404A;
+    --t4:           #C4BFCA;
+    --t1-05:        rgba(240,235,228,0.05);
+    --t1-09:        rgba(240,235,228,0.09);
+    --t2-65:        rgba(138,133,144,0.65);
+    --t2-70:        rgba(138,133,144,0.70);
+    --t2-85:        rgba(138,133,144,0.85);
+
+    /* ── Borders ───────────────────────────────────── */
+    --b1:           rgba(212,175,55,0.14);
+    --b2:           rgba(212,175,55,0.26);
+    --b3:           rgba(240,235,228,0.05);
+    --b4:           rgba(240,235,228,0.09);
+
+    /* ── Overlays ──────────────────────────────────── */
+    --overlay-30:   rgba(0,0,0,0.30);
+    --overlay-40:   rgba(0,0,0,0.40);
+    --overlay-50:   rgba(0,0,0,0.50);
+    --overlay-60:   rgba(0,0,0,0.60);
+    --overlay-70:   rgba(0,0,0,0.70);
+    --overlay-80:   rgba(0,0,0,0.80);
+    --overlay-90:   rgba(0,0,0,0.90);
+    --white-02:     rgba(255,255,255,0.02);
+    --white-03:     rgba(255,255,255,0.03);
+    --white-04:     rgba(255,255,255,0.04);
+    --white-05:     rgba(255,255,255,0.05);
+    --white-06:     rgba(255,255,255,0.06);
+    --white-08:     rgba(255,255,255,0.08);
+    --white-10:     rgba(255,255,255,0.10);
+    --white-12:     rgba(255,255,255,0.12);
+    --white-15:     rgba(255,255,255,0.15);
+    --white-20:     rgba(255,255,255,0.20);
+    --white-22:     rgba(255,255,255,0.22);
+    --white-28:     rgba(255,255,255,0.28);
+    --white-38:     rgba(255,255,255,0.38);
+
+    /* ── Aliases (legacy / multi-name support) ─────── */
+    --acc:          var(--Au);
+    --accent:       var(--Au);
+    --bg-dark:      var(--ink);
+    --bg-deep:      var(--ink);
+    --bg-primary:   var(--ink);
+    --bg-surface:   var(--ink-1);
+    --bg-sidebar:   var(--ink-1);
+    --bg-elevated:  var(--ink-2);
+    --bg-card:      var(--g-card);
+    --card:         rgba(15,15,18,0.9);
+    --sid:          var(--ink-1);
+    --border:       var(--b1);
+    --border-gold:  var(--b1);
+    --border-gold-hover: rgba(212,175,55,0.45);
+    --border-subtle: var(--b3);
+    --gold-main:    var(--Au);
+    --gold-primary: var(--Au);
+    --gold-bright:  var(--Au-hi);
+    --gold-deep:    var(--Au-lo);
+    --gold-glow:    var(--Au-glow);
+    --gold-soft:    var(--Au-mist);
+    --gold-gradient:var(--g-Au);
+    --gold-gradient-soft: var(--Au-mist);
+    --gradient-gold: var(--ga);
+    --gradient-accent: var(--ga);
+    --gradient-1:   linear-gradient(135deg,var(--Au) 0%,var(--Au) 100%);
+    --gradient-2:   linear-gradient(135deg,var(--Au-lo) 0%,var(--Au) 100%);
+    --gradient-3:   linear-gradient(135deg,var(--Au) 0%,var(--Au-hi) 100%);
+    --gradient-gold-soft: linear-gradient(135deg,var(--Au-12),var(--Au-06));
+    --g1:           linear-gradient(135deg,var(--Au) 0%,var(--Au) 100%);
+    --g2:           linear-gradient(135deg,var(--Au-lo) 0%,var(--Au) 100%);
+    --g3:           linear-gradient(135deg,var(--Au) 0%,var(--Au-hi) 100%);
+    --text-primary: var(--t1);
+    --text-secondary: var(--t2);
+    --text-dim:     var(--t2);
+    --text-muted:   var(--t3);
+    --text-gold:    var(--Au-hi);
+    --s:            var(--t2);
+    --smoke:        var(--t2);
+    --green:        var(--sage);
+    --success:      var(--sage);
+    --danger:       var(--red);
+    --warning:      var(--coral);
+    --action-red:   var(--red);
+    --accent-green: var(--sage);
+    --data-cyan:    var(--sky);
+    --cyan-gradient: linear-gradient(180deg,var(--sky) 0%,var(--sky) 100%);
+    --shadow-card:  0 10px 40px rgba(0,0,0,0.6);
+    --shadow-gold-glow: 0 0 30px rgba(212,175,55,0.15);
+
+    /* ── Typography ────────────────────────────────── */
+    --f-display:    'Josefin Sans', sans-serif;
+    --f-serif:      'Lora', Georgia, serif;
+    --f-mono:       'JetBrains Mono', monospace;
+
+    /* ── Spacing / Radii / Motion ──────────────────── */
+    --sidebar-w:    270px;
+    --col-max:      1340px;
+    --pad-x:        3rem;
+    --r-card:       16px;
+    --r-sm:         10px;
+    --r-pill:       9999px;
+    --radius-card:  var(--r-card);
+    --radius-btn:   var(--r-sm);
+    --ease:         cubic-bezier(0.16,1,0.3,1);
+    --ease-s:       cubic-bezier(0.34,1.56,0.64,1);
+    --transition:   all 0.3s cubic-bezier(0.16,1,0.3,1);
+    --transition-smooth: all 0.4s cubic-bezier(0.165,0.84,0.44,1);
+    --glass-blur:   blur(20px);
+}
+
+        /* ════════════════════════════════════════════
+           FLOWFIT ELITE — OBSIDIAN GOLD DESIGN SYSTEM
+        ════════════════════════════════════════════ */
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        html,body{overflow-x:hidden;max-width:100vw;}
+
+        body {
+            background-color: var(--ink);
+            color: var(--t1);
+            font-family:'Josefin Sans',sans-serif;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 12% 18%, var(--Au-06) 0%, transparent 42%),
+                radial-gradient(circle at 88% 82%, var(--sky-dim) 0%, transparent 38%);
+        }
+
+        /* ── LOADING OVERLAY ─────────────────────────── */
+        #loadingOverlay {
+            position:fixed;inset:0;
+            background:var(--ink);
+            z-index:10000;
+            display:none;flex-direction:column;
+            align-items:center;justify-content:center;
+            transition:opacity 0.5s ease;
+        }
+        .spinner {
+            width:56px;height:56px;
+            border:3px solid var(--Au-15);
+            border-top-color:var(--Au);
+            border-radius:50%;
+            animation:spin 0.9s linear infinite;
+            margin-bottom:1.5rem;
+        }
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .loading-text {
+            font-family:'Josefin Sans',sans-serif;
+            letter-spacing:4px;color:var(--Au);
+            font-size:0.85rem;font-weight:600;
+        }
+
+        /* ── MOBILE MENU BTN ─────────────────────────── */
+        /* ── LAYOUT ──────────────────────────────────── */
+        .dashboard-container{display:flex;min-height:100vh;}
+
+        /* ── SIDEBAR ─────────────────────────────────── */
+        /* ── USER SECTION ────────────────────────────── */
+        /* ── MAIN CONTENT ────────────────────────────── */
+        .main-content {
+            margin-left:280px;
+            padding:3.5rem 4rem;
+            flex:1;
+            width:calc(100% - 280px);
+            min-height:100vh;
+        }
+
+        /* ── HEADER ──────────────────────────────────── */
+        .header{margin-bottom:4rem;}
+        .greeting {
+            font-family:'Josefin Sans',sans-serif;
+            font-size:3rem;text-transform:uppercase;letter-spacing:2px;
+            margin-bottom:0.5rem;
+            background:linear-gradient(to right,var(--t1) 0%,var(--t2) 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .date {
+            font-family:'Josefin Sans',sans-serif;
+            color:var(--Au);letter-spacing:4px;
+            font-weight:600;font-size:0.85rem;
+            display:flex;align-items:center;gap:10px;
+        }
+        .date::before {
+            content:'';display:block;
+            width:36px;height:2px;
+            background:var(--g-Au);border-radius:2px;
+        }
+
+        /* ── STATS GRID ──────────────────────────────── */
+        .stats-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(195px,1fr));
+            gap:1.5rem;margin-bottom:4rem;
+        }
+        .stat-card {
+            background:var(--g-card);
+            backdrop-filter:blur(20px);
+            padding:2.2rem 1.5rem;
+            border-radius:16px;
+            border:1px solid var(--b1);
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            text-align:center;
+            transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
+            position:relative;overflow:hidden;
+            cursor:default;
+        }
+        .stat-card::after {
+            content:'';position:absolute;top:0;left:0;
+            width:100%;height:3px;
+            background:linear-gradient(180deg,var(--sky) 0%,var(--sky) 100%);
+            opacity:0;transition:0.35s;
+        }
+        .stat-card:hover {
+            transform:translateY(-10px);
+            border-color:var(--sky-30);
+            box-shadow:0 20px 50px var(--overlay-60),
+                       0 0 25px var(--sky-10);
+        }
+        .stat-card:hover::after{opacity:1;}
+        .stat-icon{font-size:2rem;margin-bottom:10px;}
+        .stat-value {
+            font-family:'Josefin Sans',sans-serif;
+            font-size:3.8rem;line-height:0.9;margin:8px 0;
+            background:linear-gradient(180deg,var(--sky) 0%,var(--sky) 100%);
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            background-clip:text;
+            filter:drop-shadow(0 0 8px var(--sky-20));
+        }
+        .stat-label {
+            font-family:'Josefin Sans',sans-serif;
+            color:var(--t2);
+            text-transform:uppercase;letter-spacing:3px;
+            font-size:0.78rem;font-weight:600;margin-top:4px;
+        }
+
+        /* ── CONTENT GRID ────────────────────────────── */
+        .content-grid {
+            display:grid;
+            grid-template-columns:1.8fr 1fr;
+            gap:3rem;
+        }
+        .card {
+            background:var(--g-card);
+            backdrop-filter:blur(20px);
+            padding:2.5rem;border-radius:16px;
+            border:1px solid var(--b1);
+            box-shadow:0 8px 30px var(--overlay-40);
+        }
+        .card-header {
+            display:flex;justify-content:space-between;align-items:center;
+            margin-bottom:3rem;
+        }
+        .card-title {
+            font-family:'Josefin Sans',sans-serif;
+            font-size:1.7rem;letter-spacing:2px;
+            color:var(--Au);text-transform:uppercase;
+        }
+        .btn {
+            background:var(--g-Au);color:var(--ink);
+            padding:0.75rem 1.5rem;border-radius:10px;
+            font-family:'Josefin Sans',sans-serif;font-weight:700;
+            text-decoration:none;text-transform:uppercase;
+            letter-spacing:1px;font-size:0.82rem;
+            transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
+            display:inline-flex;align-items:center;gap:6px;
+            border:none;cursor:pointer;
+        }
+        .btn:hover{transform:scale(1.05) translateY(-2px);box-shadow:0 8px 20px var(--Au-glow);}
+        .btn-primary{background:var(--g-Au);color:var(--ink);}
+
+        /* ── SESSION HISTORY ITEMS — ARTISTIC ───────────── */
+        .workout-item {
+            background: linear-gradient(135deg,
+                rgba(212,175,55,0.06) 0%,
+                rgba(20,18,32,0.70) 100%);
+            border: 1px solid var(--b3);
+            border-left: 3px solid var(--Au-07);
+            padding: 1.25rem 1.5rem;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Accent stripe that appears on hover */
+        .workout-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--Au), rgba(212,175,55,0.3));
+            border-radius: 3px 0 0 3px;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .workout-item:last-child { margin-bottom: 0; }
+        .workout-item:hover {
+            background: linear-gradient(135deg,
+                rgba(212,175,55,0.12) 0%,
+                rgba(20,18,32,0.80) 100%);
+            border-left-color: var(--Au);
+            transform: translateX(5px);
+            box-shadow: 0 4px 20px rgba(212,175,55,0.10);
+        }
+        .workout-item:hover::before { opacity: 1; }
+
+        /* Light mode override */
+        html.light-mode .workout-item {
+            background: linear-gradient(135deg,
+                rgba(212,175,55,0.07) 0%,
+                rgba(255,255,255,0.90) 100%);
+            border-left-color: rgba(184,134,11,0.30);
+        }
+        html.light-mode .workout-item:hover {
+            background: linear-gradient(135deg,
+                rgba(212,175,55,0.14) 0%,
+                rgba(255,255,255,0.95) 100%);
+            border-left-color: #B8860B;
+        }
+
+        .workout-info {
+            flex: 1;
+            min-width: 0;
+        }
+        /* Workout name — prominent, tracked */
+        .workout-info h4 {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 1.0rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--t1);
+            margin-bottom: 5px;
+            word-break: break-word;
+            white-space: normal;
+        }
+        html.light-mode .workout-info h4 { color: #0f0e18; }
+
+        /* Date / duration — mono for data feel */
+        .workout-info p {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--t2);
+            letter-spacing: 0.02em;
+            word-break: break-word;
+        }
+        html.light-mode .workout-info p { color: rgba(15,14,24,0.55); }
+
+        /* Stats column — gold mono numbers */
+        .workout-stats {
+            text-align: right;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            line-height: 1.5;
+            background: linear-gradient(135deg, #E8C96A, #C9A84C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+        html.light-mode .workout-stats {
+            background: linear-gradient(135deg, #8E6E28, #B8860B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── ACHIEVEMENT BADGES ──────────────────────── */
+        .achievement-badge {
+            background:linear-gradient(135deg,var(--Au-07),transparent);
+            border:1px solid var(--b1);
+            padding:1.3rem 1.4rem;border-radius:16px;
+            display:flex;align-items:center;gap:1.1rem;
+            margin-bottom:0.8rem;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
+        }
+        .achievement-badge:last-child{margin-bottom:0;}
+        .achievement-badge:hover {
+            transform:scale(1.02);
+            background:var(--Au-10);
+            box-shadow:0 4px 20px var(--Au-glow);
+        }
+        .achievement-icon{font-size:2rem;flex-shrink:0;}
+        .achievement-info h4 {
+            font-family:'Josefin Sans',sans-serif;
+            color:var(--Au);font-size:0.95rem;margin-bottom:2px;
+        }
+        .achievement-info p{font-size:0.78rem;color:var(--t2);line-height:1.4;}
+
+        .empty-state {
+            text-align:center;padding:3rem 1rem;
+            color:var(--t2);
+            font-family:'Josefin Sans',sans-serif;
+            letter-spacing:2px;font-size:0.85rem;
+        }
+
+        /* ── RESPONSIVE ──────────────────────────────── */
+        @media(max-width:1200px){
+            .content-grid{grid-template-columns:1fr;}
+            .main-content{padding:3rem 2.5rem;}
+        }
+        @media(max-width:900px){
+            .main-content{margin-left:76px;width:calc(100% - 76px);padding:2.5rem 2rem;}
+            .greeting{font-size:2.2rem;}
+        }
+        @media(max-width:600px){
+            .main-content{margin-left:0;width:100%;padding:1.5rem 1.25rem;padding-top:5rem;}
+            .greeting{font-size:1.8rem;}
+            .stats-grid{grid-template-columns:1fr 1fr;gap:1.2rem;}
+            .stat-value{font-size:2.8rem;}
+        }
+        @media(max-width:380px){
+            .stats-grid{grid-template-columns:1fr;}
+        }
+    
+
+/* ── CUSTOM CONFIRM MODAL ──────────────────────────── */
+.ff-confirm-backdrop {
+    position: fixed; inset: 0; z-index: 99999;
+    background: var(--overlay-80);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem;
+}
+@keyframes ffSlideUp {
+    from { transform: translateY(24px) scale(0.96); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+.ff-confirm-box {
+    background: var(--ink-2);
+    border: 1px solid var(--Au-35);
+    border-radius: 22px;
+    padding: 2.5rem 2rem 2rem;
+    max-width: 400px; width: 100%;
+    box-shadow: 0 30px 80px var(--overlay-90), 0 0 40px var(--Au-mist);
+    animation: ffSlideUp 0.22s cubic-bezier(0.165,0.84,0.44,1);
+    text-align: center;
+}
+.ff-confirm-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.ff-confirm-title {
+    font-family:'Josefin Sans',sans-serif;
+    font-size: 1.5rem; font-weight: 700;
+    letter-spacing: 1px; color: var(--t1); margin-bottom: 0.6rem;
+}
+.ff-confirm-msg { color: var(--t2); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; }
+.ff-confirm-actions { display: flex; gap: 1rem; }
+.ff-confirm-cancel {
+    flex: 1; padding: 0.9rem;
+    background: var(--white-04);
+    border: 1px solid var(--white-10);
+    border-radius: 12px; color: var(--t2);
+    font-family:'Josefin Sans',sans-serif;
+    font-size: 0.9rem; font-weight: 600; letter-spacing: 1px;
+    cursor: pointer; transition: background 0.2s;
+}
+.ff-confirm-cancel:hover { background: var(--white-10); color: var(--t1); }
+.ff-confirm-ok {
+    flex: 1.4; padding: 0.9rem;
+    background: linear-gradient(135deg,var(--Au) 0%,var(--Au-hi) 50%,var(--Au-lo) 100%);
+    border: none; border-radius: 12px; color: var(--ink);
+    font-family:'Josefin Sans',sans-serif;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.2s;
+}
+.ff-confirm-ok:hover { box-shadow: 0 6px 20px var(--Au-40); }
+.ff-confirm-ok.danger { background: linear-gradient(135deg,var(--red),var(--red)); }
+.ff-confirm-ok.danger:hover { box-shadow: 0 6px 20px var(--red-40); }
+
+
+/* ── SIDEBAR OVERLAY ───────────────────────────────── */
+/* Sidebar sits above overlay */
+/* Prevent body scroll on mobile */
+/* ── Plan tier badge ─── */
+/* ── SIDEBAR: always scrollable ───────────────────────────────────────── */
+/* ── ☰ BUTTON aligned with FLOWFIT logo ───────────────────────────────── */
+
+
+/* ── OVERLAY ───────────────────────────────────────────────────────────── */
+/* ── TOAST: always visible at top ─────────────────────────────────────── */
+#toastArea {
+    position: fixed !important;
+    top: 5rem !important;
+    right: 1.2rem !important;
+    bottom: auto !important;
+    z-index: 99999 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+    max-width: calc(100vw - 2.4rem);
+}
+#toastArea .toast, #toastArea > div[class*="toast"] {
+    pointer-events: all !important;
+    max-width: 360px;
+    min-width: 220px;
+    box-shadow: 0 8px 30px var(--overlay-50) !important;
+}
+@media (max-width: 500px) {
+    #toastArea {
+        top: 4rem !important;
+        left: 0.75rem !important;
+        right: 0.75rem !important;
+        max-width: unset;
+    }
+    #toastArea .toast, #toastArea > div[class*="toast"] {
+        max-width: 100% !important;
+        min-width: unset !important;
+        width: 100% !important;
+        font-size: 0.88rem !important;
+    }
+}
+
+
+
+
+
+/* ════════════════════════════════════════════════════════
+   CANONICAL SIDEBAR — FlowFit Premium
+   Matches index.html design system (Anton logo, gold tokens)
+════════════════════════════════════════════════════════ */
+
+/* ── Sidebar container ─────────────────────────────────── */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 272px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem 2.5rem;
+    background: var(--surface-deep);
+    border-right: 1px solid var(--Au-glow);
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    scrollbar-width: thin;
+    scrollbar-color: var(--Au-rim) transparent;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 3px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: var(--Au-28);
+    border-radius: 2px;
+}
+
+/* ── FlowFit logo in sidebar ──────────────────────────── */
+.sidebar .logo,
+.sidebar-logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.75rem;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 14px var(--Au-30));
+    text-decoration: none;
+    display: block;
+    flex-shrink: 0;
+    margin-bottom: 2.5rem;
+    line-height: 1;
+}
+
+/* ── Nav menu list ─────────────────────────────────────── */
+.sidebar .nav-menu {
+    list-style: none;
+    flex: 0 0 auto;
+    margin-bottom: 0;
+}
+
+.sidebar .nav-item {
+    margin-bottom: 0.2rem;
+}
+
+/* ── Nav links ─────────────────────────────────────────── */
+.sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.72rem 0.9rem;
+    color: var(--t2-85);
+    text-decoration: none;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sidebar .nav-link:hover {
+    color: var(--Au-hi);
+    background: var(--Au-mist);
+    border-color: var(--Au-glow);
+    transform: translateX(3px);
+}
+
+.sidebar .nav-link.active {
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%);
+    color: var(--ink);
+    font-weight: 700;
+    border-color: transparent;
+    box-shadow: 0 4px 18px var(--Au-28);
+}
+
+/* ── Nav icons ─────────────────────────────────────────── */
+.sidebar .nav-icon {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* ── Spacer (pushes user section to bottom on large screens) */
+.sidebar .nav-spacer {
+    flex: 1;
+    min-height: 1.5rem;
+}
+
+/* ── User section ──────────────────────────────────────── */
+.sidebar .user-section {
+    margin-top: 0;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--Au-14);
+    flex-shrink: 0;
+}
+
+.sidebar .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.75rem;
+    background: var(--Au-04);
+    border-radius: 12px;
+    margin-bottom: 0.6rem;
+    border: 1px solid var(--Au-10);
+}
+
+/* ── User avatar ───────────────────────────────────────── */
+.sidebar .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-lo) 100%);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Anton', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 900;
+    flex-shrink: 0;
+    letter-spacing: 0;
+}
+
+/* ── User info ─────────────────────────────────────────── */
+.sidebar .user-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    margin-left: 0;
+    width: auto;
+}
+
+.sidebar .user-info h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--t1);
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.sidebar .user-info p,
+.sidebar .user-info span:not(.plan-badge) {
+    font-size: 0.70rem;
+    color: var(--t2-70);
+    margin: 0;
+    display: block;
+}
+
+/* ── Logout button ─────────────────────────────────────── */
+.sidebar .logout-btn {
+    width: 100%;
+    padding: 0.72rem;
+    background: transparent;
+    color: var(--red);
+    border: 1px solid var(--red-28);
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sidebar .logout-btn:hover,
+.sidebar .logout-btn:active {
+    background: var(--red-08);
+    border-color: var(--red);
+    box-shadow: 0 0 16px var(--red-10);
+}
+
+/* ── Plan badges ───────────────────────────────────────── */
+.plan-badge {
+    display: inline-block;
+    padding: 0.16rem 0.52rem;
+    border-radius: 20px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.plan-free {
+    background: var(--white-06);
+    color: var(--t2-70);
+}
+
+.plan-trial {
+    background: var(--Au-10);
+    color: var(--Au-hi);
+}
+
+.plan-pro {
+    background: var(--Au-14);
+    color: var(--Au);
+    border: 1px solid var(--Au-28);
+}
+
+.plan-elite,
+.plan-premium {
+    background: linear-gradient(135deg, var(--Au-20), var(--Au-20));
+    color: var(--Au-hi);
+    border: 1px solid var(--Au-38);
+}
+
+/* ── Sidebar overlay (mobile) ──────────────────────────── */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-70);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999;
+    cursor: pointer;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* ── Body scroll lock ──────────────────────────────────── */
+body.sidebar-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+body.sidebar-open .mobile-menu-btn {
+    display: none;
+}
+
+body.sidebar-open .sidebar {
+    overflow-y: auto;
+    touch-action: pan-y;
+    pointer-events: all;
+}
+
+/* ── Mobile hamburger ──────────────────────────────────── */
+.mobile-menu-btn {
+    position: fixed;
+    top: 1.2rem;
+    left: 1.2rem;
+    z-index: 2001;
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%);
+    border: none;
+    padding: 0.5rem 0.7rem;
+    border-radius: 9px;
+    cursor: pointer;
+    color: var(--ink);
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px var(--Au-28);
+    transition: transform 0.14s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-menu-btn:active {
+    transform: scale(0.9);
+}
+
+/* ── Responsive sidebar ────────────────────────────────── */
+@media (max-width: 900px) {
+    .sidebar {
+        width: 68px;
+        padding: 1.8rem 0.4rem 2rem;
+    }
+
+    .sidebar .logo {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+        -webkit-text-fill-color: var(--Au);
+        filter: none;
+    }
+
+    .sidebar .nav-link {
+        justify-content: center;
+        padding: 0.8rem;
+        gap: 0;
+    }
+
+    .sidebar .nav-link span:not(.nav-icon) {
+        display: none;
+    }
+
+    .sidebar .user-info {
+        display: none;
+    }
+
+    .sidebar .logout-btn span {
+        display: none;
+    }
+
+    .sidebar .user-section {
+        align-items: center;
+    }
+
+    .sidebar .user-profile {
+        justify-content: center;
+        padding: 0.5rem;
+    }
+
+    .sidebar .logout-btn {
+        justify-content: center;
+        padding: 0.5rem;
+    }
+
+    .sidebar .nav-spacer {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 68px;
+        width: calc(100% - 68px);
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 272px;
+        padding: 2rem 1.5rem 2.5rem;
+    }
+
+    .sidebar.mobile-active {
+        transform: translateX(0);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+    }
+
+    .sidebar.mobile-active .logo {
+        font-size: 1.75rem;
+        letter-spacing: 3px;
+        margin-bottom: 2.5rem;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar.mobile-active .nav-link {
+        justify-content: flex-start;
+        padding: 0.72rem 0.9rem;
+        gap: 0.85rem;
+    }
+
+    .sidebar.mobile-active .nav-link span:not(.nav-icon) {
+        display: inline;
+    }
+
+    .sidebar.mobile-active .user-info {
+        display: block;
+    }
+
+    .sidebar.mobile-active .logout-btn span {
+        display: inline;
+    }
+
+    .sidebar.mobile-active .logout-btn {
+        padding: 0.72rem;
+        justify-content: center;
+    }
+
+    .sidebar.mobile-active .user-section {
+        align-items: stretch;
+    }
+
+    .sidebar.mobile-active .nav-spacer {
+        display: flex;
+        flex: 0 0 auto;
+        min-height: 0.5rem;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding-top: 4.5rem;
+    }
+
+    .mobile-menu-btn {
+        display: flex;
+    }
+}
+
+@media (max-width: 600px) {
+    .sidebar,
+    .sidebar.mobile-active {
+        width: 268px;
+    }
+}
+
+.sidebar nav {
+    padding: 0;
+    margin: 0;
+}
+
+
+
+/* ── Main content layout offset from sidebar ─────────────── */
+.main-content {
+    margin-left: 272px;
+    width: calc(100% - 272px);
+    max-width: 100%;
+    overflow-x: hidden;
+    padding: 2rem 2.5rem;
+}
+
+.main {
+    margin-left: 272px;
+    width: calc(100% - 272px);
+    min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+    .main-content {
+        margin-left: 68px;
+        width: calc(100% - 68px);
+        padding: 1.5rem 1.75rem;
+    }
+    .main {
+        margin-left: 68px;
+        width: calc(100% - 68px);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 1.2rem !important;
+        padding-top: 4.5rem !important;
+    }
+    .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-top: 4rem;
+    }
+}
+
+
+
+/* ════════════════════════════════════════════════════════
+   GLOBAL POLISH — body, scrollbars, headings, page titles
+════════════════════════════════════════════════════════ */
+
+/* ── Body base ─────────────────────────────────────────── */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── All headings use Oswald ─────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.02em;
+}
+
+/* ── Page header (dashboard pages) ──────────────────────── */
+.header h1,
+.header-left h1,
+.page-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--t1);
+    margin-bottom: 0.25rem;
+}
+
+.header p,
+.header-left p,
+.page-subtitle {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--t2-85);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+/* ── Scrollbar global ────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--Au-rim);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--Au-38);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--Au-rim) transparent;
+}
+
+/* ── Cards base ──────────────────────────────────────────── */
+.card,
+.stat-card,
+.chart-card,
+.panel-card,
+.week-block,
+.log-card,
+.timer-card,
+.sets-card,
+.info-card,
+.billing-card,
+.program-card,
+.exercise-card {
+    background: linear-gradient(145deg, var(--surface), var(--surface));
+    border: 1px solid var(--Au-14);
+    border-radius: 16px;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+/* ── Stat card accent top bar ────────────────────────────── */
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%);
+}
+
+/* ── Stat values ─────────────────────────────────────────── */
+.stat-value,
+.stat-number,
+.streak-number,
+.timer-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ── Buttons: remove clip-path arrow (looks broken) ─────── */
+.btn,
+button.btn,
+a.btn {
+    clip-path: none !important;
+    border-radius: 10px !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    padding: 0.8rem 1.8rem;
+}
+
+/* Primary buttons */
+.btn-primary,
+.btn-start,
+.btn-enroll,
+.btn-log,
+.btn-continue,
+.btn-save,
+.btn-log-workout,
+.btn-start-session {
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%);
+    color: var(--ink) !important;
+    border: none !important;
+    font-weight: 700 !important;
+    clip-path: none !important;
+    border-radius: 10px !important;
+}
+
+/* Ghost / outline buttons */
+.btn-ghost,
+.btn-details,
+.btn-save-ghost {
+    background: var(--Au-06) !important;
+    border: 1px solid var(--Au-rim) !important;
+    color: var(--Au-hi) !important;
+    clip-path: none !important;
+    border-radius: 10px !important;
+}
+
+.btn-ghost:hover,
+.btn-details:hover {
+    background: var(--Au-12) !important;
+    border-color: var(--Au-44) !important;
+    color: var(--Au-hi) !important;
+}
+
+/* ── Form inputs ─────────────────────────────────────────── */
+.form-input,
+.form-select,
+.form-field input,
+.form-field select,
+.form-field textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+    background: var(--Au-04) !important;
+    border: 1px solid var(--Au-glow) !important;
+    color: var(--t1) !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    border-radius: 10px !important;
+    transition: border-color 0.22s ease !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-input:focus,
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none !important;
+    border-color: var(--Au-50) !important;
+    box-shadow: 0 0 0 3px var(--Au-10) !important;
+}
+
+/* ── Section labels ──────────────────────────────────────── */
+.section-label {
+    background: var(--Au-09) !important;
+    border: 1px solid var(--Au-rim) !important;
+    color: var(--Au) !important;
+    border-radius: 50px !important;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 0.76rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+}
+
+/* ── Tab / time buttons ──────────────────────────────────── */
+.tab-btn,
+.time-btn {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.84rem;
+    font-weight: 600;
+    border-radius: 8px;
+    clip-path: none !important;
+}
+
+.tab-btn.active,
+.time-btn.active {
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%) !important;
+    color: var(--ink) !important;
+    clip-path: none !important;
+}
+
+/* ── Progress bars ───────────────────────────────────────── */
+.progress-fill,
+.week-progress-fill,
+.cat-bar-fill {
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%);
+}
+
+/* ── Badges ──────────────────────────────────────────────── */
+.difficulty-badge,
+.hero-badge,
+.preview-badge,
+.program-badge {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ── Gradient text ───────────────────────────────────────── */
+.gradient-text {
+    background: linear-gradient(135deg, var(--Au) 0%, var(--Au-hi) 45%, var(--Au-lo) 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* ── Modal content ───────────────────────────────────────── */
+.modal-content,
+.wmodal-box,
+.wm-body {
+    background: var(--surface-deep) !important;
+    border: 1px solid var(--Au-rim) !important;
+    border-radius: 18px !important;
+}
+
+
+/* ── Sidebar logo responsive ─────────────────────────────── */
+.sidebar-logo-wrap {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 2.4rem;
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .sidebar-logo-wrap span { display: none; }
+    .sidebar-logo-wrap { gap: 0; justify-content: center; }
+    .sidebar-logo-wrap div:last-child { display: none; }
+}
+
+@media (max-width: 768px) {
+    .sidebar.mobile-active .sidebar-logo-wrap { gap: 0.7rem; }
+    .sidebar.mobile-active .sidebar-logo-wrap div:last-child { display: flex !important; }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   BUTTON SYSTEM — Arrow signature (matches index.html)
+   Primary : gold-filled arrow → + shimmer + glow aura
+   Ghost   : outlined arrow + fill-wash hover
+   Both use clip-path polygon so shape is non-rectangular.
+══════════════════════════════════════════════════════════ */
+
+/* ── Base ──────────────────────────────────────────────── */
+.btn,
+button.btn,
+a.btn,
+.btn-primary,
+.btn-ghost,
+.btn-start,
+.btn-enroll,
+.btn-continue,
+.btn-log,
+.btn-save,
+.btn-log-workout,
+.btn-start-session,
+.btn-unlock,
+.btn-details {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 400;
+    font-size: 0.72rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0.78rem 2.4rem 0.78rem 1.6rem;
+    position: relative;
+    white-space: nowrap;
+    border-radius: 0;
+    overflow: hidden;
+    transition:
+        transform 0.28s cubic-bezier(0.16,1,0.3,1),
+        box-shadow 0.28s cubic-bezier(0.16,1,0.3,1),
+        filter 0.28s ease;
+    /* Arrow tip: right-pointing pentagon */
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
+}
+
+/* ── Primary — gold fill ───────────────────────────────── */
+.btn-primary,
+.btn-start,
+.btn-enroll,
+.btn-continue,
+.btn-log,
+.btn-save,
+.btn-log-workout,
+.btn-start-session,
+.btn-unlock {
+    background: linear-gradient(135deg, var(--Au-hi) 0%, var(--Au) 50%, var(--Au-lo) 100%) !important;
+    color: var(--ink) !important;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%) !important;
+    box-shadow:
+        inset 0 1px 0 var(--white-22),
+        0 5px 22px var(--Au-40),
+        0 2px 8px var(--overlay-40) !important;
+}
+
+/* Shimmer sweep */
+.btn-primary::before,
+.btn-start::before,
+.btn-enroll::before,
+.btn-continue::before,
+.btn-log::before,
+.btn-save::before,
+.btn-log-workout::before,
+.btn-start-session::before,
+.btn-unlock::before {
+    content: '';
+    position: absolute;
+    top: -60%; left: -120%;
+    width: 52%; height: 220%;
+    background: linear-gradient(108deg, transparent 20%, var(--white-38) 50%, transparent 80%);
+    transition: left 0.52s cubic-bezier(0.16,1,0.3,1);
+    pointer-events: none;
+}
+
+.btn-primary:hover::before,
+.btn-start:hover::before,
+.btn-enroll:hover::before,
+.btn-continue:hover::before,
+.btn-log:hover::before,
+.btn-save:hover::before,
+.btn-log-workout:hover::before,
+.btn-start-session:hover::before,
+.btn-unlock:hover::before {
+    left: 175%;
+}
+
+/* Glow aura */
+.btn-primary::after,
+.btn-start::after,
+.btn-enroll::after,
+.btn-continue::after,
+.btn-log::after,
+.btn-save::after,
+.btn-log-workout::after,
+.btn-start-session::after,
+.btn-unlock::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    background: radial-gradient(ellipse at 65% 50%, var(--Au-50), transparent 65%);
+    opacity: 0;
+    transition: opacity 0.32s ease;
+    z-index: -1;
+    filter: blur(10px);
+    pointer-events: none;
+}
+
+.btn-primary:hover::after,
+.btn-start:hover::after,
+.btn-enroll:hover::after,
+.btn-continue:hover::after,
+.btn-log:hover::after,
+.btn-save:hover::after,
+.btn-log-workout:hover::after,
+.btn-start-session:hover::after,
+.btn-unlock:hover::after {
+    opacity: 1;
+}
+
+.btn-primary:hover,
+.btn-start:hover,
+.btn-enroll:hover,
+.btn-continue:hover,
+.btn-log:hover,
+.btn-save:hover,
+.btn-log-workout:hover,
+.btn-start-session:hover,
+.btn-unlock:hover {
+    transform: translateY(-2px) !important;
+    filter: brightness(1.06) !important;
+    box-shadow:
+        inset 0 1px 0 var(--white-28),
+        0 10px 36px var(--Au-50),
+        0 3px 12px var(--overlay-40) !important;
+}
+
+.btn-primary:active,
+.btn-start:active,
+.btn-enroll:active,
+.btn-continue:active {
+    transform: translateY(0) !important;
+    filter: brightness(0.96) !important;
+}
+
+.btn-primary:disabled,
+.btn-start:disabled,
+.btn-enroll:disabled,
+.btn-continue:disabled,
+.btn-log-workout:disabled {
+    opacity: 0.52;
+    cursor: not-allowed;
+    transform: none !important;
+    filter: none !important;
+}
+
+/* ── Ghost — outlined arrow ────────────────────────────── */
+.btn-ghost,
+.btn-details {
+    background: transparent !important;
+    color: var(--Au-hi) !important;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%) !important;
+    box-shadow: inset 0 0 0 1.5px var(--Au-30) !important;
+    padding: 0.78rem 2.4rem 0.78rem 1.6rem !important;
+}
+
+.btn-ghost::before,
+.btn-details::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(108deg, var(--Au-12) 0%, var(--Au-04) 100%);
+    opacity: 0;
+    transition: opacity 0.32s ease;
+    pointer-events: none;
+}
+
+.btn-ghost::after,
+.btn-details::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 1.5px var(--Au-60);
+    opacity: 0;
+    transition: opacity 0.32s ease;
+    pointer-events: none;
+}
+
+.btn-ghost:hover::before,
+.btn-details:hover::before { opacity: 1; }
+.btn-ghost:hover::after,
+.btn-details:hover::after  { opacity: 1; }
+
+.btn-ghost:hover,
+.btn-details:hover {
+    color: var(--t1) !important;
+    transform: translateY(-1px) !important;
+    box-shadow:
+        inset 0 0 0 1.5px var(--Au-35),
+        0 3px 20px var(--Au-12) !important;
+}
+
+/* ── Small/inline variant ──────────────────────────────── */
+.btn-sm {
+    font-size: 0.64rem !important;
+    padding: 0.56rem 1.8rem 0.56rem 1.2rem !important;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%) !important;
+}
+
+/* ── Full-width (forms/checkout) ───────────────────────── */
+.btn-full,
+.btn[style*="width:100%"],
+.btn[style*="width: 100%"] {
+    width: 100% !important;
+    clip-path: none !important;
+    border-radius: 10px !important;
+    padding: 0.88rem 1.8rem !important;
+}
+
+/* ── Logout stays subtle red (no arrow) ────────────────── */
+.logout-btn,
+.sidebar .logout-btn {
+    clip-path: none !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    border: 1px solid var(--red-28) !important;
+    color: var(--red-80) !important;
+    font-family: 'Josefin Sans', sans-serif !important;
+    font-size: 0.7rem !important;
+    font-weight: 300 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    padding: 0.7rem 1rem !important;
+    width: 100% !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+}
+
+.logout-btn:hover,
+.sidebar .logout-btn:hover {
+    background: var(--red-08) !important;
+    border-color: var(--red-50) !important;
+    color: var(--red) !important;
+    transform: none !important;
+    filter: none !important;
+}
+
+
+/* ── Triple logo in sidebar top ──────────────────────────── */
+.sidebar-triple-logos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.2rem;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.tri-logo-item {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+}
+
+.tri-logo-item:hover {
+    opacity: 1;
+}
+
+.tri-logo-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-decoration: none;
+}
+
+.tri-wordmark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    gap: 0.06rem;
+}
+
+.tri-flow {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.82rem;
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+    color: var(--Au-hi);
+}
+
+.tri-fit {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.56rem;
+    letter-spacing: 0.52em;
+    text-transform: uppercase;
+    color: var(--Au);
+    opacity: 0.8;
+}
+
+/* Collapse side logos at 900px rail mode */
+@media (max-width: 900px) {
+    .sidebar-triple-logos {
+        justify-content: center;
+        gap: 0;
+    }
+    .tri-logo-item { display: none; }
+    .tri-logo-center .tri-wordmark { display: none; }
+    .tri-logo-center::after {
+        content: '';
+        display: block;
+        width: 26px;
+        height: 26px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar.mobile-active .sidebar-triple-logos {
+        justify-content: space-between;
+    }
+    .sidebar.mobile-active .tri-logo-item { display: flex; }
+    .sidebar.mobile-active .tri-logo-center .tri-wordmark { display: flex; }
+}
+
+
+/* ── Sidebar nav: thin Josefin Sans, elegant spacing ──────── */
+.sidebar .nav-link {
+    font-family: 'Josefin Sans', sans-serif !important;
+    font-weight: 200 !important;
+    font-size: 0.78rem !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--t2-85) !important;
+    padding: 0.62rem 0.85rem !important;
+    border-radius: 7px !important;
+    border: 1px solid transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    transition: all 0.22s ease !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+}
+
+.sidebar .nav-link:hover {
+    color: var(--Au-hi) !important;
+    background: var(--Au-06) !important;
+    border-color: var(--Au-15) !important;
+    transform: translateX(2px) !important;
+}
+
+.sidebar .nav-link.active {
+    background: linear-gradient(135deg,var(--Au-hi),var(--Au),var(--Au-lo)) !important;
+    color: var(--ink) !important;
+    font-weight: 400 !important;
+    border-color: transparent !important;
+    box-shadow: 0 3px 12px var(--Au-rim) !important;
+}
+
+.sidebar .nav-icon {
+    font-size: 0.9rem !important;
+    width: 18px !important;
+    text-align: center !important;
+    flex-shrink: 0 !important;
+    opacity: 0.7 !important;
+}
+
+.sidebar .nav-link.active .nav-icon {
+    opacity: 1 !important;
+}
+
+/* User info: thin font */
+.sidebar .user-info h4 {
+    font-family: 'Josefin Sans', sans-serif !important;
+    font-weight: 300 !important;
+    font-size: 0.78rem !important;
+    letter-spacing: 0.05em !important;
+    color: var(--t1) !important;
+}
+
+.sidebar .user-info span,
+.sidebar .user-info p {
+    font-family: 'Josefin Sans', sans-serif !important;
+    font-weight: 200 !important;
+    font-size: 0.64rem !important;
+    letter-spacing: 0.06em !important;
+}
+
+/* Logout: thin and discreet */
+.sidebar .logout-btn {
+    font-family: 'Josefin Sans', sans-serif !important;
+    font-weight: 200 !important;
+    font-size: 0.66rem !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    clip-path: none !important;
+    border-radius: 7px !important;
+}
+
+
+/* ═══════════════════════════════════════════════
+   DASHBOARD ENHANCEMENTS
+═══════════════════════════════════════════════ */
+
+/* ── Welcome header ─────────────────────────────── */
+.header {
+    position: relative;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg,
+        var(--Au-mist) 0%,
+        var(--Au-04) 50%,
+        transparent 100%);
+    border: 1px solid var(--Au-14);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--Au) 40%, var(--Au-hi) 60%, transparent 100%);
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--Au-10) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.greeting {
+    font-family: 'Josefin Sans', sans-serif !important;
+    font-weight: 200 !important;
+    font-size: 2rem !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase !important;
+    color: var(--t1) !important;
+    margin-bottom: 0.3rem !important;
+    position: relative;
+    z-index: 1;
+}
+
+.date {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--Au);
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Quick nav grid ─────────────────────────────── */
+.quick-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.quick-nav-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 1.4rem 0.75rem 1.1rem;
+    background: var(--Au-04);
+    border: 1px solid var(--Au-14);
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.22s ease;
+    position: relative;
+    overflow: visible;
+}
+
+.quick-nav-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--Au-60), transparent);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.quick-nav-card:hover {
+    background: var(--Au-09);
+    border-color: var(--Au-35);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px var(--overlay-30);
+}
+
+.quick-nav-card:hover::before { transform: scaleX(1); }
+
+.qn-icon {
+    width: 40px; height: 40px;
+    color: var(--Au);
+    display: flex; align-items: center; justify-content: center;
+}
+
+.qn-icon svg { width: 100%; height: 100%; }
+
+.qn-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.72rem;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--t1) !important;
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 100%;
+}
+
+.qn-arrow {
+    font-size: 1rem;
+    color: var(--Au);
+    position: absolute;
+    bottom: 0.55rem; right: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .quick-nav-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+    .quick-nav-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── W Points card ───────────────────────────────── */
+.wpoints-card {
+    background: linear-gradient(145deg, var(--surface), var(--surface-deep)) !important;
+    border-color: var(--Au-rim) !important;
+}
+
+.wpoints-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--Au-hi);
+    background: var(--Au-12);
+    border: 1px solid var(--Au-28);
+    border-radius: 20px;
+    padding: 0.18rem 0.7rem;
+    letter-spacing: 0.04em;
+}
+
+.wpoints-total-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem 0 0.75rem;
+}
+
+.wpoints-circle {
+    width: 86px; height: 86px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--Au-14) 0%, var(--Au-04) 60%, transparent 100%);
+    border: 1.5px solid var(--Au-38);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    flex-shrink: 0;
+    box-shadow: 0 0 24px var(--Au-12);
+}
+
+.wpoints-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg,var(--Au-hi),var(--Au),var(--Au-lo));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.wpoints-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.52rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--t2);
+}
+
+.wpoints-breakdown {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.wp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.32rem 0;
+    border-bottom: 1px solid var(--white-04);
+}
+
+.wp-row:last-child { border-bottom: none; }
+
+.wp-row-new .wp-key { color: var(--sage-30); }
+
+.wp-key {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--t2-85);
+}
+
+.wp-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--Au-hi);
+    letter-spacing: 0.02em;
+}
+
+.wpoints-rule {
+    padding: 0.6rem 0.85rem;
+    background: var(--white-02);
+    border-radius: 8px;
+    margin: 0.5rem 0 0.75rem;
+}
+
+.wpoints-rule span {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 200;
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+    color: var(--t2);
+}
+
+/* ── Content-grid background wrap ───────────────── */
+.content-grid {
+    background: transparent;
+    gap: 1.5rem !important;
+}
+
+.content-grid .card {
+    background: linear-gradient(145deg, var(--surface), var(--surface)) !important;
+    border: 1px solid var(--Au-12) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+}
+
+
+/* ── W Points history rows ──────────────────────── */
+.wp-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+}
+
+.wp-hist-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: var(--white-03);
+    border-radius: 8px;
+    border: 1px solid var(--white-05);
+}
+
+.wp-hist-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+}
+
+.wp-hist-label {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.74rem;
+    font-weight: 300;
+    color: var(--t1);
+    letter-spacing: 0.04em;
+}
+
+.wp-hist-note {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 200;
+    color: var(--t2);
+    letter-spacing: 0.03em;
+}
+
+.wp-hist-pts {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--sage);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+}
+
+
+
+    
+    
+    /* AI Coach */
+    
+.ai-modal {
+  position: fixed; inset: 0; background: var(--surface-deep);
+  backdrop-filter: blur(20px); z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.ai-coach-content {
+  background: var(--g-card);
+  border: 1px solid var(--Au-40);
+  border-radius: 24px;
+  width: 100%; max-width: 420px; height: 85vh; max-height: 620px;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 30px 80px var(--overlay-70);
+}
+
+.ai-coach-header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--Au-25);
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+}
+
+.coach-avatar {
+  font-size: 28px; width: 42px; height: 42px;
+  background: var(--Au-15); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.chat-messages {
+  flex: 1; padding: 1.5rem; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+  background: var(--surface-2);
+}
+
+.coach-message, .user-message {
+  max-width: 80%; padding: 14px 18px; border-radius: 20px;
+  line-height: 1.5; font-size: 0.98rem;
+}
+
+.coach-message {
+  align-self: flex-start;
+  background: var(--Au-12);
+  border-bottom-left-radius: 6px;
+}
+
+.user-message {
+  align-self: flex-end;
+  background: var(--g-Au);
+  color: var(--ink);
+  border-bottom-right-radius: 6px;
+}
+
+.quick-suggestions {
+  padding: 12px 1.5rem; display: flex; flex-wrap: wrap; gap: 8px;
+  background: var(--surface); border-top: 1px solid var(--Au-20);
+}
+
+.quick-suggestions div {
+  background: var(--Au-10); color: var(--Au);
+  padding: 6px 14px; border-radius: 9999px; font-size: 0.82rem;
+  cursor: pointer; white-space: nowrap;
+}
+
+.quick-suggestions div:hover {
+  background: var(--Au); color: var(--ink);
+}
+
+.chat-input-area {
+  padding: 1rem; display: flex; gap: 8px; background: var(--g-card);
+  border-top: 1px solid var(--Au-20);
+}
+
+.chat-input-area input {
+  flex: 1; padding: 14px 20px; border-radius: 9999px;
+  background: var(--ink-2); border: 1px solid var(--Au-30);
+  color: var(--t1); font-size: 1rem;
+}
+
+.send-btn {
+  background: var(--g-Au); color: var(--ink); border: none;
+  padding: 0 24px; border-radius: 9999px; font-weight: 600;
+}
+    
+
+/* ══ SIDEBAR NOTIFICATION BELL ═══════════════════════════════════════════ */
+.tri-notif-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--Au-09);
+  border: 1px solid var(--Au-rim);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+  padding: 0;
+}
+.tri-notif-btn:hover {
+  background: var(--Au-20);
+  transform: scale(1.1);
+  box-shadow: 0 0 14px var(--Au-25);
+}
+.tri-notif-btn:active { transform: scale(0.95); }
+.tri-bell-svg { width: 18px; height: 18px; display: block; }
+
+/* Shake animation when new notifications arrive */
+@keyframes bellShake {
+  0%,100% { transform: rotate(0); }
+  15%     { transform: rotate(12deg); }
+  30%     { transform: rotate(-10deg); }
+  45%     { transform: rotate(8deg); }
+  60%     { transform: rotate(-6deg); }
+  75%     { transform: rotate(4deg); }
+}
+.tri-notif-btn.has-unread .tri-bell-svg {
+  animation: bellShake 0.7s ease 0.2s 1;
+}
+
+/* Badge */
+.tri-notif-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  background: linear-gradient(135deg, #E8C96A, #C9A84C);
+  color: #0a0a0a;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.52rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  border: 1.5px solid var(--ink-1);
+  line-height: 1;
+  letter-spacing: 0;
+}
+.tri-notif-badge.visible { display: flex; }
+
+/* Pulse dot — visible when unread > 0 */
+@keyframes pulseDot {
+  0%,100% { r: 3; opacity: 1; }
+  50%     { r: 4.5; opacity: 0.6; }
+}
+.bell-pulse-dot.active { animation: pulseDot 2s ease-in-out infinite; }
+
+/* ══ NOTIFICATION PANEL ═══════════════════════════════════════════════════ */
+.notif-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(2px);
+}
+.notif-overlay.open { display: block; }
+
+.notif-panel {
+  position: fixed;
+  top: 0;
+  left: 280px; /* sidebar width */
+  width: 340px;
+  height: 100vh;
+  background: var(--ink-1);
+  border-right: 1px solid var(--Au-14);
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-110%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 4px 0 32px rgba(0,0,0,0.55);
+}
+.notif-panel.open { transform: translateX(0); }
+
+.notif-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem 1.2rem 1rem;
+  border-bottom: 1px solid var(--Au-09);
+  flex-shrink: 0;
+}
+.notif-panel-title {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--Au-hi);
+}
+.notif-panel-actions { display: flex; gap: 0.5rem; align-items: center; }
+.notif-action-btn {
+  background: none; border: none;
+  color: var(--t2); font-size: 0.68rem;
+  font-family: 'Josefin Sans', sans-serif;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  cursor: pointer; padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.notif-action-btn:hover { color: var(--Au); background: var(--Au-09); }
+.notif-close-btn {
+  background: none; border: none;
+  color: var(--t2); font-size: 1rem;
+  cursor: pointer; padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.notif-close-btn:hover { color: var(--t1); }
+
+.notif-list {
+  flex: 1; overflow-y: auto;
+  padding: 0.6rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--Au-20) transparent;
+}
+.notif-list::-webkit-scrollbar { width: 3px; }
+.notif-list::-webkit-scrollbar-thumb { background: var(--Au-20); border-radius: 2px; }
+
+.notif-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 100%; padding: 3rem 1.5rem;
+  text-align: center; gap: 0.75rem;
+}
+.notif-empty-icon {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.35;
+}
+.notif-empty p { color: var(--t2); font-size: 0.8rem; line-height: 1.6; margin: 0; font-family: 'Josefin Sans', sans-serif; }
+
+.notif-item {
+  display: flex; align-items: flex-start;
+  gap: 0.8rem; padding: 0.85rem 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.notif-item:hover { background: var(--Au-04); }
+.notif-item.unread { background: rgba(201,168,76,0.04); }
+.notif-item.unread::before {
+  content: '';
+  position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 55%;
+  background: linear-gradient(to bottom, var(--Au-hi), var(--Au));
+  border-radius: 0 2px 2px 0;
+}
+
+.notif-icon-wrap {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--Au-09);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem; flex-shrink: 0;
+  border: 1px solid var(--Au-14);
+}
+.notif-content { flex: 1; min-width: 0; }
+.notif-title {
+  font-size: 0.78rem; font-weight: 600; color: var(--t1);
+  line-height: 1.35; margin-bottom: 0.22rem;
+  font-family: 'Josefin Sans', sans-serif; letter-spacing: 0.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.notif-body {
+  font-size: 0.72rem; color: var(--t2); line-height: 1.5;
+  margin-bottom: 0.28rem;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.notif-time {
+  font-size: 0.65rem; color: var(--t3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.03em;
+}
+.notif-delete-btn {
+  background: none; border: none; color: var(--t3);
+  font-size: 0.85rem; cursor: pointer; padding: 0.2rem;
+  border-radius: 4px; opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0; align-self: flex-start;
+}
+.notif-item:hover .notif-delete-btn { opacity: 1; }
+.notif-delete-btn:hover { color: #E05454; }
+
+/* Skeleton loader */
+.notif-skeleton { padding: 0.85rem 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.notif-skel-line {
+  height: 9px; border-radius: 5px;
+  background: var(--Au-07); margin-bottom: 0.45rem;
+  animation: skelPulse 1.5s ease-in-out infinite;
+}
+.notif-skel-line.short { width: 50%; }
+.notif-skel-line.long  { width: 88%; }
+.notif-skel-line.mid   { width: 68%; }
+@keyframes skelPulse { 0%,100%{opacity:0.4} 50%{opacity:0.85} }
+
+/* Mobile: panel full width, no offset */
+@media (max-width: 768px) {
+  .notif-panel { left: 0; width: 100vw; }
+}
+
+    /* Theme toggle */
+
+    
+    /* ══ THEME TOGGLE & NOTIFICATION IMPROVEMENTS ══════════════ */
+    .tri-theme-btn { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      flex-shrink: 0; 
+      width: 32px; 
+      height: 32px; 
+      background: var(--Au-06); 
+      border: 1px solid var(--Au-20); 
+      border-radius: 50%; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      padding: 0; 
+    }
+    .tri-theme-btn:hover { 
+      background: var(--Au-12); 
+      border-color: var(--Au); 
+      transform: scale(1.05);
+    }
+    .tri-theme-svg { 
+      width: 16px; 
+      height: 16px; 
+      display: block; 
+    }
+    .icon-sun { display: none; }
+    .icon-moon { display: block; }
+    html.light-mode .icon-moon { display: none !important; }
+    html.light-mode .icon-sun { display: block !important; }
+    html.light-mode .tri-theme-btn {
+      background: rgba(184,134,11,0.08);
+      border-color: rgba(184,134,11,0.25);
+    }
+    html.light-mode .tri-theme-btn:hover {
+      background: rgba(184,134,11,0.15);
+      border-color: #C9A84C;
+    }
+    /* .tri-notif-btn base styles defined above */
+    .tri-notif-btn:hover {
+      background: var(--Au-12);
+      border-color: var(--Au);
+      transform: scale(1.05);
+    }
+    html.light-mode .tri-notif-btn {
+      background: rgba(184,134,11,0.08);
+      border-color: rgba(184,134,11,0.25);
+    }
+    html.light-mode .tri-notif-btn:hover {
+      background: rgba(184,134,11,0.15);
+      border-color: #C9A84C;
+    }
+    html.light-mode .notif-panel {
+      background: #ffffff;
+      border-right: 1px solid rgba(0,0,0,0.10);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    }
+    html.light-mode .notif-item {
+      background: #fafafa;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    html.light-mode .notif-item.unread {
+      background: rgba(184,134,11,0.06);
+      border-left: 3px solid #C9A84C;
+    }
+    html.light-mode .notif-item:hover {
+      background: rgba(184,134,11,0.10);
+    }
+    html.light-mode .notif-overlay {
+      background: rgba(0,0,0,0.25);
+    }
+    html.light-mode .notif-panel-title {
+      color: #8E6E28;
+    }
+    html.light-mode .notif-action-btn {
+      color: rgba(0,0,0,0.60);
+    }
+    html.light-mode .notif-action-btn:hover {
+      color: #8E6E28;
+      background: rgba(184,134,11,0.10);
+    }
+    html.light-mode .notif-close-btn {
+      color: rgba(0,0,0,0.50);
+    }
+    html.light-mode .notif-close-btn:hover {
+      color: #8E6E28;
+      background: rgba(184,134,11,0.10);
+    }
+    html.light-mode .notif-panel-header {
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════════════
+       FLOWFIT DASHBOARD - ARTISTIC REDESIGN
+       ══════════════════════════════════════════════════════════════════════ */
+    
+    /* ── BACKGROUND IMAGES ────────────────────────────────────────────── */
+    body {
+        background-image: url('Untitled.webp');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+    
+    html.light-mode body {
+        background-image: url('fit1.webp');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
+    /* Overlay to ensure content readability */
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(7,6,12,0.85);
+        z-index: -1;
+        pointer-events: none;
+    }
+    
+    html.light-mode body::before {
+        /* Reduced from 0.90 → 0.72 so fit1.webp is visible */
+        background: rgba(255,255,255,0.72);
+    }
+    
+    /* ── GRID CARD STYLING (CONSISTENT BOTH MODES) ───────────────────── */
+    .stat-card,
+    .metric-card,
+    .achievement-card,
+    .feature-card,
+    .info-card,
+    .card {
+        background: var(--g-card) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid var(--b1) !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        position: relative !important;
+        overflow: hidden !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    /* Artistic gradient border effect */
+    .stat-card::before,
+    .metric-card::before,
+    .achievement-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 16px;
+        padding: 1px;
+        background: linear-gradient(135deg, var(--Au-30), transparent, var(--Au-20));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+    
+    .stat-card:hover::before,
+    .metric-card:hover::before,
+    .achievement-card:hover::before {
+        opacity: 1;
+    }
+    
+    .stat-card:hover,
+    .metric-card:hover,
+    .achievement-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(201,168,76,0.15);
+        border-color: var(--Au-30);
+    }
+    
+    html.light-mode .stat-card:hover,
+    html.light-mode .metric-card:hover,
+    html.light-mode .achievement-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    }
+    
+    /* Card inner glow effect */
+    .stat-card::after,
+    .metric-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, var(--Au-06) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s;
+        pointer-events: none;
+    }
+    
+    .stat-card:hover::after,
+    .metric-card:hover::after {
+        opacity: 1;
+    }
+    
+    /* ── STATS GRID ENHANCED ─────────────────────────────────────────── */
+    .stats-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+        gap: 1.5rem !important;
+    }
+    
+    .stat-value,
+    .stat-number,
+    .metric-value {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-size: 2.5rem !important;
+        font-weight: 800 !important;
+        background: linear-gradient(135deg, var(--Au-hi), var(--Au), var(--Au-lo)) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        margin: 0.5rem 0 !important;
+        line-height: 1 !important;
+        display: block !important;
+    }
+    
+    .stat-label,
+    .metric-label {
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.1em !important;
+        color: var(--t2) !important;
+        opacity: 0.8 !important;
+    }
+    
+    .stat-change,
+    .metric-change {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        color: var(--sage) !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    .stat-change.negative {
+        color: var(--red) !important;
+    }
+    
+    /* ── AI COACH SECTION - ARTISTIC DESIGN ──────────────────────────── */
+    .ai-coach-section {
+        background: linear-gradient(145deg, 
+            rgba(201,168,76,0.08) 0%,
+            rgba(59,191,138,0.06) 50%,
+            rgba(91,156,246,0.05) 100%) !important;
+        backdrop-filter: blur(30px) !important;
+        border: 2px solid var(--Au-25) !important;
+        border-radius: 20px !important;
+        padding: 2rem !important;
+        position: relative !important;
+        overflow: hidden !important;
+        box-shadow: 0 8px 32px rgba(201,168,76,0.12) !important;
+    }
+    
+    html.light-mode .ai-coach-section {
+        background: linear-gradient(145deg, 
+            rgba(184,134,11,0.05) 0%,
+            rgba(59,191,138,0.04) 50%,
+            rgba(91,156,246,0.03) 100%) !important;
+        border-color: rgba(184,134,11,0.20) !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.06) !important;
+    }
+    
+    /* AI Coach animated background pattern */
+    .ai-coach-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            var(--Au-04) 10px,
+            var(--Au-04) 20px
+        );
+        opacity: 0.3;
+        animation: slidePattern 20s linear infinite;
+        pointer-events: none;
+    }
+    
+    @keyframes slidePattern {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+    
+    /* AI Coach header with icon */
+    .ai-coach-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .ai-coach-icon {
+        width: 48px !important;
+        height: 48px !important;
+        background: linear-gradient(135deg, var(--Au), var(--Au-lo)) !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 24px !important;
+        box-shadow: 0 4px 16px rgba(201,168,76,0.3) !important;
+        animation: pulse 2s ease-in-out infinite !important;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .ai-coach-title {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        background: linear-gradient(135deg, var(--Au-hi), var(--Au)) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+        margin: 0 !important;
+    }
+    
+    .ai-coach-subtitle {
+        font-size: 0.8rem !important;
+        color: var(--t2) !important;
+        opacity: 0.7 !important;
+        font-weight: 500 !important;
+        margin: 0 !important;
+    }
+    
+    /* AI Coach content area */
+    .ai-coach-content {
+        background: var(--surface) !important;
+        border: 1px solid var(--b1) !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+        min-height: 200px !important;
+    }
+    
+    .ai-coach-input {
+        width: 100% !important;
+        background: var(--ink-2) !important;
+        border: 1px solid var(--b2) !important;
+        border-radius: 10px !important;
+        padding: 1rem 1.2rem !important;
+        font-size: 0.95rem !important;
+        color: var(--t1) !important;
+        transition: all 0.2s !important;
+    }
+    
+    .ai-coach-input:focus {
+        outline: none !important;
+        border-color: var(--Au) !important;
+        box-shadow: 0 0 0 3px var(--Au-10) !important;
+    }
+    
+    .ai-coach-button {
+        background: linear-gradient(135deg, var(--Au), var(--Au-lo)) !important;
+        color: #0a0a0a !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.9rem 1.8rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        transition: all 0.3s !important;
+        box-shadow: 0 4px 12px rgba(201,168,76,0.3) !important;
+    }
+    
+    .ai-coach-button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(201,168,76,0.4) !important;
+    }
+    
+    .ai-coach-button:active {
+        transform: translateY(0) !important;
+    }
+    
+    /* ── ACHIEVEMENTS GRID ───────────────────────────────────────────── */
+    .achievements-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 1rem !important;
+    }
+    
+    .achievement-card {
+        text-align: center !important;
+        padding: 1.2rem !important;
+    }
+    
+    .achievement-icon {
+        font-size: 2.5rem !important;
+        margin-bottom: 0.5rem !important;
+        filter: drop-shadow(0 2px 8px rgba(201,168,76,0.3)) !important;
+    }
+    
+    .achievement-name {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        color: var(--t1) !important;
+        margin: 0.3rem 0 !important;
+    }
+    
+    .achievement-date {
+        font-size: 0.7rem !important;
+        color: var(--t3) !important;
+    }
+    
+    /* ── QUICK NAV GRID ──────────────────────────────────────────────── */
+    .quick-nav-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)) !important;
+        gap: 0.8rem !important;
+    }
+    
+    .quick-nav-item {
+        background: var(--surface) !important;
+        border: 1px solid var(--b1) !important;
+        border-radius: 12px !important;
+        padding: 1rem !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        text-decoration: none !important;
+    }
+    
+    .quick-nav-item:hover {
+        background: var(--Au-09) !important;
+        border-color: var(--Au-30) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    .quick-nav-icon {
+        font-size: 1.8rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+    
+    .quick-nav-label {
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        color: var(--t2) !important;
+    }
+    
+    /* ── THEME TOGGLE BUTTON ─────────────────────────────────────────── */
+    .tri-theme-btn,
+    #themeToggle {
+        width: 32px !important;
+        height: 32px !important;
+        background: var(--Au-09) !important;
+        border: 1px solid var(--Au-25) !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        padding: 0 !important;
+    }
+    
+    .tri-theme-btn:hover,
+    #themeToggle:hover {
+        background: var(--Au-15) !important;
+        border-color: var(--Au) !important;
+        transform: scale(1.05) !important;
+    }
+    
+    .tri-theme-svg,
+    .theme-icon {
+        width: 16px !important;
+        height: 16px !important;
+    }
+    
+    /* Icon visibility (moon in dark, sun in light) */
+    html:not(.light-mode) .icon-sun { display: none !important; }
+    html:not(.light-mode) .icon-moon { display: block !important; }
+    html.light-mode .icon-sun { display: block !important; }
+    html.light-mode .icon-moon { display: none !important; }
+    
+    /* ── CONTENT GRID ────────────────────────────────────────────────── */
+    .content-grid {
+        display: grid !important;
+        grid-template-columns: 1.8fr 1fr !important;
+        gap: 2rem !important;
+    }
+    
+    /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+    @media (max-width: 1200px) {
+        .content-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1rem !important;
+        }
+        
+        .achievements-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        
+        .quick-nav-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .stat-value,
+        .metric-value {
+            font-size: 2rem !important;
+        }
+    }
+    
+    /* ── REMOVE ANY YELLOW HUE / FADE SPOTS ──────────────────────────── */
+    /* Ensure no unwanted tints in backgrounds */
+    * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Override any yellowish overlays */
+    .overlay,
+    .backdrop,
+    .modal-overlay {
+        background: rgba(0,0,0,0.75) !important;
+    }
+    
+    html.light-mode .overlay,
+    html.light-mode .backdrop,
+    html.light-mode .modal-overlay {
+        background: rgba(0,0,0,0.50) !important;
+    }
+    
+    /* Ensure cards don't have yellow tint */
+    html.light-mode .card,
+    html.light-mode .stat-card,
+    html.light-mode .metric-card {
+        background: linear-gradient(145deg, #ffffff, #fafafa) !important;
+    }
+    
+    /* Remove any fade spots */
+    .main-content,
+    .dashboard-main,
+    .content-wrapper {
+        background: transparent !important;
+    }
+    
+/* ── Workout items: full text on mobile ──────────────────────────────────── */
+@media (max-width: 600px) {
+    .workout-item {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .workout-info h4 {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+    }
+    .workout-stats {
+        flex-shrink: 0;
+        min-width: max-content;
+    }
+}
+html.light-mode .workout-info h4,
+html.light-mode .workout-info p {
+    -webkit-text-fill-color: unset !important;
+}
+
+    
+    
+/* ── AI Coach Launch Button ────────────────────────────────────────── */
+.ai-launch-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg,
+        rgba(201,168,76,0.10) 0%,
+        rgba(201,168,76,0.04) 100%);
+    border: 1px solid var(--Au-28);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    text-align: left;
+}
+.ai-launch-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(201,168,76,0.06) 50%,
+        transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+}
+.ai-launch-btn:hover { border-color: var(--Au-50); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,0.14); }
+.ai-launch-btn:hover::before { transform: translateX(100%); }
+.ai-launch-btn:active { transform: translateY(0); }
+.ai-launch-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: linear-gradient(135deg,var(--Au-mist),var(--Au-09));
+    border: 1px solid var(--Au-30);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px var(--Au-glow);
+}
+.ai-launch-icon svg { width: 26px; height: 26px; }
+.ai-launch-label { flex: 1; min-width: 0; }
+.ai-launch-title {
+    display: block;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--Au-hi);
+    line-height: 1.2;
+}
+.ai-launch-sub {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--t2);
+    letter-spacing: 0.04em;
+    margin-top: 0.15rem;
+    opacity: 0.75;
+}
+.ai-launch-arrow {
+    width: 28px; height: 28px; flex-shrink: 0;
+    color: var(--Au);
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.ai-launch-btn:hover .ai-launch-arrow { opacity: 1; transform: translateX(4px); }
+.ai-launch-arrow svg { width: 16px; height: 16px; }
+
+/* Light mode AI coach button */
+html.light-mode .ai-launch-btn {
+    background: rgba(255,255,255,0.85) !important;
+    border-color: rgba(184,134,11,0.22) !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+}
+html.light-mode .ai-launch-btn:hover {
+    border-color: rgba(184,134,11,0.40) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.09) !important;
+}
+html.light-mode .ai-launch-title { color: #8B6914 !important; }
+html.light-mode .ai-launch-sub   { color: #6b6560 !important; }
+html.light-mode .ai-launch-arrow { color: #B8860B !important; }
+html.light-mode .ai-launch-icon  {
+    background: rgba(184,134,11,0.07) !important;
+    border-color: rgba(184,134,11,0.18) !important;
+}
+
+/* ── Quick-nav mobile: fully visible labels ─────────────────────────── */
+@media (max-width: 480px) {
+    .quick-nav-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.6rem !important;
+    }
+    .quick-nav-card {
+        padding: 1rem 0.6rem 0.9rem !important;
+        min-height: unset !important;
+    }
+    .qn-label {
+        font-size: 0.65rem !important;
+        letter-spacing: 0.06em !important;
+    }
+    .qn-icon { width: 32px !important; height: 32px !important; }
+}
+
+/* ── Light mode: all cards pure white, no yellow hue ────────────────── */
+html.light-mode .stat-card,
+html.light-mode .card,
+html.light-mode .wpoints-card,
+html.light-mode .quick-nav-card {
+    background: rgba(255,255,255,0.85) !important;
+    border-color: rgba(0,0,0,0.08) !important;
+}
+html.light-mode .header,
+html.light-mode .stat-card:first-child {
+    background: rgba(255,255,255,0.82) !important;
+    border-color: rgba(0,0,0,0.08) !important;
+}
+/* duplicate light-mode body rules removed — see ARTISTIC block above */
+
+/* ── Workout items: full text on mobile ─────────────────────────────── */
+.workout-info h4 {
+    white-space: normal;
+    word-break: break-word;
+    overflow: visible;
+}
+@media (max-width: 600px) {
+    .workout-item { flex-wrap: wrap; align-items: flex-start; gap: 0.5rem; }
+    .workout-info { width: 100%; }
+    .workout-stats { flex-shrink: 0; }
+}
+
+/* ── Josefin Sans fallback (if not yet loaded) ───────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&display=swap');
+
+</style>
+
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">&#9776;</button>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay">
+      <div class="spinner"></div>
+      <p class="loading-text">INITIALIZING SYSTEMS...</p>
+  </div>
+
+    
+
+    
+   <div class="dashboard-container">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+      <div class="sidebar-triple-logos">
+  <!-- LEFT: Theme toggle -->
+  <button class="tri-theme-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle dark / light mode">
+    <svg class="tri-theme-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="themeGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#E8C96A"/>
+          <stop offset="60%" stop-color="#C9A84C"/>
+          <stop offset="100%" stop-color="#8E6E28"/>
+        </linearGradient>
+      </defs>
+      <path class="icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" fill="url(#themeGrad)" fill-opacity="0.18" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <g class="icon-sun">
+        <circle cx="12" cy="12" r="4" fill="url(#themeGrad)" fill-opacity="0.22" stroke="url(#themeGrad)" stroke-width="1.6"/>
+        <line x1="12" y1="2" x2="12" y2="5" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="12" y1="19" x2="12" y2="22" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="2" y1="12" x2="5" y2="12" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="19" y1="12" x2="22" y2="12" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" stroke="url(#themeGrad)" stroke-width="1.6" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </button>
+  <!-- CENTER: FlowFit wordmark -->
+  <a href="index.html" class="tri-logo-center" title="FlowFit">
+    <div class="tri-wordmark">
+      <span class="tri-flow">Flow</span>
+      <span class="tri-fit">Fit</span>
+    </div>
+  </a>
+  <!-- RIGHT: Notification bell -->
+  <button class="tri-notif-btn" id="sidebarNotifBtn" onclick="toggleNotifPanel()" aria-label="Notifications" title="Notifications">
+    <svg class="tri-bell-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bellGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#E8C96A"/>
+          <stop offset="60%" stop-color="#C9A84C"/>
+          <stop offset="100%" stop-color="#8E6E28"/>
+        </linearGradient>
+      </defs>
+      <path d="M6 10a6 6 0 0 1 12 0c0 3.5 1.5 5.5 2 6H4c.5-.5 2-2.5 2-6Z" fill="url(#bellGrad)" fill-opacity="0.18" stroke="url(#bellGrad)" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M10 17a2 2 0 0 0 4 0" fill="none" stroke="url(#bellGrad)" stroke-width="1.6" stroke-linecap="round"/>
+      <circle class="bell-pulse-dot" cx="18" cy="6" r="0" fill="#E8C96A"/>
+    </svg>
+    <span class="tri-notif-badge" id="sidebarNotifBadge"></span>
+  </button>
+</div>
+      <nav>
+          <ul class="nav-menu">
+      <li class="nav-item"><a href="index.html" class="nav-link"><span>Home</span></a></li>
+      <li class="nav-item"><a href="dashboard.html" class="nav-link active"><span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="workouts.html" class="nav-link"><span>Workouts</span></a></li>
+      <li class="nav-item"><a href="programs.html" class="nav-link"><span>Programs</span></a></li>
+      <li class="nav-item"><a href="progress.html" class="nav-link"><span>Progress</span></a></li>
+      <li class="nav-item"><a href="profile.html" class="nav-link"><span>Profile</span></a></li>
+      <li class="nav-item"><a href="subscription.html" class="nav-link"><span>Subscription</span></a></li>
+          </ul>
+      </nav>
+      <!-- Spacer: pushes user-section down on large screens
+             but collapses so content scrolls on small screens -->
+      <div class="nav-spacer"></div>
+      <div class="user-section">
+          <div class="user-profile">
+              <div class="user-avatar" id="userAvatar">U</div>
+              <div class="user-info">
+                  <h4 id="userName"><span id="userEmail" style="display:none"></span>Loading...</h4>
+                  <span id="planBadge" class="plan-badge plan-free">FREE</span>
+              </div>
+          </div>
+          <button class="logout-btn" id="sidebarLogoutBtn"><span>LOGOUT</span></button>
+      </div>
+  </aside>
+
+  <!-- ══ NOTIFICATION PANEL ════════════════════════════════════════════ -->
+  <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+  <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
+    <div class="notif-panel-header">
+      <span class="notif-panel-title">Notifications</span>
+      <div class="notif-panel-actions">
+        <button class="notif-action-btn" id="markAllBtn" onclick="markAllNotifsRead()" style="display:none">
+          Mark all read
+        </button>
+        <button class="notif-close-btn" onclick="closeNotifPanel()" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div class="notif-list" id="notifList">
+      <!-- Skeleton -->
+      <div class="notif-skeleton"><div class="notif-skel-line long"></div><div class="notif-skel-line short"></div></div>
+      <div class="notif-skeleton"><div class="notif-skel-line mid"></div><div class="notif-skel-line short"></div></div>
+    </div>
+  </div>
+      <main class="main-content">
+
+          <div class="header">
+              <h1 class="greeting" id="greeting">Welcome Back</h1>
+              <p class="date" id="currentDate">LOADING DATE...</p>
+          </div>
+
+          <!-- STATS -->
+          <div class="stats-grid">
+              <div class="stat-card">
+                                      <div class="stat-value" id="streakValue">0</div>
+                  <div class="stat-label">Day Streak</div>
+              </div>
+              <div class="stat-card">
+                                      <div class="stat-value" id="workoutCount">0</div>
+                  <div class="stat-label">Workouts</div>
+              </div>
+              <div class="stat-card">
+                                      <div class="stat-value" id="totalDuration">0h</div>
+                  <div class="stat-label">Total Time</div>
+              </div>
+              <div class="stat-card">
+                                      <div class="stat-value" id="totalCalories">0</div>
+                  <div class="stat-label">Calories</div>
+              </div>
+          </div>
+
+
+          <!-- QUICK NAVIGATION GRID -->
+          <div class="quick-nav-grid">
+              <a href="workouts.html" class="quick-nav-card">
+                  <div class="qn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M6.5 6.5h11M6.5 12h7M6.5 17.5h4.5"/><rect x="2" y="2" width="20" height="20" rx="4"/>
+                      </svg>
+                  </div>
+                  <span class="qn-label">Workouts</span>
+                  <span class="qn-arrow">&#8250;</span>
+              </a>
+              <a href="programs.html" class="quick-nav-card">
+                  <div class="qn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                      </svg>
+                  </div>
+                  <span class="qn-label">Programs</span>
+                  <span class="qn-arrow">&#8250;</span>
+              </a>
+              <a href="progress.html" class="quick-nav-card">
+                  <div class="qn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                      </svg>
+                  </div>
+                  <span class="qn-label">Progress</span>
+                  <span class="qn-arrow">&#8250;</span>
+              </a>
+              <a href="subscription.html" class="quick-nav-card">
+                  <div class="qn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                  </div>
+                  <span class="qn-label">Subscription</span>
+                  <span class="qn-arrow">&#8250;</span>
+              </a>
+          </div>
+
+        <button  onclick="window.open('https://aicoach.cctamcc.site', '_blank')" class="ai-launch-btn" aria-label="Open AI Coach">
+          <span class="ai-launch-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="aiBrainGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#E8C96A"/>
+                  <stop offset="100%" stop-color="#8E6E28"/>
+                </linearGradient>
+              </defs>
+              <circle cx="12" cy="11" r="5" stroke="url(#aiBrainGrad)" stroke-width="1.5" fill="none"/>
+              <path d="M9 8.5c0-1.66 1.34-3 3-3s3 1.34 3 3" stroke="url(#aiBrainGrad)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+              <path d="M10 11c0-.55.45-1 1-1h2c.55 0 1 .45 1 1v.5" stroke="url(#aiBrainGrad)" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+              <circle cx="12" cy="12.5" r="1" fill="url(#aiBrainGrad)"/>
+              <path d="M7 11H5.5a1 1 0 0 0 0 2H7M17 11h1.5a1 1 0 0 0 0 2H17" stroke="url(#aiBrainGrad)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+              <path d="M9 16l1-1.5h4l1 1.5" stroke="url(#aiBrainGrad)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M9.5 19h5" stroke="url(#aiBrainGrad)" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="12" cy="19" r="0.8" fill="url(#aiBrainGrad)"/>
+            </svg>
+          </span>
+          <span class="ai-launch-label">
+            <span class="ai-launch-title">AI Coach</span>
+            <span class="ai-launch-sub">Ask anything · 24/7</span>
+          </span>
+          <span class="ai-launch-arrow">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </button>
+        
+
+          <!-- CONTENT -->
+          <div class="content-grid">
+              <div class="card">
+                  <div class="card-header">
+                      <h2 class="card-title">Mission History</h2>
+                        
+                  </div>
+                  <div id="recentWorkouts">
+                      <div class="empty-state">NO MISSIONS LOGGED YET.</div>
+                  </div>
+              </div>
+
+              <div class="card wpoints-card">
+                  <div class="card-header">
+                      <h2 class="card-title">W Points</h2>
+                      <span class="wpoints-badge" id="wpointsBadge">0 W</span>
+                  </div>
+                  <div class="wpoints-total-row">
+                      <div class="wpoints-circle" id="wpointsCircle">
+                          <span class="wpoints-number" id="wpointsTotal">0</span>
+                          <span class="wpoints-label">WINS</span>
+                      </div>
+                      <div class="wpoints-breakdown" id="wpointsBreakdown">
+                          <div class="wp-row"><span class="wp-key">Achievements</span><span class="wp-val" id="wpAch">0 W</span></div>
+                          <div class="wp-row"><span class="wp-key">Programs completed</span><span class="wp-val" id="wpProg">0 W</span></div>
+                          <div class="wp-row wp-row-new"><span class="wp-key">Welcome bonus</span><span class="wp-val">1 W</span></div>
+                      </div>
+                  </div>
+                  <div class="wpoints-rule">
+                      <span>3 achievements = 1 W &nbsp;&middot;&nbsp; 1 program = 1 W &nbsp;&middot;&nbsp; New user = 1 W</span>
+                  </div>
+                  <div id="wpointsHistory"></div>
+              </div>
+          </div>
+
+      </main>
+  </div>
+
+  
+  
+  <!-- AI COACH MODAL -->
+<div id="aiCoachModal" class="ai-modal" style="display: none;">
+  <div class="ai-coach-content">
+    <div class="ai-coach-header">
+      <div class="coach-avatar">🤖</div>
+      <div>
+        <h2>AI Coach</h2>
+        <p>Your personal trainer • Always here</p>
+      </div>
+      <button onclick="closeCoachModal()" class="close-btn">✕</button>
+    </div>
+    <div id="chatMessages" class="chat-messages"></div>
+
+    <div class="quick-suggestions">
+      <div onclick="quickAsk('How do I fix my push-up form?')">Push-up form</div>
+      <div onclick="quickAsk('Wrist hurts during planks')">Wrist pain</div>
+      <div onclick="quickAsk('I feel tired today')">Lighter session</div>
+      <div onclick="quickAsk('Motivate me')">Motivate me</div>
+    </div>
+
+    <div class="chat-input-area">
+      <input id="coachInput" type="text" placeholder="Ask anything... (form, pain, adjustments...)" 
+             onkeypress="if(event.key === 'Enter') sendCoachMessage()">
+      <button onclick="sendCoachMessage()" class="send-btn">Send</button>
+    </div>
+  </div>
+</div>
+
+
+  <div id="toastArea"></div>
+<script src="api.js"></script>
+  <script>
+
+      /* ── LOADING ──────────────────────────────── */
+        const _overlay = document.getElementById('loadingOverlay');
+        const PageLoader = {
+            show: () => {
+                _overlay.style.display = 'flex';
+                // Force reflow so the opacity transition fires
+                _overlay.offsetHeight;
+                _overlay.style.opacity = '1';
+            },
+            hide: () => {
+                _overlay.style.opacity = '0';
+                setTimeout(() => { _overlay.style.display = 'none'; }, 500);
+            }
+        };
+
+        /* ── DATE ────────────────────────────────── */
+        function updateDate() {
+            const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+            document.getElementById('currentDate').textContent =
+                new Date().toLocaleDateString('en-US', opts).toUpperCase();
+        }
+
+        /* ── SIDEBAR USER ────────────────────────── */
+        function initDashboardHeader() {
+            populateSidebarUser();
+            const user = TokenManager.getUser();
+            if (!user) return;
+            const name = user.name || user.email || 'User';
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+            // Update sidebar
+            const avatarEl = document.getElementById('userAvatar');
+            const nameEl   = document.getElementById('userName');
+            const emailEl  = document.getElementById('userEmail');
+            if (avatarEl) avatarEl.textContent = initials;
+            if (nameEl)   nameEl.textContent   = name;
+            if (emailEl)  emailEl.textContent  = user.role === 'ADMIN' ? 'Admin' : 'Member';
+            // Update greeting
+            const greetEl = document.getElementById('greeting');
+            if (greetEl) greetEl.textContent = 'WELCOME, ' + name.split(' ')[0].toUpperCase();
+        }
+
+        /* ── STREAK ──────────────────────────────── */
+        async function loadStreak() {
+            try {
+                const res = await ProgressAPI.getStreaks();
+                if (res.success && res.data) {
+                    // FIX: handle multiple possible field names from API
+                    const d = res.data;
+                    const streak = d.currentStreak ?? d.streak ?? d.current ?? d.streakDays ?? 0;
+                    document.getElementById('streakValue').textContent = streak;
+                }
+            } catch (e) { document.getElementById('streakValue').textContent = '0'; }
+        }
+
+        /* ── STATS ───────────────────────────────── */
+        async function loadStats() {
+            try {
+                const res = await ProgressAPI.getStats('30d');
+                // FIX: handle {data:{stats:{...}}} or flat {data:{...}} response shapes
+                const s = res.data?.stats || res.data || {};
+                if (res.success && s) {
+                    // FIX: try multiple field names the API may return
+                    const workouts = s.totalWorkouts ?? s.workoutCount ?? s.total ?? 0;
+                    document.getElementById('workoutCount').textContent = workouts;
+
+                    // totalDuration is in MINUTES (per api.js); show as Xh or Xm
+                    const mins = s.totalDuration ?? s.totalMinutes ?? s.duration ?? 0;
+                    document.getElementById('totalDuration').textContent =
+                        mins >= 60 ? (mins / 60).toFixed(1) + 'h' : (mins || 0) + 'm';
+
+                    const cals = s.totalCalories ?? s.caloriesBurned ?? s.calories ?? 0;
+                    document.getElementById('totalCalories').textContent =
+                        Math.round(cals).toLocaleString();
+                }
+            } catch (e) { console.error('Stats error:', e); }
+        }
+
+        /* ── RECENT WORKOUTS ─────────────────────── */
+        async function loadRecentWorkouts() {
+            try {
+                // FIX: use getWorkoutHistory (designed for this) not getUserProgress
+                // getUserProgress can return paginated {data:{logs:[...]}} not a flat array
+                const res = await ProgressAPI.getWorkoutHistory(5);
+                // Handle both flat array and nested {logs:[...]} shapes
+                const logs = Array.isArray(res.data) ? res.data
+                           : Array.isArray(res.data?.logs) ? res.data.logs
+                           : Array.isArray(res.data?.workouts) ? res.data.workouts
+                           : [];
+                if (logs.length > 0) {
+                    displayRecentWorkouts(logs);
+                } else {
+                    document.getElementById('recentWorkouts').innerHTML =
+                        '<div class="empty-state">NO MISSIONS LOGGED YET.</div>';
+                }
+            } catch (e) { console.error('Recent workouts error:', e); }
+        }
+
+        function displayRecentWorkouts(workouts) {
+            const container = document.getElementById('recentWorkouts');
+            container.innerHTML = workouts.map(log => {
+                // FIX: API may use createdAt, date, or completedAt
+                const rawDate  = log.date || log.createdAt || log.completedAt || log.updatedAt;
+                const date     = rawDate ? formatDate(rawDate) : '—';
+                const duration = formatDuration(log.duration || 0);
+                // FIX: exercise name may be nested or flat
+                const exName   = log.exercise?.name || log.exerciseName || log.name || 'Workout';
+                const sets     = log.sets ? `${log.sets} sets` : '';
+                const reps     = log.reps ? `&times; ${log.reps}` : '';
+                const cals     = log.caloriesBurned ? `${Math.round(log.caloriesBurned)} cal` : '';
+                return `<div class="workout-item">
+                  <div class="workout-info">
+                      <h4>${exName}</h4>
+                      <p>${date} &nbsp;&middot;&nbsp; ${duration}</p>
+                  </div>
+                  <div class="workout-stats">
+                      ${sets} ${reps}
+                        ${cals ? `<br><span style="font-size:0.82rem;color:var(--t2);">${cals}</span>` : ''}
+                    </div>
+              </div>`;
+            }).join('');
+        }
+
+        /* ── W POINTS ────────────────────────────── */
+        /**
+         * W-point rules (computed client-side from server data):
+         *  +1 on account creation (always applied)
+         *  +1 per 3 unlocked achievements
+         *  +1 per completed program enrollment
+         */
+        async function loadWPoints() {
+            try {
+                // Run in parallel
+                const [achRes, progRes] = await Promise.all([
+                    ProgressAPI.getAchievements().catch(() => ({ success:false, data:[] })),
+                    ProgramsAPI.getUserPrograms().catch(() => ({ success:false, data:[] }))
+                ]);
+
+                // Achievements
+                const allAch = Array.isArray(achRes.data) ? achRes.data : [];
+                const earnedCount = allAch.filter(a => a.unlocked || a.isUnlocked || a.earned).length;
+                const achPoints = Math.floor(earnedCount / 3);
+
+                // Completed programs
+                let progList = [];
+                if (progRes.success) {
+                    const d = progRes.data;
+                    progList = Array.isArray(d) ? d
+                             : Array.isArray(d?.enrollments) ? d.enrollments
+                             : Array.isArray(d?.data) ? d.data : [];
+                }
+                const completedProgs = progList.filter(e =>
+                  e.completedAt || (!e.isActive && e.progress >= 100) ||
+                    (e.completedDays && e.program &&
+                     e.completedDays >= (e.program.durationWeeks||0)*(e.program.daysPerWeek||0))
+                ).length;
+
+                const welcomeBonus = 1; // every registered user
+                const total = welcomeBonus + achPoints + completedProgs;
+
+                // Update UI
+                document.getElementById('wpointsTotal').textContent = total;
+                document.getElementById('wpointsBadge').textContent = total + ' W';
+                document.getElementById('wpAch').textContent  = achPoints + ' W';
+                document.getElementById('wpProg').textContent = completedProgs + ' W';
+
+                // History list
+                const histEl = document.getElementById('wpointsHistory');
+                const items = [];
+                if (welcomeBonus) items.push({ label:'Welcome bonus', pts:1, note:'Account created' });
+                if (achPoints)    items.push({ label:earnedCount+' achievements earned', pts:achPoints, note:'Every 3 achievements = 1 W' });
+                if (completedProgs) items.push({ label:completedProgs+' program'+(completedProgs!==1?'s':'')+' completed', pts:completedProgs, note:'1 W per program' });
+
+                histEl.innerHTML = items.length
+                    ? '<div class="wp-history">' + items.map(it => `
+                        <div class="wp-hist-row">
+                          <div class="wp-hist-info">
+                              <span class="wp-hist-label">${it.label}</span>
+                              <span class="wp-hist-note">${it.note}</span>
+                          </div>
+                          <span class="wp-hist-pts">+${it.pts} W</span>
+                      </div>`).join('') + '</div>'
+                    : '';
+            } catch(e) {
+                console.error('W Points error:', e);
+            }
+        }
+
+        function refreshDashboardAchievements() { loadWPoints(); loadStats(); }
+
+
+// 1. On tab focus (returning from workout session)
+let _dashFocusTs = 0;
+window.addEventListener('focus', () => {
+    const now = Date.now();
+    if (now - _dashFocusTs > 15000) { _dashFocusTs = now; refreshDashboardAchievements(); }
+});
+
+// 2. Storage event — workout-session sets this key after logging
+window.addEventListener('storage', e => {
+    if (e.key === 'ff_workout_logged' || e.key === 'ff_achievement_update') {
+        refreshDashboardAchievements();
+        if (e.key === 'ff_workout_logged') {
+            loadRecentWorkouts();
+            localStorage.removeItem('ff_workout_logged');
+        }
+    }
+});
+
+// 3. Periodic poll every 90 seconds while tab is visible
+let _achPollInterval = null;
+function startAchievementPolling() {
+    if (_achPollInterval) return;
+    _achPollInterval = setInterval(() => {
+        if (!document.hidden) refreshDashboardAchievements();
+    }, 90000);
+}
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshDashboardAchievements();
+});
+startAchievementPolling();
+
+
+function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText = 'Confirm', cancelText = 'Cancel', danger = false, onOk }) {
+    const ex = document.getElementById('ff-confirm');
+    if (ex) ex.remove();
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ff-confirm-backdrop';
+    backdrop.id = 'ff-confirm';
+    backdrop.innerHTML = `
+        <div class="ff-confirm-box">
+          <span class="ff-confirm-icon">${icon}</span>
+          <div class="ff-confirm-title">${title}</div>
+          <p class="ff-confirm-msg">${message}</p>
+          <div class="ff-confirm-actions">
+              <button class="ff-confirm-cancel" id="ffCancel">${cancelText}</button>
+              <button class="ff-confirm-ok ${danger ? 'danger' : ''}" id="ffOk">${okText}</button>
+          </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    const close = () => {
+        backdrop.style.opacity = '0';
+        backdrop.style.pointerEvents = 'none';
+        backdrop.style.visibility = 'hidden';
+        if (backdrop.parentNode) backdrop.parentNode.removeChild(backdrop);
+    };
+    backdrop.querySelector('#ffCancel').addEventListener('click', e => { e.stopPropagation(); close(); });
+    backdrop.querySelector('#ffOk').addEventListener('click', e => { e.stopPropagation(); close(); if (onOk) onOk(); });
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+    document.addEventListener('keydown', function esc(e) {
+        if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+}
+
+
+
+
+        /* ── LOGOUT ──────────────────────────────── */
+        function handleLogout() {
+            showConfirm({
+                icon: '&#9654;',
+                title: 'LOG OUT',
+                message: 'Are you sure you want to log out of FlowFit?',
+                okText: 'LOG OUT',
+                cancelText: 'Stay',
+                danger: true,
+                onOk: async () => {
+                    PageLoader.show();
+                    await AuthAPI.logout();
+                }
+            });
+        }
+
+        /* ── INIT ────────────────────────────────── */
+        async function loadDashboard() {
+            PageLoader.show();
+            const safetyTimer = setTimeout(() => PageLoader.hide(), 8000);
+            try {
+                updateDate();
+                try { initDashboardHeader(); } catch (_) {}
+                try { await updatePlanBadge(); } catch (_) {}
+                await Promise.all([
+                    loadStreak(),
+                    loadStats(),
+                    loadRecentWorkouts(),
+                    loadWPoints()
+                ]);
+            } catch (e) {
+                console.error('Dashboard init error:', e);
+            } finally {
+                clearTimeout(safetyTimer);
+                PageLoader.hide();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try { requireAuth(); } catch (_) {}
+            // Recalculate achievements once per day
+            const _sessKey = 'ff_ach_recalc_' + (new Date().toISOString().split('T')[0]);
+            if (!sessionStorage.getItem(_sessKey)) {
+                sessionStorage.setItem(_sessKey, '1');
+                try { if (typeof ProgressAPI !== 'undefined') await ProgressAPI.recalculateAchievements(); } catch (_) {}
+            }
+            loadDashboard();
+            const _lb = document.getElementById('sidebarLogoutBtn');
+            if (_lb) _lb.addEventListener('click', () => { if (typeof handleLogout === 'function') handleLogout(); });
+        });
+  </script>
+
+<script>
+  /* ── FLOWFIT SIDEBAR JS v4 — smooth scroll + reliable swipe ─────────────── */
+(function () {
+    'use strict';
+    let _savedY = 0;
+
+    function openSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        _savedY = window.scrollY || 0;
+        sb.classList.add('mobile-active');
+        if (ov) ov.classList.add('active');
+        document.body.classList.add('sidebar-open');
+        document.body.style.top = `-${_savedY}px`;
+        sb.offsetHeight; // force reflow
+    }
+
+    function closeSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (!sb) return;
+        sb.classList.remove('mobile-active');
+        if (ov) ov.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+        document.body.style.top = '';
+        window.scrollTo({ top: _savedY, behavior: 'instant' });
+    }
+
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        if (!sb) return;
+        sb.classList.contains('mobile-active') ? closeSidebar() : openSidebar();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) closeSidebar();
+            });
+        });
+        const sb = document.getElementById('sidebar');
+        if (sb) {
+            let startX = 0;
+            sb.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+            sb.addEventListener('touchend', e => {
+                if (startX - e.changedTouches[0].clientX > 80) closeSidebar();
+            }, { passive: true });
+        }
+    });
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+    window.openSidebar  = openSidebar;
+    window.closeSidebar = closeSidebar;
+    window.toggleSidebar = toggleSidebar;
+}());
+
+</script>
+
+
+ 
+
+
+  
+<script>
+let currentCoachContext = null;
+  
+
+function openCoachModal(exerciseName = null) {
+  currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
+  document.getElementById('aiCoachModal').style.display = 'flex';
+  document.getElementById('chatMessages').innerHTML = '';
+
+  // Welcome message from the intelligent coach
+  setTimeout(() => {
+    addCoachMessage("Hi 👋 I'm your AI Coach. I can help with form, substitutions, adjustments, motivation, or even predict your future progress. What’s on your mind today?", "assistant");
+  }, 300);
+}
+  
+function closeCoachModal() {
+  document.getElementById('aiCoachModal').style.display = 'none';
+}
+
+
+async function sendCoachMessage() {
+  // FIX: removed TypeScript cast 'as HTMLInputElement'
+  const input = document.getElementById('coachInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  addCoachMessage(text, 'user');
+  input.value = '';
+
+  // FIX: _LM was never defined -- use send button as loading indicator
+  const sendBtn = document.querySelector('.chat-send-btn');
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = '...'; }
+
+  try {
+    // FIX: apiRequest takes 2 args (endpoint, options) not 3
+    // FIX: /ai/coach -- api.js prepends API_CONFIG.baseURL (/api/v1)
+    const res = await apiRequest('/ai/coach', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: text,
+        currentExercise: currentCoachContext ? currentCoachContext.currentExercise : null
+      })
+    });
+
+    if (res && res.success) {
+      addCoachMessage(res.reply, 'assistant');
+
+      // FIX: broken template literals replaced with DOM createElement
+      if (res.alternatives && res.alternatives.length) {
+        const container = document.getElementById('chatMessages');
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'margin:12px 0 8px;display:flex;gap:8px;flex-wrap:wrap';
+        res.alternatives.forEach(function(a) {
+          const chip = document.createElement('div');
+          chip.className = 'suggestion-chip';
+          chip.textContent = a;
+          chip.onclick = function() { quickAsk(a); };
+          wrap.appendChild(chip);
+        });
+        container.appendChild(wrap);
+      }
+
+      if (res.suggestion) {
+        const tip = document.createElement('div');
+        tip.style.cssText = 'margin-top:10px;padding:10px 14px;background:rgba(201,168,76,0.1);border-radius:12px;font-size:0.9rem;color:var(--t1)';
+        tip.innerHTML = '<strong>💡 Coach Tip:</strong> ' + res.suggestion;
+        document.getElementById('chatMessages').appendChild(tip);
+      }
+    } else {
+      addCoachMessage("Sorry, I couldn't get a response. Please try again.", 'assistant');
+    }
+  } catch (e) {
+    console.error('[AI Coach] sendCoachMessage error:', e);
+    addCoachMessage("Sorry, I'm having a quick rest. Try again in a moment.", 'assistant');
+  } finally {
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '\u27a4'; }
+  }
+}
+
+
+function quickAsk(question) {
+  const input = document.getElementById('coachInput');
+  if (input) input.value = question;
+  sendCoachMessage();
+}
+
+function addCoachMessage(text, sender) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+  const div = document.createElement('div');
+  div.className = sender === 'user' ? 'user-message' : 'coach-message';
+  div.innerHTML = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+</script>
+
+  <script>
+
+/* ══ NOTIFICATION PANEL ════════════════════════════════════════════════════
+   Full notification system: fetch, render, badge, mark-read, delete, poll.
+   Uses the same API_CONFIG.baseURL and TokenManager pattern as the rest of
+   the dashboard.
+════════════════════════════════════════════════════════════════════════════ */
+(function () {
+  const BASE = (typeof API_CONFIG !== 'undefined' && API_CONFIG.baseURL)
+    ? API_CONFIG.baseURL
+    : 'https://fit.cctamcc.site/api/v1';
+
+  let _open   = false;
+  let _data   = [];
+  let _timer  = null;
+
+  function _token() {
+    return (typeof TokenManager !== 'undefined' && TokenManager.getAccessToken)
+      ? TokenManager.getAccessToken()
+      : (localStorage.getItem('accessToken') || '');
+  }
+  function _auth() {
+    return typeof isAuthenticated !== 'undefined'
+      ? isAuthenticated()
+      : !!_token();
+  }
+
+  /* ── Public API ─────────────────────────────────────────────────────── */
+  window.toggleNotifPanel = function () { _open ? closeNotifPanel() : openNotifPanel(); };
+
+  window.openNotifPanel = function () {
+    _open = true;
+    document.getElementById('notifPanel')?.classList.add('open');
+    document.getElementById('notifOverlay')?.classList.add('open');
+    _fetchFull();
+  };
+
+  window.closeNotifPanel = function () {
+    _open = false;
+    document.getElementById('notifPanel')?.classList.remove('open');
+    document.getElementById('notifOverlay')?.classList.remove('open');
+  };
+
+  /* ── Fetch ──────────────────────────────────────────────────────────── */
+  async function _fetchFull() {
+    if (!_auth()) return;
+    try {
+      const r = await fetch(BASE + '/notifications?limit=30', {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _token() },
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      _data = d.notifications || [];
+      _render(_data);
+      _updateBadge(d.unreadCount || 0);
+    } catch { /* non-critical */ }
+  }
+
+  async function _fetchCount() {
+    if (!_auth()) return;
+    try {
+      const r = await fetch(BASE + '/notifications/unread', {
+        credentials: 'include',
+        headers: { 'Authorization': 'Bearer ' + _token() },
+      });
+      if (!r.ok) return;
+      const d = await r.json();
+      _updateBadge(d.count || 0);
+      if (_open) _fetchFull();
+    } catch { /* non-critical */ }
+  }
+
+  /* ── Render ─────────────────────────────────────────────────────────── */
+  function _render(items) {
+    const list    = document.getElementById('notifList');
+    const markBtn = document.getElementById('markAllBtn');
+    if (!list) return;
+
+    const hasUnread = items.some(n => !n.readAt);
+    if (markBtn) markBtn.style.display = hasUnread ? 'block' : 'none';
+
+    if (!items.length) {
+      list.innerHTML = `
+        <div class="notif-empty">
+          <div class="notif-empty-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="22" stroke="#C9A84C" stroke-width="1.5" stroke-opacity="0.4"/>
+              <path d="M16 24a8 8 0 0 1 16 0c0 5 2 7.5 2.5 8h-21C14 31.5 16 29 16 24Z"
+                    fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linejoin="round" stroke-opacity="0.6"/>
+              <path d="M21 32a3 3 0 0 0 6 0" fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
+              <line x1="24" y1="13" x2="24" y2="16" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.6"/>
+            </svg>
+          </div>
+          <p>All caught up!<br>Notifications about your plan,<br>progress, and milestones appear here.</p>
+        </div>`;
+      return;
+    }
+
+    const ICON_BG = {
+      welcome:       'rgba(201,168,76,0.14)',
+      sub_activated: 'rgba(59,191,138,0.12)',
+      sub_trial:     'rgba(251,191,36,0.12)',
+      sub_expired:   'rgba(156,163,175,0.10)',
+      sub_cancelled: 'rgba(224,84,84,0.12)',
+      sub_renewed:   'rgba(59,191,138,0.12)',
+      sub_failed:    'rgba(224,84,84,0.12)',
+      milestone:     'rgba(201,168,76,0.18)',
+      achievement:   'rgba(201,168,76,0.18)',
+      system:        'rgba(91,156,246,0.12)',
+    };
+
+    list.innerHTML = items.map(n => {
+      const bg  = ICON_BG[n.type] || 'rgba(255,255,255,0.05)';
+      const ago = _timeAgo(new Date(n.createdAt));
+      const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return `
+        <div class="notif-item${n.readAt ? '' : ' unread'}"
+             onclick="handleNotifClick('${n.id}','${esc(n.link || '')}')"
+             data-id="${n.id}">
+          <div class="notif-icon-wrap" style="background:${bg}">${esc(n.icon)}</div>
+          <div class="notif-content">
+            <div class="notif-title">${esc(n.title)}</div>
+            <div class="notif-body">${esc(n.body)}</div>
+            <div class="notif-time">${ago}</div>
+          </div>
+          <button class="notif-delete-btn"
+                  onclick="deleteNotif(event,'${n.id}')"
+                  aria-label="Dismiss">✕</button>
+        </div>`;
+    }).join('');
+  }
+
+  /* ── Badge ──────────────────────────────────────────────────────────── */
+  function _updateBadge(count) {
+    const badge = document.getElementById('sidebarNotifBadge');
+    const btn   = document.getElementById('sidebarNotifBtn');
+    const dot   = document.querySelector('.bell-pulse-dot');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count > 99 ? '99+' : String(count);
+      badge.classList.add('visible');
+      btn?.classList.add('has-unread');
+      dot?.classList.add('active');
+      // Trigger shake on new unread
+      if (btn) { btn.classList.remove('has-unread'); void btn.offsetWidth; btn.classList.add('has-unread'); }
+    } else {
+      badge.classList.remove('visible');
+      btn?.classList.remove('has-unread');
+      dot?.classList.remove('active');
+    }
+  }
+
+  /* ── Actions ────────────────────────────────────────────────────────── */
+  window.handleNotifClick = async function (id, link) {
+    await _call('/' + id + '/read', 'PUT');
+    const n = _data.find(x => x.id === id);
+    if (n) { n.readAt = new Date().toISOString(); _render(_data); _updateBadge(_data.filter(x => !x.readAt).length); }
+    if (link) { closeNotifPanel(); window.location.href = link; }
+  };
+
+  window.deleteNotif = async function (e, id) {
+    e.stopPropagation();
+    await _call('/' + id, 'DELETE');
+    _data = _data.filter(x => x.id !== id);
+    _render(_data);
+    _updateBadge(_data.filter(x => !x.readAt).length);
+  };
+
+  window.markAllNotifsRead = async function () {
+    await _call('/read-all', 'PUT');
+    _data = _data.map(n => ({ ...n, readAt: n.readAt || new Date().toISOString() }));
+    _render(_data);
+    _updateBadge(0);
+  };
+
+  async function _call(path, method) {
+    try {
+      await fetch(BASE + '/notifications' + path, {
+        method, credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _token() },
+      });
+    } catch { /* silent */ }
+  }
+
+  /* ── Time helper ────────────────────────────────────────────────────── */
+  function _timeAgo(d) {
+    const s = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (s < 60)    return 'just now';
+    if (s < 3600)  return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    const days = Math.floor(s / 86400);
+    return days === 1 ? 'yesterday' : days + 'd ago';
+  }
+
+  /* ── Polling ────────────────────────────────────────────────────────── */
+  function _startPolling() {
+    if (_timer) clearInterval(_timer);
+    _fetchCount(); // immediate check
+    _timer = setInterval(_fetchCount, 90_000); // every 90s
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (_auth()) _startPolling();
+    // Re-check auth after possible login within the page
+    setTimeout(() => { if (_auth() && !_timer) _startPolling(); }, 2000);
+  });
+})();
+  
+  </script>
+
+
+</body>
+</html>
