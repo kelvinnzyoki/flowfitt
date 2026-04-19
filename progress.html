@@ -8,39 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="theme.css">
-<script>
-/* FlowFit Theme — inline preload */
-(function(){
-  var s = localStorage.getItem('flowfit-theme');
-  if (s === 'light') {
-    document.documentElement.classList.add('light-mode');
-    document.documentElement.dataset.theme = 'light';
-  } else {
-    document.documentElement.dataset.theme = 'dark';
-  }
-})();
-document.addEventListener('DOMContentLoaded', function () {
-  var btn  = document.getElementById('themeToggle');
-  var root = document.documentElement;
-  function _syncIcons() {
-    var light = root.classList.contains('light-mode');
-    var moon = document.querySelector('.icon-moon');
-    var sun  = document.querySelector('.icon-sun');
-    if (moon) moon.style.display = light ? 'none'  : 'block';
-    if (sun)  sun.style.display  = light ? 'block' : 'none';
-  }
-  _syncIcons();
-  if (btn) {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      var isLight = root.classList.toggle('light-mode');
-      root.dataset.theme = isLight ? 'light' : 'dark';
-      localStorage.setItem('flowfit-theme', isLight ? 'light' : 'dark');
-      _syncIcons();
-    });
-  }
-});
-</script>
+  <script src="theme.js" defer></script>
+
     
   <style>
 
@@ -4983,7 +4952,44 @@ html.light-mode .ff-footer-bottom {
           </div>
       </div>
   </main>
-</div><!-- FIX #21: api.js loaded ONCE only -->
+</div>
+
+
+<footer class="ff-footer">
+  <div class="ff-footer-inner">
+    <div class="ff-footer-brand">
+      <span class="ff-footer-logo">FlowFit</span>
+      <p class="ff-footer-tagline">Train smart. Track progress. Achieve more.</p>
+    </div>
+    <nav class="ff-footer-links" aria-label="Footer navigation">
+      <div class="ff-footer-col">
+        <span class="ff-footer-col-title">Train</span>
+        <a href="workouts.html">Workouts</a>
+        <a href="programs.html">Programs</a>
+        <a href="progress.html">Progress</a>
+      </div>
+      <div class="ff-footer-col">
+        <span class="ff-footer-col-title">Account</span>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="profile.html">Profile</a>
+        <a href="subscription.html">Subscription</a>
+      </div>
+      <div class="ff-footer-col">
+        <span class="ff-footer-col-title">App</span>
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Sign Up</a>
+      </div>
+    </nav>
+  </div>
+  <div class="ff-footer-bottom">
+    <span>&copy; <script>document.write(new Date().getFullYear())</script> FlowFit Elite. All rights reserved.</span>
+    <span class="ff-footer-sep">·</span>
+    <span>Built for athletes who mean business.</span>
+  </div>
+</footer>
+
+    
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 <script src="api.js" defer></script>
 
@@ -5804,38 +5810,6 @@ function showConfirm(opts) {
 
 
 <!-- ── FLOWFIT FOOTER ──────────────────────────────────────────── -->
-<footer class="ff-footer">
-  <div class="ff-footer-inner">
-    <div class="ff-footer-brand">
-      <span class="ff-footer-logo">FlowFit</span>
-      <p class="ff-footer-tagline">Train smart. Track progress. Achieve more.</p>
-    </div>
-    <nav class="ff-footer-links" aria-label="Footer navigation">
-      <div class="ff-footer-col">
-        <span class="ff-footer-col-title">Train</span>
-        <a href="workouts.html">Workouts</a>
-        <a href="programs.html">Programs</a>
-        <a href="progress.html">Progress</a>
-      </div>
-      <div class="ff-footer-col">
-        <span class="ff-footer-col-title">Account</span>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="profile.html">Profile</a>
-        <a href="subscription.html">Subscription</a>
-      </div>
-      <div class="ff-footer-col">
-        <span class="ff-footer-col-title">App</span>
-        <a href="index.html">Home</a>
-        <a href="login.html">Login</a>
-        <a href="register.html">Sign Up</a>
-      </div>
-    </nav>
-  </div>
-  <div class="ff-footer-bottom">
-    <span>&copy; <script>document.write(new Date().getFullYear())</script> FlowFit Elite. All rights reserved.</span>
-    <span class="ff-footer-sep">·</span>
-    <span>Built for athletes who mean business.</span>
-  </div>
-</footer>
+
 </body>
 </html>
