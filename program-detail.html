@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Program - FlowFit</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Oswald:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;700&family=Josefin+Sans:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
+  
   
 <link rel="stylesheet" href="theme.css">
 <script src="theme.js" defer></script>
@@ -4371,8 +4375,10 @@ html.light-mode .footer-copy { color: #a3a3a3 !important; border-top-color: rgba
     .footer-links { flex-wrap: wrap; gap: 1rem; }
 }
 
-</style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Oswald:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;700&family=Josefin+Sans:wght@100;200;300;400;600;700&display=swap" rel="stylesheet"></head>
+</style>
+  
+
+</head>
 <body>
 <div class="main">
 <div class="pd-back-bar">
@@ -4429,6 +4435,21 @@ html.light-mode .footer-copy { color: #a3a3a3 !important; border-top-color: rgba
       </div>
   </div>
 </div>
+
+  <footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">Flow<span>Fit</span></div>
+    <ul class="footer-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="programs.html">Programs</a></li>
+      <li><a href="workouts.html">Workouts</a></li>
+      <li><a href="progress.html">Progress</a></li>
+      <li><a href="subscription.html">Subscription</a></li>
+    </ul>
+    <p class="footer-copy">© 2025 FlowFit · Built for your best self</p>
+  </div>
+  </footer>
+  
 <div class="wmodal" id="wmodal">
   <div class="wmodal-box">
       <div class="wm-hero" id="wmHero"><span id="wmIcon"></span></div>
@@ -4447,6 +4468,9 @@ html.light-mode .footer-copy { color: #a3a3a3 !important; border-top-color: rgba
 </div>
 <div id="toastArea"></div>
 <script src="api.js"></script>
+
+
+  
 <script>
 const P=new URLSearchParams(location.search),PROG_ID=P.get('id'),EID=P.get('enrollmentId')||P.get('enrollment');
 if(!PROG_ID)location.href='programs.html';
@@ -4979,7 +5003,9 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
 
 
 
-</script><script>
+</script>
+  
+  <script>
 // ── Sidebar open/close ───────────────────────────────────────────────────────
 (function() {
     'use strict';
@@ -5178,19 +5204,7 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
 })();
 </script>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-brand">Flow<span>Fit</span></div>
-    <ul class="footer-links">
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="programs.html">Programs</a></li>
-      <li><a href="workouts.html">Workouts</a></li>
-      <li><a href="progress.html">Progress</a></li>
-      <li><a href="subscription.html">Subscription</a></li>
-    </ul>
-    <p class="footer-copy">© 2025 FlowFit · Built for your best self</p>
-  </div>
-</footer>
+
 
 </body>
 </html>
