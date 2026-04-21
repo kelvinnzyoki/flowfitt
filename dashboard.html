@@ -4599,13 +4599,13 @@ window.sendCoachMessage = sendCoachMessage;
   // server logs, and are stripped from the URL by the AI Coach app immediately
   // after reading — making this the safest cross-origin token handoff without
   // a dedicated SSO backend.
-  function openAICoach() {
-    const token = localStorage.getItem('accessToken');
-    const base  = 'https://aicoach.cctamcc.site';
+  //function openAICoach() {
+   // const token = localStorage.getItem('accessToken');
+   // const base  = 'https://aicoach.cctamcc.site';
     // Only append token if we actually have one; otherwise open unauthenticated
     // (AI Coach will show a "session required" message)
-    const url = token ? (base + '#token=' + encodeURIComponent(token)) : base;
-    window.open(url, '_blank', 'noopener');
+   // const url = token ? (base + '#token=' + encodeURIComponent(token)) : base;
+  // window.open(url, '_blank', 'noopener');
   }
 
 </script>
