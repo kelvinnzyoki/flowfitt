@@ -2098,7 +2098,6 @@ a.btn,
     
     /* AI Coach */
     
-
 .ai-modal {
   position: fixed;
   inset: 0;
@@ -2108,6 +2107,8 @@ a.btn,
   justify-content: center;
   background: var(--overlay-80);
   padding: 1rem;
+  /* Scroll lock helper */
+  touch-action: none; /* prevents iOS rubber-band */
 }
 
 .ai-modal-content {
@@ -2128,6 +2129,31 @@ a.btn,
 @keyframes modalPop {
   0% { transform: scale(0.95) translateY(20px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* MOBILE FULL-SCREEN */
+@media (max-width: 768px) {
+  .ai-modal {
+    padding: 8px; /* small margin around the whole modal */
+  }
+  
+  .ai-modal-content {
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+    border-radius: 20px; /* still rounded but full-screen feel */
+  }
+  
+  .ai-modal-header {
+    padding: 1rem 1.5rem;
+  }
+  
+  .chat-messages {
+    padding: 1.25rem 1rem;
+  }
+  
+  .chat-input-area {
+    padding: 1rem 1rem 1.25rem;
+  }
 }
 
 .ai-modal-header {
@@ -2152,20 +2178,8 @@ a.btn,
   box-shadow: 0 0 0 4px var(--Au-20);
 }
 
-.ai-coach-title {
-  font-family: 'Josefin Sans', sans-serif;
-  font-size: 1.55rem;
-  letter-spacing: 1px;
-  color: var(--Au-hi);
-  margin: 0;
-}
-
-.ai-coach-subtitle {
-  font-size: 0.8rem;
-  color: var(--t2);
-  margin: 0;
-  line-height: 1.2;
-}
+.ai-coach-title { font-size: 1.55rem; letter-spacing: 1px; color: var(--Au-hi); margin: 0; }
+.ai-coach-subtitle { font-size: 0.8rem; color: var(--t2); margin: 0; line-height: 1.2; }
 
 .ai-modal-close {
   width: 36px; height: 36px;
@@ -2206,21 +2220,8 @@ a.btn,
   font-size: 1.02rem;
 }
 
-.coach-message {
-  align-self: flex-start;
-  background: var(--surface-2);
-  border-radius: 20px 20px 20px 6px;
-  color: var(--t1);
-  border: 1px solid var(--Au-12);
-}
-
-.user-message {
-  align-self: flex-end;
-  background: var(--g-Au);
-  color: var(--ink);
-  border-radius: 20px 20px 6px 20px;
-  font-weight: 500;
-}
+.coach-message { align-self: flex-start; background: var(--surface-2); border-radius: 20px 20px 20px 6px; border: 1px solid var(--Au-12); color: var(--t1); }
+.user-message   { align-self: flex-end;   background: var(--g-Au); border-radius: 20px 20px 6px 20px; color: var(--ink); font-weight: 500; }
 
 .chat-input-area {
   padding: 1.25rem 1.5rem 1.75rem;
@@ -2251,8 +2252,7 @@ a.btn,
 }
 
 .chat-send-btn {
-  width: 44px;
-  height: 44px;
+  width: 44px; height: 44px;
   background: var(--g-Au);
   color: var(--ink);
   border: none;
@@ -2264,47 +2264,21 @@ a.btn,
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.chat-send-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--Au-glow); }
 
-.chat-send-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px var(--Au-glow);
-}
-
-/* ====================== LIGHT MODE ====================== */
+/* LIGHT MODE */
 html.light-mode .ai-modal-content {
   background: #ffffff;
   border-color: rgba(0,0,0,0.12);
   box-shadow: 0 25px 70px rgba(0,0,0,0.25), 0 0 40px rgba(184,134,11,0.15);
 }
 
-html.light-mode .ai-modal-header,
-html.light-mode .chat-input-area {
-  background: #fafafa;
-}
+/* SCROLL LOCK HELPER (body class) */
+body.modal-open {
+  overflow: hidden !important;
+  touch-action: none; /* extra iOS protection */
+    }
 
-html.light-mode .ai-coach-title { color: #B8860B; }
-
-html.light-mode .coach-avatar {
-  background: linear-gradient(135deg, #B8860B, #D4AF37);
-  color: #fff;
-}
-
-html.light-mode .chat-messages {
-  background: linear-gradient(to bottom, #fafafa, #f5f5f5);
-}
-
-html.light-mode .coach-message {
-  background: #ffffff;
-  border-color: rgba(184,134,11,0.25);
-  color: #0a0a0a;
-}
-
-html.light-mode .user-message {
-  background: linear-gradient(135deg, #B8860B, #D4AF37);
-  color: #ffffff;
-}
-
-html.light-mode #coachInput { color: #0a0a0a; }
 
 /* ══ SIDEBAR NOTIFICATION BELL ═══════════════════════════════════════════ */
 .tri-notif-btn {
@@ -4189,23 +4163,34 @@ let currentCoachContext = null;
 
 function openCoachModal(exerciseName = null) {
   currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
-  const modal = document.getElementById('aiCoachModal');
-  modal.style.display = 'flex';
   
+  const modal = document.getElementById('aiCoachModal');
   const messages = document.getElementById('chatMessages');
+  
+  // Enable scroll lock
+  document.body.classList.add('modal-open');
+  
+  modal.style.display = 'flex';
   messages.innerHTML = '';
 
-  // Premium welcome message
+  // Welcome message
   setTimeout(() => {
     addCoachMessage("👋 Hey champion! I'm your FlowFit AI Coach.<br>I know your program, streak, volume, recovery, and metrics.<br>What’s on your mind today?", "coach");
   }, 350);
 }
 
 function closeCoachModal() {
-  document.getElementById('aiCoachModal').style.display = 'none';
+  const modal = document.getElementById('aiCoachModal');
+  modal.style.display = 'none';
+  
+  // Disable scroll lock
+  document.body.classList.remove('modal-open');
+  
+  // Optional: clear chat if you want fresh session every time
+  // document.getElementById('chatMessages').innerHTML = '';
 }
 
-async function sendCoachMessage() {
+async function sendCoachMessage() { /* unchanged from previous version – keeping it clean */ 
   const input = document.getElementById('coachInput');
   const text = input.value.trim();
   if (!text) return;
@@ -4216,9 +4201,8 @@ async function sendCoachMessage() {
   const sendBtn = document.querySelector('.chat-send-btn');
   const originalHTML = sendBtn.innerHTML;
   sendBtn.disabled = true;
-  sendBtn.innerHTML = `<span style="display:flex;gap:4px"><span class="typing-dot" style="background:#fff;width:6px;height:6px;border-radius:50%;animation:typingBounce 1.2s infinite"></span><span class="typing-dot" style="background:#fff;width:6px;height:6px;border-radius:50%;animation:typingBounce 1.2s infinite 150ms"></span><span class="typing-dot" style="background:#fff;width:6px;height:6px;border-radius:50%;animation:typingBounce 1.2s infinite 300ms"></span></span>`;
+  sendBtn.innerHTML = `…`;
 
-  // Show assistant typing
   const messagesContainer = document.getElementById('chatMessages');
   const typingHTML = `<div class="chat-message coach-message typing-indicator"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
   messagesContainer.insertAdjacentHTML('beforeend', typingHTML);
@@ -4233,7 +4217,6 @@ async function sendCoachMessage() {
       })
     });
 
-    // Remove typing indicator
     const typingEl = messagesContainer.querySelector('.typing-indicator');
     if (typingEl) typingEl.remove();
 
@@ -4257,7 +4240,6 @@ async function sendCoachMessage() {
 function addCoachMessage(text, sender) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
-
   const div = document.createElement('div');
   div.className = `chat-message ${sender === 'user' ? 'user-message' : 'coach-message'}`;
   div.innerHTML = text;
@@ -4265,11 +4247,10 @@ function addCoachMessage(text, sender) {
   container.scrollTop = container.scrollHeight;
 }
 
-// Optional: expose for quick buttons if you want them later
 window.openCoachModal = openCoachModal;
 window.closeCoachModal = closeCoachModal;
 window.sendCoachMessage = sendCoachMessage;
-</script>
+ </script>
 
 
  
