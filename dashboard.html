@@ -4244,8 +4244,9 @@ function addCoachMessage(text, sender) {
   div.className = `chat-message ${sender === 'user' ? 'user-message' : 'coach-message'}`;
   div.innerHTML = text;
   if (sender === 'coach') {
-  div.style.whiteSpace = 'pre-wrap';
-  div.style.lineHeight = '1.6';
+    div.style.whiteSpace = 'pre-wrap';
+    div.style.lineHeight = '1.65';
+    div.style.fontSize = '1.05rem';
   }
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
