@@ -108,17 +108,22 @@ async function apiRequest(endpoint, options = {}) {
     const config = { credentials: 'include', ...options, headers };
     try {
         let response = await fetch(url, config);
-        if (response.status === 401 && token) {
-            const refreshed = await refreshAccessToken();
-            if (refreshed) {
-                headers['Authorization'] = `Bearer ${TokenManager.getAccessToken()}`;
-                response = await fetch(url, { ...config, headers });
-            } else {
-                TokenManager.clearTokens();
-                window.location.href = 'login.html';
-                throw new Error('Session expired. Please login again.');
-            }
-        }
+        ‎// In your apiRequest / fetch wrapper:
+‎if (res.status === 401) {
+‎  const body = await res.json();
+‎  if (body.code === 'TOKEN_EXPIRED') {
+‎    // Attempt refresh, then retry the original request
+‎    const refreshed = await fetch('/api/v1/auth/refresh', { method: 'POST', credentials: 'include' });
+‎    if (refreshed.ok) {
+‎      const { data } = await refreshed.json();
+‎      TokenManager.setAccessToken(data.accessToken);
+‎      return retryOriginalRequest(); // with new token in header
+‎    }
+‎  }
+‎  // Only reach here if refresh also failed — now it's safe to logout
+‎  AuthAPI.logout();
+‎}
+‎
         return await handleResponse(response);
     } catch (error) {
         if (error.name === 'TypeError') throw new Error('Network error. Check your connection.');
