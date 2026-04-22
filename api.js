@@ -190,31 +190,40 @@ async function handleResponse(response) {
 // clearTokens() → redirect to login.html. User is logged out every 15 minutes.
 let _refreshInFlight = null;
 
+let _authReady = null;
+let _authReadyResolve = null;
+function _getAuthReadyPromise() {
+    if (!_authReady) {
+        _authReady = new Promise(resolve => { _authReadyResolve = resolve; });
+    }
+    return _authReady;
+}
+function _signalAuthReady(success) {
+    _getAuthReadyPromise();
+    if (_authReadyResolve) { _authReadyResolve(success); _authReadyResolve = null; }
+}
+
 async function refreshAccessToken() {
-    // If a refresh is already running, share its promise instead of starting another.
     if (_refreshInFlight) return _refreshInFlight;
 
     _refreshInFlight = (async () => {
         try {
             const response = await fetch(`${API_CONFIG.baseURL}/auth/refresh`, {
                 method:      'POST',
-                credentials: 'include',   // sends the httpOnly ff_refresh cookie
+                credentials: 'include',
                 headers:     { 'Content-Type': 'application/json' },
             });
 
-            // FIX 4: Check response.ok before parsing — a 4xx/5xx with a JSON body
-            // (e.g. 401 "Session expired") should return false, not attempt setTokens.
+            if (response.status === 409) {
+                _refreshInFlight = null;
+                return await refreshAccessToken();
+            }
+
             if (!response.ok) return false;
 
             const data = await response.json();
 
-            // FIX 4 (continued): Guard that accessToken is a real string before storing.
-            // Without this guard, data.data.accessToken === undefined would store the
-            // literal string "undefined" in localStorage, poisoning every subsequent
-            // request with "Authorization: Bearer undefined".
             if (data.success && typeof data.data?.accessToken === 'string' && data.data.accessToken) {
-                // Server has already set the new ff_refresh cookie in the response headers.
-                // We only need to persist the short-lived access token on the client.
                 TokenManager.setTokens(data.data.accessToken);
                 return true;
             }
@@ -222,7 +231,6 @@ async function refreshAccessToken() {
         } catch {
             return false;
         } finally {
-            // Always release the lock so future expiries can start a fresh refresh.
             _refreshInFlight = null;
         }
     })();
@@ -232,6 +240,19 @@ async function refreshAccessToken() {
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 const AuthAPI = {
+    checkSession: async () => {
+        try {
+            const res = await fetch(`${API_CONFIG.baseURL}/auth/session`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (!res.ok) return false;
+            const data = await res.json();
+            return data?.valid === true;
+        } catch {
+            return false;
+        }
+    },
     register: async (userData) => {
         const { name, email, password } = userData;
         const data = await apiRequest('/auth/register', {
