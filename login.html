@@ -1016,15 +1016,16 @@ html.light-mode .hero::after {
     // domain). We must do an async refresh attempt instead — the httpOnly
     // ff_refresh cookie is sent automatically by the browser cross-origin.
     document.addEventListener('DOMContentLoaded', async () => {
-        // In-memory fast path (same tab, token still live)
         if (typeof TokenManager !== 'undefined' && TokenManager.getAccessToken()) {
             window.location.href = 'dashboard.html';
             return;
         }
-        // Silent refresh — succeeds if the user already has a valid session
-        if (typeof refreshAccessToken === 'function') {
-            const refreshed = await refreshAccessToken();
-            if (refreshed) { window.location.href = 'dashboard.html'; }
+        if (typeof AuthAPI !== 'undefined' && typeof refreshAccessToken === 'function') {
+            const hasValidSession = await AuthAPI.checkSession();
+            if (hasValidSession) {
+                const refreshed = await refreshAccessToken();
+                if (refreshed) { window.location.href = 'dashboard.html'; }
+            }
         }
     });
 
