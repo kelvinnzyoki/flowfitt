@@ -293,6 +293,28 @@ const AuthAPI = {
     }),
 };
 
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
+const NotificationsAPI = {
+    getAll: async (limit = 30) => {
+        const r = await fetch(`${API_CONFIG.baseURL}/notifications?limit=${limit}`, {
+            credentials: 'include',
+            headers: { 'Authorization': 'Bearer ' + (TokenManager.getAccessToken() || '') },
+        });
+        return r.ok ? r.json() : { notifications: [], unreadCount: 0 };
+    },
+    getUnreadCount: async () => {
+        const r = await fetch(`${API_CONFIG.baseURL}/notifications/unread`, {
+            credentials: 'include',
+            headers: { 'Authorization': 'Bearer ' + (TokenManager.getAccessToken() || '') },
+        });
+        return r.ok ? r.json() : { count: 0 };
+    },
+    markRead:    async (id) => apiRequest(`/notifications/${id}/read`,  { method: 'PUT' }),
+    markAllRead: async ()   => apiRequest('/notifications/read-all',    { method: 'PUT' }),
+    delete:      async (id) => apiRequest(`/notifications/${id}`,       { method: 'DELETE' }),
+};
+
 // ── WORKOUTS ──────────────────────────────────────────────────────────────────
 // FIX #1: Pass ALL filters — backend supports category, difficulty, muscle, equipment, limit, page
 // Resolved at runtime — set to '/workouts' or '/exercises' depending on which the
@@ -657,28 +679,13 @@ function isAuthenticated() {
 //     // ... rest of page init
 //   });
 async function requireAuth() {
-    // Fast path — already have a live access token in memory
-    if (TokenManager.getAccessToken()) return true;
-
-    // Reload/cross-origin path — always attempt a silent refresh.
-    //
-    // WHY we no longer gate this on hasSession():
-    //   hasSession() reads ff_session via document.cookie. In a cross-origin
-    //   setup (GitHub Pages → Vercel backend), ff_session is set on the backend
-    //   domain (.cctamcc.site) and is never visible to the frontend via
-    //   document.cookie — browsers only expose same-domain cookies to JS.
-    //   hasSession() always returns false on a cross-origin frontend, so gating
-    //   the refresh on it caused requireAuth() to skip the refresh and redirect
-    //   to login on every page load, even right after a successful login.
-    //
-    //   The ff_refresh httpOnly cookie IS sent automatically by the browser on
-    //   cross-origin requests when credentials:'include' is used (that is exactly
-    //   what SameSite:None + Secure enables). We therefore always attempt the
-    //   refresh and let the server decide whether the session is valid.
+    if (TokenManager.getAccessToken()) {
+        _signalAuthReady(true);
+        return true;
+    }
     const refreshed = await refreshAccessToken();
+    _signalAuthReady(refreshed);
     if (refreshed) return true;
-
-    // Refresh definitively failed — no valid session, send to login.
     try { localStorage.setItem('redirectAfterLogin', window.location.pathname); } catch {}
     window.location.href = 'login.html';
     return false;
