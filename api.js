@@ -214,10 +214,7 @@ async function refreshAccessToken() {
                 headers:     { 'Content-Type': 'application/json' },
             });
 
-            if (response.status === 409) {
-                _refreshInFlight = null;
-                return await refreshAccessToken();
-            }
+            
 
             if (!response.ok) return false;
 
