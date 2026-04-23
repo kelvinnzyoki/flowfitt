@@ -134,7 +134,7 @@ async function apiRequest(endpoint, options = {}) {
 
     const config = { credentials: 'include', cache: 'no-store', ...options, headers };
     
-    const config = { credentials: 'include', ...options, headers };
+    
     try {
         let response = await fetch(url, config);
         // Handle 401: if the access token has expired, attempt a silent refresh
