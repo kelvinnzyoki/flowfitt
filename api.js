@@ -24,12 +24,14 @@ const TokenManager = {
     setTokens(accessToken) {
         this._accessToken = accessToken || null;
     },
+clearTokens() {
+    this._accessToken = null;
+    localStorage.removeItem('user');
+    // Clear ALL session caches — stale plan/subscription data from a previous
+    // user session must not leak to the next user on the same browser.
+    try { sessionStorage.clear(); } catch {}
+},
 
-    clearTokens() {
-        this._accessToken = null;
-        localStorage.removeItem('user');
-        // The server clears ff_refresh, ff_access, ff_session on /auth/logout.
-    },
 
     // Read the non-httpOnly ff_session=1 cookie the server sets alongside the
     // httpOnly tokens. Presence means a valid refresh token likely exists.
@@ -129,6 +131,9 @@ async function apiRequest(endpoint, options = {}) {
     if (token) headers['Authorization'] = `Bearer ${token}`;
     // credentials:'include' sends the httpOnly refreshToken cookie on every request
     // Required for cross-origin requests (GitHub Pages → Vercel backend)
+
+    const config = { credentials: 'include', cache: 'no-store', ...options, headers };
+    
     const config = { credentials: 'include', ...options, headers };
     try {
         let response = await fetch(url, config);
@@ -264,29 +269,32 @@ const AuthAPI = {
         return data;
     },
     login: async (email, password) => {
-        const data = await apiRequest('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
-        });
-        if (data.success && data.data) {
-            // Server sets refreshToken as httpOnly cookie automatically.
-            // We only store the accessToken in localStorage.
-            TokenManager.setTokens(data.data.accessToken);
-            TokenManager.setUser(data.data.user);
-        }
-        return data;
-    },
-    logout: async () => {
+    const data = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+    });
+    if (data.success && data.data) {
+        TokenManager.setTokens(data.data.accessToken);
+        // Fetch canonical user from /me — not the login payload — so
+        // the stored object is always complete and up-to-date.
         try {
-            // POST to /auth/logout — the server reads the httpOnly cookie
-            // and clears it. No need to send the token in the body.
-            await apiRequest('/auth/logout', { method: 'POST' });
-        } catch (e) { console.error('Logout error:', e); }
-        finally {
-            TokenManager.clearTokens();   // clears accessToken + user from localStorage
-            window.location.href = 'index.html';
-        }
-    },
+            const me = await AuthAPI.getCurrentUser();
+            if (me?.success && me?.data) TokenManager.setUser(me.data);
+            else TokenManager.setUser(data.data.user);
+        } catch { TokenManager.setUser(data.data.user); }
+    }
+    return data;
+},
+    logout: async () => {
+    // Clear client state immediately — do NOT wait for server.
+    // This prevents any window where stale cookies/state could
+    // be picked up by the next user on the same browser.
+    TokenManager.clearTokens();
+    try {
+        await apiRequest('/auth/logout', { method: 'POST' });
+    } catch (e) { console.error('Logout error:', e); }
+    window.location.href = 'index.html';
+},
     getCurrentUser: async () => await apiRequest('/auth/me'),
     changePassword: async (currentPassword, newPassword) => await apiRequest('/auth/change-password', {
         method: 'POST', body: JSON.stringify({ currentPassword, newPassword }),
@@ -685,7 +693,15 @@ async function requireAuth() {
     }
     const refreshed = await refreshAccessToken();
     _signalAuthReady(refreshed);
-    if (refreshed) return true;
+    if (refreshed) {
+        // CRITICAL: fetch fresh user data after token refresh so
+        // TokenManager.getUser() never returns a previous user's object.
+        try {
+            const me = await AuthAPI.getCurrentUser();
+            if (me?.success && me?.data) TokenManager.setUser(me.data);
+        } catch { /* non-blocking */ }
+        return true;
+    }
     try { localStorage.setItem('redirectAfterLogin', window.location.pathname); } catch {}
     window.location.href = 'login.html';
     return false;
