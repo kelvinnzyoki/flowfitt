@@ -862,3 +862,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateNavigation();
     populateSidebarUser();
 });
+
+// Add near the other globals, after _getAuthReadyPromise is defined
+window.waitForAuth = () => _getAuthReadyPromise();
