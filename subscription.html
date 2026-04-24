@@ -5996,6 +5996,7 @@ document.addEventListener('visibilitychange', () => {
         btn.textContent = 'Sending…';
         $('verifyError').textContent = '';
         try {
+            if (typeof waitForAuth === 'function') await waitForAuth();
             const r = await fetch(_VBASE + '/auth/send-phone-otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ..._vAuthHdr() },
