@@ -4636,16 +4636,22 @@ async function loadAll() {
         renderPlansGrid();
         renderCompareTable();
         renderBillingHistory();
+
+        // Hide overlay BEFORE checkUrlParams so the page is visible during
+        // the verify polling loop (which can take up to 37s). Without this
+        // the spinner blocks the page for the entire polling window.
+        $('loadingOverlay').style.display = 'none';
+
         await checkUrlParams();
     } catch (err) {
         console.error('[Subscription] loadAll error:', err);
         toast('Unable to load subscription data. Please refresh the page.', 'error', 12000);
-        // Always render plans grid even on error
         if (!allPlans.length) allPlans = PLAN_CATALOG;
         renderCurrentPlan();
         renderPlansGrid();
         renderCompareTable();
     } finally {
+        // Ensure overlay is always hidden even if checkUrlParams throws
         $('loadingOverlay').style.display = 'none';
     }
 }
@@ -4663,48 +4669,55 @@ async function checkUrlParams() {
     // Trigger on ?success=1&reference=xxx (our callbackUrl) OR on bare
     // ?reference=xxx (Paystack dashboard fallback URL without success=1).
     if (reference && (params.get('success') === '1' || !params.has('success'))) {
-        toast('Verifying your payment…', 'info', 5000);
+        // Store reference in sessionStorage as backup — if the callbackUrl
+        // redirect ever loses the query params, visibilitychange picks this up.
+        sessionStorage.setItem('ff_ps_ref', reference);
 
-        // 8 attempts with increasing delays — total wait ~37 s.
-        // Delay sequence: 1.5 s, 2.5 s, 3 s, 4 s, 5 s, 6 s, 7 s, 8 s.
-        const DELAYS  = [1500, 2500, 3000, 4000, 5000, 6000, 7000, 8000];
+        toast('Verifying your payment…', 'info', 4000);
+
+        // 6 attempts: 2s, 3s, 4s, 5s, 6s, 8s = 28s total.
+        // Paystack webhooks typically fire within 5–10s of payment.
+        const DELAYS  = [2000, 3000, 4000, 5000, 6000, 8000];
         let activated = false;
 
         for (let attempt = 0; attempt < DELAYS.length; attempt++) {
-            // Wait before each attempt so the webhook has time to fire.
             await new Promise(r => setTimeout(r, DELAYS[attempt]));
 
             try {
                 const res = await apiRequest(`/subscriptions/paystack/verify/${reference}`);
 
                 if (res?.success && res.subscription?.status === 'ACTIVE') {
-                    // Subscription is confirmed ACTIVE — celebrate and stop polling.
-                    if (res.subscription) currentSub = normaliseSubscription(res.subscription);
-                    await loadAll();
+                    sessionStorage.removeItem('ff_ps_ref');
+                    currentSub = normaliseSubscription(res.subscription);
+                    // Refresh plans grid only — avoid re-hitting /current which
+                    // may still be 500ing during the transition period.
+                    renderCurrentPlan();
+                    renderPlansGrid();
+                    renderBillingHistory();
                     toast('Payment verified! Your subscription is now active.', 'success', 10000);
                     activated = true;
                     break;
                 }
 
                 if (res?.success && res.subscription) {
-                    // Verify succeeded but status is not ACTIVE yet (e.g. TRIALING,
-                    // INCOMPLETE) — update local state and keep polling silently.
                     currentSub = normaliseSubscription(res.subscription);
+                    renderCurrentPlan();
+                    // Not ACTIVE yet — keep polling silently
+                    if (attempt < DELAYS.length - 1) {
+                        toast(`Activating your subscription… (${attempt + 1}/${DELAYS.length})`, 'info', 2500);
+                    }
                     continue;
                 }
 
-                // Non-success response — only surface on the final attempt.
                 if (attempt >= DELAYS.length - 1) {
                     toast(
-                        `️ Payment received but activation is delayed. ` +
-                        `${safeError(res?.message, 'Please refresh in a moment.')}`,
+                        'Payment received! Activation is taking a moment — refresh in 30 seconds if your plan hasn\'t updated.',
                         'warning',
                         15000,
                     );
                 }
 
             } catch {
-                // Network error or server 5xx — only surface on the final attempt.
                 if (attempt >= DELAYS.length - 1) {
                     toast(
                         'Payment received! Your plan is activating — refresh in a moment if it hasn\'t updated.',
@@ -4716,11 +4729,19 @@ async function checkUrlParams() {
         }
 
         if (!activated) {
-            // Final safety net: auto-refresh 10 s after the last poll so the UI
-            // catches a webhook that fired just after the polling window closed.
+            // Final safety net — reload data 12s after last poll
             setTimeout(async () => {
-                try { await loadAll(); renderCurrentPlan(); renderPlansGrid(); } catch { /* non-critical */ }
-            }, 10000);
+                try {
+                    const res = await apiRequest(`/subscriptions/paystack/verify/${reference}`);
+                    if (res?.success && res.subscription) {
+                        sessionStorage.removeItem('ff_ps_ref');
+                        currentSub = normaliseSubscription(res.subscription);
+                        renderCurrentPlan();
+                        renderPlansGrid();
+                        renderBillingHistory();
+                    }
+                } catch { /* non-critical */ }
+            }, 12000);
         }
 
         // Always clean the URL so a hard refresh doesn't re-trigger the flow.
@@ -4740,6 +4761,29 @@ async function checkUrlParams() {
         window.history.replaceState({}, '', window.location.pathname);
     }
 }
+
+    // ── Visibilitychange backup — picks up the Paystack reference if the user
+// navigated away and came back without ?reference= in the URL (e.g. the
+// Next.js router stripped query params on redirect).
+document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState !== 'visible') return;
+    const ref = sessionStorage.getItem('ff_ps_ref');
+    if (!ref) return;
+    // Already have a pending reference — run one verify attempt
+    try {
+        const res = await apiRequest(`/subscriptions/paystack/verify/${ref}`);
+        if (res?.success && res.subscription) {
+            sessionStorage.removeItem('ff_ps_ref');
+            currentSub = normaliseSubscription(res.subscription);
+            renderCurrentPlan();
+            renderPlansGrid();
+            renderBillingHistory();
+            if (res.subscription.status === 'ACTIVE') {
+                toast('Subscription activated! Welcome to your new plan. 🎉', 'success', 10000);
+            }
+        }
+    } catch { /* non-critical */ }
+});
 
 // ── Render: current plan banner ───────────────────────────────────────────────
 function renderCurrentPlan() {
@@ -5186,7 +5230,7 @@ async function initCheckout(planId) {
             interval,
             // Paystack appends ?reference=xxx&trxref=xxx to this URL on redirect.
             // We add ?success=1 so checkUrlParams knows to start the verify loop.
-            callbackUrl: `${window.location.origin}/subscription.html?success=1`,
+            callbackUrl: `${window.location.origin}/subscription?success=1`,
         }),
         });
 
