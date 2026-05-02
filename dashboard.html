@@ -5336,7 +5336,7 @@ window.sendCoachMessage = sendCoachMessage;
     const btn = this;
     const orig = btn.textContent;
     btn.disabled = true;
-    btn.textContent = '🤖 AI is thinking...';
+    btn.textContent = ' AI is thinking...';
 
     if (typeof LoadingManager !== 'undefined') {
       LoadingManager.show('Generating your personalised workout...');
@@ -5430,7 +5430,7 @@ window.sendCoachMessage = sendCoachMessage;
     const btn = btnEl || (typeof event !== 'undefined' && event.target) || document.querySelector('.ai-gen-save-btn');
     btn.disabled = true;
     const orig = btn.textContent;
-    btn.textContent = '⏳ Saving...';
+    btn.textContent = ' Saving...';
 
     // Build a payload that matches the backend /programs schema.
     // Map AI plan fields → program fields so validation passes.
@@ -5465,6 +5465,7 @@ window.sendCoachMessage = sendCoachMessage;
     // profile page always has the latest plan regardless of network outcome.
     // Uses a single key (flowfit_ai_plan) that always replaces the previous
     // plan. The profile page reads exclusively from this key.
+// Always persist to localStorage FIRST — profile page and offline fallback
     const _planSnapshot = {
       name:        programPayload.name,
       description: programPayload.description,
@@ -5473,39 +5474,46 @@ window.sendCoachMessage = sendCoachMessage;
       exercises:   programPayload.exercises,
       aiPlan:      _aiGenPlan,
       savedAt:     new Date().toISOString(),
+      serverSaved: false,
     };
     try {
       localStorage.setItem('flowfit_ai_plan', JSON.stringify(_planSnapshot));
-    } catch (_) { /* storage quota — ignore */ }
+    } catch (_) { /* storage quota — non-fatal */ }
 
-    // Try API save first; fall back to localStorage so user never loses the plan
+    // DB save via ProgramsAPI.saveAiProgram — always replaces existing AI program
     let savedToServer = false;
+    let serverProgram = null;
     try {
-      await apiRequest('/programs', {
-        method: 'POST',
-        body: JSON.stringify(programPayload),
-      });
-      savedToServer = true;
-      // Mark as server-synced in the profile snapshot
-      try {
-        const snap = JSON.parse(localStorage.getItem('flowfit_ai_plan') || '{}');
-        snap.serverSaved = true;
-        localStorage.setItem('flowfit_ai_plan', JSON.stringify(snap));
-      } catch (_) { /* ignore */ }
+      const res = await ProgramsAPI.saveAiProgram(programPayload);
+      if (res?.success) {
+        savedToServer  = true;
+        serverProgram  = res.data;
+        // Mark the localStorage snapshot as server-synced
+        try {
+          const snap = JSON.parse(localStorage.getItem('flowfit_ai_plan') || '{}');
+          snap.serverSaved = true;
+          snap.programId   = res.data?.id || null;
+          localStorage.setItem('flowfit_ai_plan', JSON.stringify(snap));
+        } catch (_) { /* ignore */ }
+      } else {
+        throw new Error(res?.error || 'Server returned failure');
+      }
     } catch (apiErr) {
-      // Server save failed — flowfit_ai_plan already written above for the
-      // profile page. Also append to the local queue for later sync.
+      // Server save failed — log full error so Vercel logs show the real cause
+      console.error('[AI Workout] DB save failed:', apiErr?.message ?? apiErr);
+      // Queue locally for retry
       try {
         const key   = 'flowfit_saved_plans';
-        const saved = JSON.parse(localStorage.getItem(key) || '[]');
-        saved.unshift({ ...programPayload, savedAt: new Date().toISOString(), localOnly: true });
-        localStorage.setItem(key, JSON.stringify(saved.slice(0, 20)));
-      } catch (_) { /* storage unavailable — ignore */ }
-      console.warn('[AI Workout] Server save failed, stored locally:', apiErr);
+        const queue = JSON.parse(localStorage.getItem(key) || '[]');
+        queue.unshift({ ...programPayload, savedAt: new Date().toISOString(), localOnly: true });
+        localStorage.setItem(key, JSON.stringify(queue.slice(0, 20)));
+      } catch (_) { /* storage unavailable */ }
     }
 
-    // Profile link embedded in toast so the user can jump there immediately
-    const _profileLink = '<a href="profile.html" style="color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px;margin-left:6px;white-space:nowrap;">View in Profile →</a>';
+    btn.disabled    = false;
+    btn.textContent = orig;
+
+    const _profileLink = '<a href="/profile" style="color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px;margin-left:6px;white-space:nowrap;">View in Profile →</a>';
 
     if (savedToServer) {
       if (typeof Toast !== 'undefined') Toast.success('Workout saved! ' + _profileLink, 8000);
@@ -5513,12 +5521,13 @@ window.sendCoachMessage = sendCoachMessage;
       setTimeout(window.closeAIGeneratorModal, 1400);
     } else {
       if (typeof Toast !== 'undefined') {
-        Toast.warning('Saved locally. ' + _profileLink, 8000);
-      } else {
-        alert('Saved locally. It will sync to your account when reconnected.');
+        Toast.warning(
+          'Saved locally (server offline). ' + _profileLink +
+          '<br><small style="opacity:.7">Will sync on next visit.</small>',
+          10000,
+        );
       }
-      // Still close the modal — the plan is not lost
-      setTimeout(window.closeAIGeneratorModal, 2000);
+      setTimeout(window.closeAIGeneratorModal, 2500);
     }
 
     btn.disabled    = false;
