@@ -161,7 +161,7 @@ async function apiRequest(endpoint, options = {}) {
                 }
                 // Refresh also failed — session is dead, force re-login
                 TokenManager.clearTokens();
-                window.location.href = 'login.html';
+                window.location.href = '/auth/login';
                 throw new Error('Session expired. Please log in again.');
             }
             // Other 401 (wrong credentials, account locked, etc.) — let handleResponse
@@ -402,15 +402,24 @@ const ProgramsAPI = {
         const params = new URLSearchParams(filters);
         return await apiRequest(`/programs?${params}`);
     },
-    getProgramById: async (id) => await apiRequest(`/programs/${id}`),
-    enrollInProgram: async (programId) => await apiRequest(`/programs/${programId}/enroll`, { method: 'POST' }),
-    getUserPrograms: async () => await apiRequest('/programs/my-enrollments'),
-    updateProgress: async (enrollmentId, data) => await apiRequest(`/programs/enrollments/${enrollmentId}/progress`, {
+    getProgramById:    async (id)           => await apiRequest(`/programs/${id}`),
+    enrollInProgram:   async (programId)    => await apiRequest(`/programs/${programId}/enroll`, { method: 'POST' }),
+    getUserPrograms:   async ()             => await apiRequest('/programs/my-enrollments'),
+    cancelEnrollment:  async (enrollmentId) => await apiRequest(`/programs/enrollments/${enrollmentId}`, { method: 'DELETE' }),
+    updateProgress:    async (enrollmentId, data) => await apiRequest(`/programs/enrollments/${enrollmentId}/progress`, {
         method: 'PUT', body: JSON.stringify(data),
     }),
-    // Cancel (delete) an enrollment so the user can re-enroll from scratch
-    cancelEnrollment: async (enrollmentId) => await apiRequest(`/programs/enrollments/${enrollmentId}`, {
-        method: 'DELETE',
+
+    // Returns the user's saved AI-generated program with full exercise data.
+    // Called by profile page on load — always fetches fresh from DB so the
+    // latest saved plan is shown even if localStorage was cleared.
+    getAiProgram: async () => await apiRequest('/programs/ai-generated'),
+
+    // Saves (upserts) an AI-generated plan. The server always replaces the
+    // previous ai_generated program so the user has exactly one at all times.
+    saveAiProgram: async (payload) => await apiRequest('/programs', {
+        method: 'POST',
+        body:   JSON.stringify({ ...payload, type: 'ai_generated' }),
     }),
 };
 
