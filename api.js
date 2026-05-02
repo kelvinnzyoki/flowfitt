@@ -402,25 +402,37 @@ const ProgramsAPI = {
         const params = new URLSearchParams(filters);
         return await apiRequest(`/programs?${params}`);
     },
-    getProgramById:    async (id)           => await apiRequest(`/programs/${id}`),
-    enrollInProgram:   async (programId)    => await apiRequest(`/programs/${programId}/enroll`, { method: 'POST' }),
-    getUserPrograms:   async ()             => await apiRequest('/programs/my-enrollments'),
-    cancelEnrollment:  async (enrollmentId) => await apiRequest(`/programs/enrollments/${enrollmentId}`, { method: 'DELETE' }),
-    updateProgress:    async (enrollmentId, data) => await apiRequest(`/programs/enrollments/${enrollmentId}/progress`, {
-        method: 'PUT', body: JSON.stringify(data),
-    }),
 
-    // Returns the user's saved AI-generated program with full exercise data.
-    // Called by profile page on load — always fetches fresh from DB so the
-    // latest saved plan is shown even if localStorage was cleared.
-    getAiProgram: async () => await apiRequest('/programs/ai-generated'),
+    getProgramById: async (id) =>
+        await apiRequest(`/programs/${id}`),
 
-    // Saves (upserts) an AI-generated plan. The server always replaces the
-    // previous ai_generated program so the user has exactly one at all times.
-    saveAiProgram: async (payload) => await apiRequest('/programs', {
-        method: 'POST',
-        body:   JSON.stringify({ ...payload, type: 'ai_generated' }),
-    }),
+    enrollInProgram: async (programId) =>
+        await apiRequest(`/programs/${programId}/enroll`, { method: 'POST' }),
+
+    getUserPrograms: async () =>
+        await apiRequest('/programs/my-enrollments'),
+
+    cancelEnrollment: async (enrollmentId) =>
+        await apiRequest(`/programs/enrollments/${enrollmentId}`, { method: 'DELETE' }),
+
+    updateProgress: async (enrollmentId, data) =>
+        await apiRequest(`/programs/enrollments/${enrollmentId}/progress`, {
+            method: 'PUT',
+            body:   JSON.stringify(data),
+        }),
+
+    // Fetches the user's saved AI-generated program with full exercise data.
+    // Profile page calls this on load so it always shows the latest saved plan.
+    getAiProgram: async () =>
+        await apiRequest('/programs/ai-generated'),
+
+    // Upserts the AI-generated plan — server always replaces the previous one
+    // so the user has exactly one ai_generated program at all times.
+    saveAiProgram: async (payload) =>
+        await apiRequest('/programs', {
+            method: 'POST',
+            body:   JSON.stringify({ ...payload, type: 'ai_generated' }),
+        }),
 };
 
 // ── PROGRESS ──────────────────────────────────────────────────────────────────
