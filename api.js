@@ -402,36 +402,24 @@ const ProgramsAPI = {
         const params = new URLSearchParams(filters);
         return await apiRequest(`/programs?${params}`);
     },
+    getProgramById:   async (id)           => await apiRequest(`/programs/${id}`),
+    enrollInProgram:  async (programId)    => await apiRequest(`/programs/${programId}/enroll`, { method: 'POST' }),
+    getUserPrograms:  async ()             => await apiRequest('/programs/my-enrollments'),
+    cancelEnrollment: async (enrollmentId) => await apiRequest(`/programs/enrollments/${enrollmentId}`, { method: 'DELETE' }),
+    updateProgress:   async (enrollmentId, data) => await apiRequest(`/programs/enrollments/${enrollmentId}/progress`, {
+        method: 'PUT', body: JSON.stringify(data),
+    }),
 
-    getProgramById: async (id) =>
-        await apiRequest(`/programs/${id}`),
+    // Uses the dedicated AI endpoint — avoids the general /programs route
+    // which reads weeks.title (a column that was renamed to name in the DB,
+    // crashing the response and making every save appear as "server offline").
+    getAiProgram:  async () =>
+        await apiRequest('/ai/saved-program'),
 
-    enrollInProgram: async (programId) =>
-        await apiRequest(`/programs/${programId}/enroll`, { method: 'POST' }),
-
-    getUserPrograms: async () =>
-        await apiRequest('/programs/my-enrollments'),
-
-    cancelEnrollment: async (enrollmentId) =>
-        await apiRequest(`/programs/enrollments/${enrollmentId}`, { method: 'DELETE' }),
-
-    updateProgress: async (enrollmentId, data) =>
-        await apiRequest(`/programs/enrollments/${enrollmentId}/progress`, {
-            method: 'PUT',
-            body:   JSON.stringify(data),
-        }),
-
-    // Fetches the user's saved AI-generated program with full exercise data.
-    // Profile page calls this on load so it always shows the latest saved plan.
-    getAiProgram: async () =>
-        await apiRequest('/programs/ai-generated'),
-
-    // Upserts the AI-generated plan — server always replaces the previous one
-    // so the user has exactly one ai_generated program at all times.
     saveAiProgram: async (payload) =>
-        await apiRequest('/programs', {
+        await apiRequest('/ai/save-program', {
             method: 'POST',
-            body:   JSON.stringify({ ...payload, type: 'ai_generated' }),
+            body:   JSON.stringify(payload),
         }),
 };
 
