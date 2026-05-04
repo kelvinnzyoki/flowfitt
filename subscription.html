@@ -4699,6 +4699,23 @@ async function checkUrlParams() {
                     break;
                 }
 
+    // If subscription_code is missing, poll /paystack/fetch-codes
+                    // after 30s — the subscription.create webhook usually arrives
+                    // within 30s of payment and stores the code on the server.
+                    // We need it for cancellation and the billing portal to work.
+                    if (!res.subscription?.paystackSubscriptionCode) {
+                        setTimeout(async () => {
+                            try {
+                                const codesRes = await apiRequest('/subscriptions/paystack/fetch-codes');
+                                if (codesRes?.paystackSubscriptionCode) {
+                                    console.log('[Subscription] Codes stored:', codesRes.paystackSubscriptionCode);
+                                    // Refresh subscription display with codes
+                                    await loadAll();
+                                }
+                            } catch { /* non-critical */ }
+                        }, 30_000);
+                    }
+
                 if (res?.success && res.subscription) {
                     currentSub = normaliseSubscription(res.subscription);
                     renderCurrentPlan();
