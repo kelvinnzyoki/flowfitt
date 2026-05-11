@@ -5181,9 +5181,12 @@ async function renderBillingHistory() {
                     <tbody>
                         ${payments.map(p => {
                             const receipt = p.mpesaReceipt || p.paystackReference || '—';
-                            const amount  = p.currency === 'KES'
-                                ? 'KES ' + Math.round(p.amountCents / 100 * 130)
-                                : '$' + (p.amountCents / 100).toFixed(2);
+                            const amount = p.currency === 'KES'
+    ? 'KES ' + (p.amountCents / 100).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+    : '$' + (p.amountCents / 100).toFixed(2);
                             return `
                             <tr style="border-bottom:1px solid var(--white-05)">
                                 <td style="padding:0.5rem 0.5rem;white-space:nowrap">${formatDate(p.createdAt)}</td>
