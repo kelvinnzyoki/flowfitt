@@ -4717,7 +4717,7 @@ async function checkUrlParams() {
                 // ISSUE-4a: paystackSubscriptionCode is always null from the API (security fix).
                 // Use isPendingActivation or non-ACTIVE status as the correct signal.
                 const needsCodesFetch = res.subscription?.isPendingActivation
-                    || (res.subscription?.status && res.subscription.status !== 'ACTIVE');
+                    || (res.subscription?.status && res.subscription.status !== 'INCOMPLETE');
                 if (needsCodesFetch && !fetchCodesScheduled) {
                     fetchCodesScheduled = true;
                     setTimeout(async () => {
@@ -5270,7 +5270,7 @@ function normaliseSubscription(raw) {
         // 'PAYSTACK' + activatedAt null = free trial (no payment taken yet)
         // 'MPESA'                        = M-Pesa subscription
         provider:                 raw.provider || null,
-        planId:                   raw.planId   || null,
+        planId: raw.planId || raw.plan?.id || null,
     };
 }
 
@@ -5387,10 +5387,10 @@ function initPlanAction(planId) {
     if (hasActiveSub) {
         pendingChange = { planId, interval: billingYearly ? 'YEARLY' : 'MONTHLY', type: 'upgrade_checkout' };
         $('upgradeModalIcon').textContent = '';
-        $('upgradeModalTitle').textContent = `Upgrade to ${plan.name}`;
+        $('upgradeModalTitle').textContent = `Upgrade to ${esc(plan.name)}`;
         $('upgradeModalBody').innerHTML = `
             Upgrading will <strong>cancel your current plan immediately</strong> and then open a new Paystack checkout for
-            <strong>esc(plan.name)</strong>.<br/><br/>
+            <strong>${esc(plan.name)}</strong>.<br/><br/>
             Your old plan will stop now. The new plan only becomes active after the new checkout payment succeeds.
         `;
         $('upgradeConfirmBtn').textContent = 'CANCEL CURRENT & CHECKOUT';
@@ -5400,7 +5400,7 @@ function initPlanAction(planId) {
     }
 
     $('pmIcon').textContent  = '';
-    $('pmTitle').textContent = `Get esc(plan.name)`;
+    $('pmTitle').textContent = `Get ${esc(plan.name)}`;
 
     if (hasTrial) {
         $('pmBody').innerHTML = `
@@ -5410,7 +5410,7 @@ function initPlanAction(planId) {
             Or pay now to skip the trial and subscribe immediately.`;
     } else {
         $('pmBody').innerHTML = `
-            Subscribe to <strong>esc(plan.name)</strong>. Choose your payment method:`;
+            Subscribe to <strong>${esc(plan.name)}</strong>. Choose your payment method:`;
     }
 
     $('pmActions').innerHTML = `
@@ -5455,7 +5455,7 @@ async function startFreeTrial(planId) {
         });
         const subData = res?.subscription || res?.data?.subscription || res?.data;
         if (subData) currentSub = normaliseSubscription(subData);
-        toast(`${plan.trialDays}-day free trial started! Enjoy ${plan.name}.`, 'success', 10000);
+        toast(`${plan.trialDays}-day free trial started! Enjoy ${esc(plan.name)}.`, 'success', 10000);
         renderCurrentPlan();
         renderPlansGrid();
         await renderBillingHistory();
@@ -5474,7 +5474,7 @@ function initDowngrade(planId) {
     $('upgradeModalBody').innerHTML = `
         Downgrading will <strong>keep your current plan active until period end</strong>
         (<strong>${formatDate(currentSub?.currentPeriodEnd)}</strong>).<br/><br/>
-        After that date, your account will automatically move to <strong>${plan.name}</strong> when your subscription is next checked.
+        After that date, your account will automatically move to <strong>${esc(plan.name)}</strong> when your subscription is next checked.
         You do not need to start checkout manually.
     `;
     $('upgradeConfirmBtn').textContent = 'SCHEDULE DOWNGRADE';
@@ -5664,7 +5664,7 @@ function openMpesaModal(planId, planSlug) {
     // FIX: if kes is still 0 after both sources, the plan has no M-Pesa price configured.
     // Show a clear message rather than letting the server error with a cryptic API response.
     if (!kes || kes <= 0) {
-        toast(`M-Pesa is not available for the ${plan.name} plan. Please use Paystack (card) or contact support.`, 'error', 9000);
+        toast(`M-Pesa is not available for the ${esc(plan.name)} plan. Please use Paystack (card) or contact support.`, 'error', 9000);
         return;
     }
 
