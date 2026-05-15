@@ -4441,6 +4441,7 @@ let billingYearly = false;
 let pendingChange  = null;  // { planId, interval, type: 'upgrade'|'downgrade'|'checkout' }
 let mpesaPending   = null;  // { planId, interval, planName, amountKes }
 let mpesaPollTimer = null;  // setInterval handle
+let _bgIntervalHandle = null;
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -4587,6 +4588,7 @@ const PLAN_CATALOG = [
 ];
 
 async function loadAll() {
+    if (_bgIntervalHandle) { clearInterval(_bgIntervalHandle); _bgIntervalHandle = null; }
     $('loadingOverlay').style.display = 'flex';
     try {
         // ── Fetch plans + current subscription in parallel ──────────────────
@@ -4758,12 +4760,14 @@ async function checkUrlParams() {
             // 5 minutes. This catches the subscription.create webhook arriving after the
             // main loop ended — which was the common failure mode (old code gave up and
             // showed a warning with no automatic recovery).
+            if (_bgIntervalHandle) clearInterval(_bgIntervalHandle);
             let bgAttempt = 0;
-            const MAX_BG_ATTEMPTS = 10; // 10 × 30 s = 5 minutes total background window
-            const bgInterval = setInterval(async () => {
+            const MAX_BG_ATTEMPTS = 10;
+            _bgIntervalHandle = setInterval(async () => {
                 bgAttempt++;
                 if (bgAttempt > MAX_BG_ATTEMPTS) {
-                    clearInterval(bgInterval);
+                    clearInterval(_bgIntervalHandle);
+                    _bgIntervalHandle = null;
                     toast(
                         'Subscription activation is taking longer than expected. ' +
                         'Your payment was received — please refresh the page in a few minutes.',
@@ -4775,7 +4779,8 @@ async function checkUrlParams() {
                 try {
                     const res = await apiRequest(`/subscriptions/paystack/verify/${reference}`);
                     if (res?.success && res.subscription?.status === 'ACTIVE') {
-                        clearInterval(bgInterval);
+                        clearInterval(_bgIntervalHandle);
+                        _bgIntervalHandle = null;
                         sessionStorage.removeItem('ff_ps_ref');
                         currentSub = normaliseSubscription(res.subscription);
                         renderCurrentPlan();
@@ -5385,7 +5390,7 @@ function initPlanAction(planId) {
         $('upgradeModalTitle').textContent = `Upgrade to ${plan.name}`;
         $('upgradeModalBody').innerHTML = `
             Upgrading will <strong>cancel your current plan immediately</strong> and then open a new Paystack checkout for
-            <strong>${plan.name}</strong>.<br/><br/>
+            <strong>esc(plan.name)</strong>.<br/><br/>
             Your old plan will stop now. The new plan only becomes active after the new checkout payment succeeds.
         `;
         $('upgradeConfirmBtn').textContent = 'CANCEL CURRENT & CHECKOUT';
@@ -5395,17 +5400,17 @@ function initPlanAction(planId) {
     }
 
     $('pmIcon').textContent  = '';
-    $('pmTitle').textContent = `Get ${plan.name}`;
+    $('pmTitle').textContent = `Get esc(plan.name)`;
 
     if (hasTrial) {
         $('pmBody').innerHTML = `
-            Get full access to <strong>${plan.name}</strong> features.<br/><br/>
+            Get full access to <strong>esc(plan.name)</strong> features.<br/><br/>
             Start with a <strong>${plan.trialDays}-day free trial</strong> — no payment needed.
             Cancel anytime during the trial and you won't be charged a thing.
             Or pay now to skip the trial and subscribe immediately.`;
     } else {
         $('pmBody').innerHTML = `
-            Subscribe to <strong>${plan.name}</strong>. Choose your payment method:`;
+            Subscribe to <strong>esc(plan.name)</strong>. Choose your payment method:`;
     }
 
     $('pmActions').innerHTML = `
@@ -5465,7 +5470,7 @@ function initDowngrade(planId) {
     if (!plan) return;
     pendingChange = { planId, interval: billingYearly ? 'YEARLY' : 'MONTHLY', type: 'schedule_auto_downgrade' };
     $('upgradeModalIcon').textContent = '';
-    $('upgradeModalTitle').textContent = `Downgrade to ${plan.name}`;
+    $('upgradeModalTitle').textContent = `Downgrade to esc(plan.name)`;
     $('upgradeModalBody').innerHTML = `
         Downgrading will <strong>keep your current plan active until period end</strong>
         (<strong>${formatDate(currentSub?.currentPeriodEnd)}</strong>).<br/><br/>
