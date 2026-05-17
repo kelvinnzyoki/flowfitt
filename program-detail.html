@@ -4884,6 +4884,9 @@ function renderIncludes(){
     const p=prog,tot=(p.durationWeeks||0)*(p.daysPerWeek||0);
     document.getElementById('includesGrid').innerHTML=`<div class="include-item"><span class="include-icon"></span><div class="include-text"><h4>${p.durationWeeks} Weeks</h4><p>Duration</p></div></div><div class="include-item"><span class="include-icon"></span><div class="include-text"><h4>${p.daysPerWeek} Days/Week</h4><p>Frequency</p></div></div><div class="include-item"><span class="include-icon"></span><div class="include-text"><h4>${tot} Sessions</h4><p>Total workouts</p></div></div><div class="include-item"><span class="include-icon"></span><div class="include-text"><h4>Bodyweight Only</h4><p>No equipment needed</p></div></div>`;
 }
+// ISSUE-3-FIX: HTML escape helper — prevents stored XSS from DB-sourced strings.
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 function renderWeeks(){
     const weeks=prog.weeks||[],totalDays=(prog.durationWeeks||0)*(prog.daysPerWeek||0),pct=enroll?(enroll.progress||0):0,doneDays=Math.round(pct/100*totalDays);
     let dc=0;
@@ -4891,15 +4894,15 @@ function renderWeeks(){
         const days=wk.days||[],ws=dc;
         const dh=days.map((day,di)=>{
             const gi=dc+di,isDone=gi<doneDays,isCur=!isDone&&gi===doneDays&&!!enroll,chips=(day.exercises||[]).map(ex=>{
-                const _n=ex.name||ex.exercise?.name||ex.exerciseName||'Exercise';
+                const _n=esc(ex.name||ex.exercise?.name||ex.exerciseName||'Exercise'); // ISSUE-3-FIX
                 const _c=(ex.category||ex.exercise?.category||'STRENGTH').toUpperCase();
                 return`<span class="ex-chip">${CI[_c]||''} ${_n}</span>`;
             }).join('');
-            return `<div class="day-row ${isDone?'completed-day':''} ${isCur?'current-day':''}"><div class="day-num">${isCur?'▶':isDone?'✓':di+1}</div><div class="day-info"><div class="day-title">Day ${day.dayNumber}: ${day.title||'Workout Day'}</div><div class="day-exercises">${chips}</div></div><div class="day-status">${isDone?'<span class="status-done"></span>':isCur?`<button class="status-current" onclick="openDay(${gi})">Start →</button>`:'<span class="status-locked"></span>'}</div></div>`;
+            return `<div class="day-row ${isDone?'completed-day':''} ${isCur?'current-day':''}"><div class="day-num">${isCur?'▶':isDone?'✓':di+1}</div><div class="day-info"><div class="day-title">Day ${day.dayNumber}: ${esc(day.title||'Workout Day')}</div><div class="day-exercises">${chips}</div></div><div class="day-status">${isDone?'<span class="status-done"></span>':isCur?`<button class="status-current" onclick="openDay(${gi})">Start →</button>`:'<span class="status-locked"></span>'}</div></div>`;
         }).join('');
         const doneW=Math.max(0,Math.min(days.length,doneDays-ws)),wPct=Math.round(doneW/days.length*100);
         dc+=days.length;
-        const _isWkOpen=enroll?(Math.max(0,(enroll.currentWeek||1)-1))===wi:wi===0;return `<div class="week-block"><div class="week-header ${_isWkOpen?'open':''}" onclick="toggleWeek(this)"><div class="week-num">W${wi+1}</div><div class="week-info"><div class="week-title">${wk.title||'Week '+(wi+1)}</div><div class="week-meta">${days.length} sessions · ${days.flatMap(d=>d.exercises||[]).length} exercises</div></div><span class="week-chevron">▾</span></div><div class="week-progress-bar"><div class="week-progress-fill" style="width:${wPct}%"></div></div><div class="week-body ${_isWkOpen?'open':''}">${dh}</div></div>`;
+        const _isWkOpen=enroll?(Math.max(0,(enroll.currentWeek||1)-1))===wi:wi===0;return `<div class="week-block"><div class="week-header ${_isWkOpen?'open':''}" onclick="toggleWeek(this)"><div class="week-num">W${wi+1}</div><div class="week-info"><div class="week-title">${esc(wk.title||'Week '+(wi+1))}</div><div class="week-meta">${days.length} sessions · ${days.flatMap(d=>d.exercises||[]).length} exercises</div></div><span class="week-chevron">▾</span></div><div class="week-progress-bar"><div class="week-progress-fill" style="width:${wPct}%"></div></div><div class="week-body ${_isWkOpen?'open':''}">${dh}</div></div>`;
     }).join('');
 }
 function getDayAt(idx){let c=0;for(const wk of(prog.weeks||[])){for(const d of(wk.days||[])){if(c===idx)return d;c++;}}return null;}

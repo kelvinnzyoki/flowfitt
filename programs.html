@@ -4957,7 +4957,7 @@ function renderPrograms(programs) {
         return `
         <div class="program-card">
           <div class="program-header">
-              <span class="program-badge">${level}</span>
+              <span class="program-badge">${esc(level)}</span> <!-- ISSUE-4-FIX -->
               <h3 class="program-title">${esc((prog.title || prog.name || ''))}</h3>
           </div>
           <div class="program-body">
@@ -4971,7 +4971,7 @@ function renderPrograms(programs) {
                   <div class="meta-item">
                       <div class="meta-icon">lvl</div>
                       <div class="meta-label">Level</div>
-                      <div class="meta-value">${level}</div>
+                      <div class="meta-value">${esc(level)}</div> <!-- ISSUE-4-FIX -->
                   </div>
                   <div class="meta-item">
                       <div class="meta-icon">d/w</div>

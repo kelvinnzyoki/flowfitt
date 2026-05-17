@@ -4752,7 +4752,11 @@ html.light-mode #aiGeneratorModal .ai-gen-close { color: #515768; background: rg
                 const date     = rawDate ? formatDate(rawDate) : '—';
                 const duration = formatDuration(log.duration || 0);
                 // FIX: exercise name may be nested or flat
-                const exName   = log.exercise?.name || log.exerciseName || log.name || 'Workout';
+                // ISSUE-2-FIX: Escape before inserting into innerHTML — exercise names come from
+                // the DB and an injected or admin-set name containing HTML would execute for
+                // every user who loads their dashboard (stored XSS).
+                const _rawName = log.exercise?.name || log.exerciseName || log.name || 'Workout';
+                const exName   = String(_rawName).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
                 const sets     = log.sets ? `${log.sets} sets` : '';
                 const reps     = log.reps ? `&times; ${log.reps}` : '';
                 const cals     = log.caloriesBurned ? `${Math.round(log.caloriesBurned)} cal` : '';
@@ -5204,7 +5208,10 @@ function addCoachMessage(text, sender) {
   if (sender === 'user') {
     div.textContent = text;
   } else {
-    div.innerHTML = text;
+    // ISSUE-1-FIX: Never use innerHTML for LLM-generated content — prompt injection
+    // can cause the model to return <script> or event-handler payloads that execute
+    // in the user's browser. textContent is always safe; pre-wrap preserves formatting.
+    div.textContent = text;
     div.style.whiteSpace = 'pre-wrap';
     div.style.lineHeight = '1.55';
   }

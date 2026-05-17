@@ -4433,9 +4433,12 @@ body.sidebar-open {
     let _open = false, _data = [], _timer = null;
 
     function _token() {
+        // ISSUE-7-FIX: Removed localStorage.getItem('accessToken') fallback.
+        // Access tokens have not been stored in localStorage since the httpOnly
+        // cookie migration. The fallback always returned '' and was dead code.
         return (typeof TokenManager !== 'undefined' && TokenManager.getAccessToken)
             ? TokenManager.getAccessToken()
-            : localStorage.getItem('accessToken') || '';
+            : '';
     }
     function _auth() { return typeof isAuthenticated !== 'undefined' ? isAuthenticated() : !!_token(); }
 

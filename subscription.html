@@ -6192,7 +6192,10 @@ document.addEventListener('visibilitychange', () => {
     if (!pending) return; // not returning from a checkout redirect
     sessionStorage.removeItem('paystackRedirectPending');
     // Small delay so the page has fully resumed before re-rendering
-    setTimeout(() => renderPlansGrid(), 150);
+    // ISSUE-6-FIX: Call loadAll() not renderPlansGrid() — renderPlansGrid re-renders
+    // stale in-memory currentSub state. loadAll() fetches fresh subscription data from
+    // the server, matching what the pageshow handler already does correctly.
+    setTimeout(() => loadAll(), 150);
 });
 
 
