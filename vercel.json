@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/workouts", "destination": "/workouts.html" },
+    { "source": "/workout-session", "destination": "/workout-session.html" },
+    { "source": "/programs", "destination": "/programs.html" },
+    { "source": "/program-detail", "destination": "/program-detail.html" },
+    { "source": "/progress", "destination": "/progress.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/subscription", "destination": "/subscription.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/termsofservice", "destination": "/termsofservice.html" },
+    { "source": "/cookiepolicy", "destination": "/cookiepolicy.html" },
+    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/policy", "destination": "/policy.html" }
+  ]
+}
