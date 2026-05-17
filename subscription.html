@@ -6438,9 +6438,13 @@ document.addEventListener('visibilitychange', () => {
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    if (_auth()) _startPolling();
-    // Re-check auth after possible login within the page
-    setTimeout(() => { if (_auth() && !_timer) _startPolling(); }, 2000);
+    if (typeof _getAuthReadyPromise === 'function') {
+      _getAuthReadyPromise().then(success => {
+        if (success && !_timer) _startPolling();
+      });
+    } else {
+      setTimeout(() => { if (_auth() && !_timer) _startPolling(); }, 3000);
+    }
   });
 })();
   
