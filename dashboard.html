@@ -4494,7 +4494,7 @@ html.light-mode #aiGeneratorModal .ai-gen-close { color: #515768; background: rg
                 </span>
                 <span class="ai-launch-label">
                   <span class="ai-launch-title">AI Coach</span>
-                  <span class="ai-launch-sub">Ask anything · 24/7</span>
+                  <span class="ai-launch-sub">Pro + Elite only · 24/7</span>
                 </span>
                 <span class="ai-launch-arrow">
                   <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -5023,6 +5023,61 @@ async function loadCoachHistory() {
 }
 
 
+
+/* ── AI Coach access gate: Pro + Elite only ─────────────────────────────── */
+async function canUseAICoach() {
+  try {
+    const res = await apiRequest('/subscriptions/current');
+    const sub = res?.subscription || res?.data?.subscription || res?.data || null;
+    const status = String(sub?.status || '').toUpperCase();
+    const slug = String(sub?.plan?.slug || sub?.planSlug || '').toLowerCase();
+
+    const activeStatuses = ['ACTIVE', 'TRIALING', 'PAST_DUE'];
+    return activeStatuses.includes(status) && ['pro', 'elite'].includes(slug);
+  } catch (_) {
+    // Fallback only if local cached user data clearly says Pro/Elite.
+    try {
+      const user = TokenManager.getUser?.();
+      const raw = String(
+        user?.subscriptionData?.plan?.slug ||
+        user?.subscriptionData?.plan ||
+        user?.subscription?.plan?.slug ||
+        user?.subscription ||
+        user?.role ||
+        ''
+      ).toLowerCase();
+      return raw.includes('pro') || raw.includes('elite') || raw.includes('admin');
+    } catch {
+      return false;
+    }
+  }
+}
+
+function showAICoachUpgradePrompt() {
+  if (typeof Toast !== 'undefined') {
+    Toast.warning('AI Personal Training Coach is available on Pro and Elite plans only.', 7000);
+  }
+
+  const existing = document.getElementById('aiCoachUpgradeGate');
+  if (existing) existing.remove();
+
+  const gate = document.createElement('div');
+  gate.id = 'aiCoachUpgradeGate';
+  gate.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);z-index:100001;display:flex;align-items:center;justify-content:center;padding:1.25rem;';
+  gate.innerHTML = `
+    <div style="width:100%;max-width:420px;background:linear-gradient(145deg,#111019,#0c0b12);border:1px solid rgba(212,175,55,.35);border-radius:22px;padding:2rem;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.7);">
+      <div style="font-size:2.5rem;margin-bottom:.8rem;">🔒</div>
+      <h3 style="font-family:'Oswald',sans-serif;color:var(--t1);font-size:1.45rem;margin:0 0 .55rem;letter-spacing:.04em;">AI Coach is Pro+</h3>
+      <p style="color:var(--t2);font-size:.9rem;line-height:1.6;margin:0 0 1.4rem;">Upgrade to Pro or Elite to unlock the AI Personal Training Coach.</p>
+      <a href="/subscription" style="display:block;width:100%;padding:.95rem;background:linear-gradient(135deg,#E8C96A,#C9A84C,#8E6E28);color:#08070d;font-weight:800;border-radius:12px;text-decoration:none;margin-bottom:.75rem;">View Plans</a>
+      <button type="button" onclick="document.getElementById('aiCoachUpgradeGate')?.remove()" style="width:100%;padding:.8rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--t2);border-radius:12px;cursor:pointer;">Not now</button>
+    </div>`;
+  gate.addEventListener('click', (e) => {
+    if (e.target === gate) gate.remove();
+  });
+  document.body.appendChild(gate);
+}
+
 /* ── Modal page scroll lock: keeps dashboard still behind AI modals ───────── */
 let __flowfitModalLockCount = 0;
 let __flowfitModalScrollY = 0;
@@ -5049,7 +5104,13 @@ function unlockDashboardScroll() {
   window.scrollTo(0, __flowfitModalScrollY || 0);
 }
 
-function openCoachModal(exerciseName = null) {
+async function openCoachModal(exerciseName = null) {
+  const allowed = await canUseAICoach();
+  if (!allowed) {
+    showAICoachUpgradePrompt();
+    return;
+  }
+
   currentCoachContext = exerciseName ? { currentExercise: exerciseName } : null;
 
   const modal = document.getElementById('aiCoachModal');
