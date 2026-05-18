@@ -5397,7 +5397,7 @@ document.getElementById('logCal').addEventListener('input', e => {
 });
 
 async function submitLog() {
-    
+
     syncSetsToForm();
 
 // Read form field; if empty fall back to live timer (running or paused)
@@ -5416,18 +5416,30 @@ async function submitLog() {
     const btn = document.getElementById('logBtn');
     btn.disabled = true; btn.innerHTML = '<span>Logging...</span>';
 
+    const workoutPayload = {
+        exerciseId:     EXERCISE_ID,
+        duration,
+        sets:           document.getElementById('logSets').value  || undefined,
+        reps:           document.getElementById('logReps').value  || undefined,
+        heartRate:      document.getElementById('logHR').value    || undefined,
+        bodyWeight:     document.getElementById('logBodyWeight')?.value || undefined,
+        caloriesBurned: document.getElementById('logCal').value   || undefined,
+        difficulty:     document.getElementById('logDifficulty').value || undefined,
+        notes:          document.getElementById('logNotes').value || undefined,
+    };
+
     try {
-        await ProgressAPI.logWorkout({
-            exerciseId:     EXERCISE_ID,
-            duration,
-            sets:           document.getElementById('logSets').value  || undefined,
-            reps:           document.getElementById('logReps').value  || undefined,
-            heartRate:      document.getElementById('logHR').value    || undefined,
-            bodyWeight:     document.getElementById('logBodyWeight')?.value || undefined,
-            caloriesBurned: document.getElementById('logCal').value   || undefined,
-            difficulty:     document.getElementById('logDifficulty').value || undefined,
-            notes:          document.getElementById('logNotes').value || undefined,
-        });
+        try {
+            await ProgressAPI.logWorkout(workoutPayload);
+        } catch (primaryErr) {
+            // Program/custom exercise IDs can fail when /progress only accepts seeded Exercise ids.
+            // GUIDE_ID is the seeded library exercise used for the demo video, so retry with it.
+            if (FROM_PROG && GUIDE_ID && GUIDE_ID !== workoutPayload.exerciseId) {
+                await ProgressAPI.logWorkout({ ...workoutPayload, exerciseId: GUIDE_ID });
+            } else {
+                throw primaryErr;
+            }
+        }
 
         showToast('Workout saved! Great work.', 'success');
         if (timerRunning) pauseTimer();   // stop if still counting
