@@ -5444,7 +5444,7 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
         document.querySelectorAll('.sidebar .nav-link').forEach(function (link) {
             var txt = (link.textContent || '').trim().toLowerCase();
             if (txt === 'home') {
-                link.setAttribute('href', 'dashboard.html');
+                link.setAttribute('href', 'index.html');
                 link.removeAttribute('onclick');
             }
         });
