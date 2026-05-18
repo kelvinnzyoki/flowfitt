@@ -3957,6 +3957,121 @@ body.sidebar-open {
     background-color: var(--ink) !important;
 }
 
+
+/* ══ FEEDBACK MODAL ═══════════════════════════════════════════════════════ */
+.feedback-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 10050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+}
+.feedback-modal-overlay.open { display: flex; }
+.feedback-modal {
+  width: min(520px, 100%);
+  background: linear-gradient(145deg, var(--ink-2, #111019), var(--ink-1, #0c0b12));
+  border: 1px solid var(--Au-30, rgba(212,175,55,0.30));
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.68);
+  overflow: hidden;
+}
+.feedback-modal-header {
+  padding: 1.25rem 1.45rem 1rem;
+  border-bottom: 1px solid var(--Au-14, rgba(212,175,55,0.14));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.feedback-modal-title {
+  margin: 0;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--Au-hi, #E8C96A);
+}
+.feedback-modal-close {
+  background: var(--white-05, rgba(255,255,255,0.05));
+  border: 1px solid var(--white-12, rgba(255,255,255,0.12));
+  color: var(--t2, #8A8590);
+  border-radius: 10px;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+}
+.feedback-modal-body { padding: 1.45rem; }
+.feedback-field { margin-bottom: 1rem; }
+.feedback-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t2, #8A8590);
+}
+.feedback-input,
+.feedback-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid var(--Au-20, rgba(212,175,55,0.20));
+  border-radius: 12px;
+  color: var(--t1, #F0EBE0);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.9rem;
+  padding: 0.8rem 0.95rem;
+}
+.feedback-textarea { min-height: 130px; resize: vertical; line-height: 1.55; }
+.feedback-input:focus,
+.feedback-textarea:focus {
+  outline: none;
+  border-color: var(--Au, #C9A84C);
+  box-shadow: 0 0 0 3px var(--Au-10, rgba(212,175,55,0.10));
+}
+.feedback-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.2rem;
+}
+.feedback-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+.feedback-btn-secondary {
+  background: rgba(255,255,255,0.06);
+  color: var(--t2, #8A8590);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.feedback-btn-primary {
+  background: linear-gradient(135deg, #E8C96A, #C9A84C, #8E6E28);
+  color: #08070d;
+  font-weight: 800;
+}
+.feedback-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+html.light-mode .feedback-modal {
+  background: #ffffff;
+  border-color: rgba(184,134,11,0.24);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.20);
+}
+html.light-mode .feedback-input,
+html.light-mode .feedback-textarea {
+  background: #ffffff;
+  color: #0f1117;
+  border-color: rgba(0,0,0,0.14);
+}
+
 </style>
 
 </head>
@@ -4024,6 +4139,7 @@ body.sidebar-open {
     <li class="nav-item"><a href="/progress" class="nav-link"><span>Progress</span></a></li>
     <li class="nav-item"><a href="/profile" class="nav-link active"><span>Profile</span></a></li>
     <li class="nav-item"><a href="/subscription" class="nav-link"><span>Subscription</span></a></li>
+      <li class="nav-item"><button type="button" class="nav-link" onclick="openFeedbackModal()" style="width:100%;background:none;border:none;text-align:left;"><span>Feedback</span></button></li>
   </ul>
 </nav>
 <div class="nav-spacer"></div>
@@ -4828,6 +4944,126 @@ body.sidebar-open {
     document.addEventListener('DOMContentLoaded', function () {
         try { mo.observe(document.body, { childList: true, subtree: true }); } catch (_) {}
     });
+})();
+</script>
+
+
+<!-- ══ FEEDBACK MODAL ═══════════════════════════════════════════════════════ -->
+<div class="feedback-modal-overlay" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+  <div class="feedback-modal">
+    <div class="feedback-modal-header">
+      <h3 class="feedback-modal-title" id="feedbackTitle">Send Feedback</h3>
+      <button type="button" class="feedback-modal-close" onclick="closeFeedbackModal()" aria-label="Close feedback">✕</button>
+    </div>
+    <form class="feedback-modal-body" id="feedbackForm">
+      <div class="feedback-field">
+        <label class="feedback-label" for="feedbackType">Type</label>
+        <select class="feedback-input" id="feedbackType" required>
+          <option value="suggestion">Suggestion</option>
+          <option value="bug">Bug report</option>
+          <option value="complaint">Complaint</option>
+          <option value="praise">Praise</option>
+        </select>
+      </div>
+      <div class="feedback-field">
+        <label class="feedback-label" for="feedbackMessage">Message</label>
+        <textarea class="feedback-textarea" id="feedbackMessage" maxlength="2000" placeholder="Tell us what happened, what you expected, or what we can improve..." required></textarea>
+      </div>
+      <div class="feedback-actions">
+        <button type="button" class="feedback-btn feedback-btn-secondary" onclick="closeFeedbackModal()">Cancel</button>
+        <button type="submit" class="feedback-btn feedback-btn-primary" id="feedbackSubmitBtn">Send</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+/* ══ FEEDBACK FEATURE ═══════════════════════════════════════════════════════ */
+(function () {
+  function toastOk(message) {
+    if (typeof Toast !== 'undefined' && Toast.success) Toast.success(message, 5000);
+    else alert(message);
+  }
+
+  function toastErr(message) {
+    if (typeof Toast !== 'undefined' && Toast.error) Toast.error(message, 7000);
+    else alert(message);
+  }
+
+  window.openFeedbackModal = function () {
+    const modal = document.getElementById('feedbackModal');
+    const message = document.getElementById('feedbackMessage');
+    if (!modal) return;
+    modal.classList.add('open');
+    setTimeout(() => message && message.focus(), 80);
+  };
+
+  window.closeFeedbackModal = function () {
+    const modal = document.getElementById('feedbackModal');
+    const form = document.getElementById('feedbackForm');
+    if (!modal) return;
+    modal.classList.remove('open');
+    if (form) form.reset();
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('feedbackModal');
+    const form = document.getElementById('feedbackForm');
+    const btn = document.getElementById('feedbackSubmitBtn');
+
+    if (modal) {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) window.closeFeedbackModal();
+      });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal && modal.classList.contains('open')) {
+        window.closeFeedbackModal();
+      }
+    });
+
+    if (!form) return;
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const type = document.getElementById('feedbackType')?.value || 'suggestion';
+      const message = document.getElementById('feedbackMessage')?.value.trim() || '';
+
+      if (message.length < 5) {
+        toastErr('Please enter a little more detail before sending feedback.');
+        return;
+      }
+
+      const original = btn ? btn.textContent : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+      }
+
+      try {
+        await apiRequest('/feedback', {
+          method: 'POST',
+          body: JSON.stringify({
+            type,
+            message,
+            pageUrl: window.location.pathname + window.location.search,
+          }),
+        });
+
+        toastOk('Feedback sent. Thank you for helping improve FlowFit.');
+        window.closeFeedbackModal();
+      } catch (err) {
+        toastErr(err?.message || 'Could not send feedback. Please try again.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = original || 'Send';
+        }
+      }
+    });
+  });
 })();
 </script>
 
