@@ -5023,8 +5023,7 @@ function showModal(ex){
     document.getElementById('wmCat').textContent=cat;
     document.getElementById('wmCal').textContent=''+ex.caloriesPerMin+' cal/min';
     document.getElementById('wmDesc').textContent=ex.description||'Perform with controlled form.';
-    const stepId = (typeof getWorkoutExerciseId === 'function' ? getWorkoutExerciseId(ex) : ex.id);
-    const steps=STEPS[stepId]||STEPS[ex.id]||['Start in correct position.','Perform with controlled form.','Rest between sets.'];
+    const steps=STEPS[ex.id]||['Start in correct position.','Perform with controlled form.','Rest between sets.'];
     document.getElementById('wmSteps').innerHTML=steps.map((s,i)=>`<li class="wm-step"><div class="wm-step-n">${i+1}</div><p class="wm-step-t">${s}</p></li>`).join('');
     modal.classList.add('active');
     requestAnimationFrame(function() {
@@ -5057,42 +5056,16 @@ function clearExerciseProgress(dayIdx) {
     localStorage.removeItem(_exKey(dayIdx));
 }
 
-// ── Resolve the REAL Exercise.id for workout logging ─────────────────────────
-// DB-backed day rows can include both:
-//   ex.id         = DayExercise row id
-//   ex.exerciseId = real Exercise id
-// /api/v1/progress expects the real Exercise.id. Passing DayExercise.id causes
-// "Failed to log workout" on DB programs whose day-exercise ids differ.
-function getWorkoutExerciseId(ex) {
-    return ex?.exercise?.id || ex?.exerciseId || ex?.id || '';
-}
-
 // ── Launch a specific exercise from the current day ───────────────────────────
 function goToSession(exIdx) {
     const d = getDayAt(_activeDayIndex);
-    if (!d || !d.exercises || !d.exercises.length) return;
-
-    // If opened from preview modal, goToSession() may be called without an index.
-    // Derive the index from activeEx so the returned exIndex still marks correctly.
-    if (exIdx === undefined || exIdx === null || Number.isNaN(Number(exIdx))) {
-        exIdx = d.exercises.findIndex(ex => ex === activeEx);
-    }
-
-    exIdx = Number(exIdx);
-    if (exIdx < 0 || !d.exercises[exIdx]) return;
-
+    if (!d || !d.exercises[exIdx]) return;
     const ex  = d.exercises[exIdx];
     const eid = enroll ? enroll.id : '';
-    const name = ex.name || ex.exercise?.name || ex.exerciseName || 'Exercise';
+    const name = ex.name || ex.exercise?.name || 'Exercise';
     const cat  = (ex.category || ex.exercise?.category || 'STRENGTH');
     const cal  = ex.caloriesPerMin || ex.exercise?.caloriesPerMin || 8;
-    const id   = getWorkoutExerciseId(ex);
-
-    if (!id) {
-        Toast.error('This exercise is missing its database ID. Please refresh programs and try again.');
-        return;
-    }
-
+    const id   = ex.id || ex.exerciseId || ex.exercise?.id || '';
     // Pass exIdx back so we know which exercise was completed on return
     const returnUrl = encodeURIComponent(
         `/program-detail?id=${PROG_ID}&enrollmentId=${eid}&exDone=1&dayIndex=${_activeDayIndex}&exIndex=${exIdx}`
@@ -5354,12 +5327,53 @@ function _pdObjectPayload(payload, keys) {
     return payload;
 }
 
+function _pdGuideIdFromName(name, category) {
+    const s = String(name || '').toLowerCase();
+    if (s.includes('burpee')) return 'ex-burpee';
+    if (s.includes('mountain')) return 'ex-mclimb';
+    if (s.includes('jump squat')) return 'ex-sqjmp';
+    if (s.includes('squat')) return 'ex-squat';
+    if (s.includes('lunge')) return 'ex-lunge';
+    if (s.includes('push') && s.includes('pike')) return 'ex-pike';
+    if (s.includes('push')) return 'ex-pushup';
+    if (s.includes('dip')) return 'ex-dips';
+    if (s.includes('plank')) return 'ex-plank';
+    if (s.includes('crunch')) return 'ex-crunch';
+    if (s.includes('leg raise')) return 'ex-lraise';
+    if (s.includes('russian')) return 'ex-rtwist';
+    if (s.includes('glute')) return 'ex-glute';
+    if (s.includes('jumping jack')) return 'ex-jjack';
+    if (s.includes('high knee')) return 'ex-hknees';
+    if (s.includes('butt kick')) return 'ex-bkicks';
+    if (s.includes('sprint')) return 'ex-sprint';
+    if (s.includes('box')) return 'ex-boxjmp';
+    if (s.includes('downward')) return 'ex-ddog';
+    if (s.includes('child')) return 'ex-child';
+    if (s.includes('hip flexor')) return 'ex-hipfx';
+
+    const c = String(category || '').toUpperCase();
+    if (c === 'CARDIO' || c === 'HIIT') return 'ex-burpee';
+    if (c === 'CORE') return 'ex-plank';
+    return 'ex-squat';
+}
+
+function _pdRealExerciseId(item, ex, fallbackIndex) {
+    // Prefer the actual Exercise.id, not the DayExercise row id.
+    // item.id can be the join-row id in DB-backed program days.
+    return ex?.id || item?.exerciseId || item?.exercise_id || item?.workoutExerciseId || item?.exercise?.id || item?.id || `ex-generated-${fallbackIndex || 0}`;
+}
+
 function _pdNormaliseExercise(item, fallbackIndex) {
     const ex = item && item.exercise ? item.exercise : (item || {});
+    const name = ex.name || item?.name || item?.exerciseName || `Exercise ${(fallbackIndex || 0) + 1}`;
+    const category = ex.category || item?.category || 'STRENGTH';
+    const realId = _pdRealExerciseId(item, ex, fallbackIndex);
     return {
-        id:             ex.id || item?.exerciseId || item?.id || `ex-generated-${fallbackIndex || 0}`,
-        name:           ex.name || item?.name || item?.exerciseName || `Exercise ${(fallbackIndex || 0) + 1}`,
-        category:       ex.category || item?.category || 'STRENGTH',
+        id:             realId,
+        exerciseId:     realId,
+        guideId:        item?.guideId || item?.libraryId || _pdGuideIdFromName(name, category),
+        name,
+        category,
         caloriesPerMin: Number(ex.caloriesPerMin ?? ex.calories_per_min ?? item?.caloriesPerMin ?? item?.calories_per_min ?? 8),
         description:    ex.description || item?.description || 'Perform with controlled form and steady breathing.',
     };
@@ -5596,10 +5610,18 @@ goToSession = function goToSession(exIdx) {
 
     const ex  = d.exercises[idx];
     const eid = enroll ? enroll.id : '';
-    const name = ex.name || ex.exercise?.name || 'Exercise';
+    const name = ex.name || ex.exercise?.name || ex.exerciseName || 'Exercise';
     const cat  = ex.category || ex.exercise?.category || 'STRENGTH';
     const cal  = Number(ex.caloriesPerMin || ex.exercise?.caloriesPerMin || 8);
-    const id   = ex.id || ex.exerciseId || ex.exercise?.id || `ex-${idx}`;
+    const id   = (typeof getWorkoutExerciseId === 'function')
+        ? getWorkoutExerciseId(ex)
+        : (ex.exercise?.id || ex.exerciseId || ex.id || `ex-${idx}`);
+    const guideId = ex.guideId || (typeof _pdGuideIdFromName === 'function' ? _pdGuideIdFromName(name, cat) : id);
+
+    if (!id) {
+        Toast.error('This exercise is missing its database ID. Please refresh programs and try again.');
+        return;
+    }
 
     const returnUrl = encodeURIComponent(
         `/program-detail?id=${encodeURIComponent(PROG_ID)}&enrollmentId=${encodeURIComponent(eid)}&exDone=1&dayIndex=${_activeDayIndex}&exIndex=${idx}`
@@ -5607,6 +5629,7 @@ goToSession = function goToSession(exIdx) {
 
     location.href =
         `/workout-session?id=${encodeURIComponent(id)}` +
+        `&guide=${encodeURIComponent(guideId)}` +
         `&name=${encodeURIComponent(name)}` +
         `&cal=${encodeURIComponent(cal)}` +
         `&category=${encodeURIComponent(cat)}` +

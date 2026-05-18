@@ -4637,7 +4637,8 @@ html.light-mode .exercise-hero::after {
 <script>
 // ── Params from URL ──────────────────────────────────────────────────────────
 const params      = new URLSearchParams(location.search);
-const EXERCISE_ID = params.get('id');
+const EXERCISE_ID = params.get('id');        // real DB Exercise.id used for saving logs
+const GUIDE_ID    = params.get('guide') || params.get('libraryId') || params.get('demo') || EXERCISE_ID; // local demo/video id
 const FROM_PROG   = params.get('program');   // program ID if launched from program
 const FROM_ENR    = params.get('enrollment');// enrollment ID if launched from program
 const FROM_DAY    = params.get('day');       // day label e.g. "Week 1 · Day 2"
@@ -5012,8 +5013,47 @@ const EXERCISE_LIBRARY = {
 };
 
 // Default library entry for exercises not in the map
+function libraryIdFromName(name, category) {
+    const s = String(name || '').toLowerCase();
+    if (s.includes('burpee')) return 'ex-burpee';
+    if (s.includes('mountain')) return 'ex-mclimb';
+    if (s.includes('jump squat')) return 'ex-sqjmp';
+    if (s.includes('squat')) return 'ex-squat';
+    if (s.includes('lunge')) return 'ex-lunge';
+    if (s.includes('pike') && s.includes('push')) return 'ex-pike';
+    if (s.includes('push')) return 'ex-pushup';
+    if (s.includes('dip')) return 'ex-dips';
+    if (s.includes('plank')) return 'ex-plank';
+    if (s.includes('crunch')) return 'ex-crunch';
+    if (s.includes('leg raise')) return 'ex-lraise';
+    if (s.includes('russian')) return 'ex-rtwist';
+    if (s.includes('glute')) return 'ex-glute';
+    if (s.includes('jumping jack')) return 'ex-jjack';
+    if (s.includes('high knee')) return 'ex-hknees';
+    if (s.includes('butt kick')) return 'ex-bkicks';
+    if (s.includes('sprint')) return 'ex-sprint';
+    if (s.includes('box')) return 'ex-boxjmp';
+    if (s.includes('downward')) return 'ex-ddog';
+    if (s.includes('child')) return 'ex-child';
+    if (s.includes('hip flexor')) return 'ex-hipfx';
+
+    const c = String(category || '').toUpperCase();
+    if (c === 'CARDIO' || c === 'HIIT') return 'ex-burpee';
+    if (c === 'CORE') return 'ex-plank';
+    return 'ex-squat';
+}
+
 function getLibraryData(id) {
-    return EXERCISE_LIBRARY[id] || {
+    const byId = EXERCISE_LIBRARY[id];
+    if (byId) return byId;
+
+    const byGuide = EXERCISE_LIBRARY[GUIDE_ID];
+    if (byGuide) return byGuide;
+
+    const byName = EXERCISE_LIBRARY[libraryIdFromName(params.get('name'), params.get('category'))];
+    if (byName) return byName;
+
+    return {
         icon: '', difficulty: null, video: null,
         muscles: [],
         instructions: ['Follow your trainer\'s instructions or search for a video guide for this exercise.'],
@@ -5040,7 +5080,7 @@ async function loadExercise() {
 
     // Fallback: check if api.js exposes a local cache, or use library
     if (!exercise) {
-        const lib = getLibraryData(EXERCISE_ID);
+        const lib = getLibraryData(GUIDE_ID);
         exercise = {
             id: EXERCISE_ID,
             name: params.get('name') || 'Exercise',
@@ -5051,7 +5091,7 @@ async function loadExercise() {
     }
 
     calPerMin = exercise.caloriesPerMin || 0;
-    const lib = getLibraryData(EXERCISE_ID);
+    const lib = getLibraryData(GUIDE_ID);
 
     // Populate UI
     document.title = `${exercise.name} - FlowFit`;
