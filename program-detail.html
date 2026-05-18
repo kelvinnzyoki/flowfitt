@@ -5023,7 +5023,8 @@ function showModal(ex){
     document.getElementById('wmCat').textContent=cat;
     document.getElementById('wmCal').textContent=''+ex.caloriesPerMin+' cal/min';
     document.getElementById('wmDesc').textContent=ex.description||'Perform with controlled form.';
-    const steps=STEPS[ex.id]||['Start in correct position.','Perform with controlled form.','Rest between sets.'];
+    const stepId = (typeof getWorkoutExerciseId === 'function' ? getWorkoutExerciseId(ex) : ex.id);
+    const steps=STEPS[stepId]||STEPS[ex.id]||['Start in correct position.','Perform with controlled form.','Rest between sets.'];
     document.getElementById('wmSteps').innerHTML=steps.map((s,i)=>`<li class="wm-step"><div class="wm-step-n">${i+1}</div><p class="wm-step-t">${s}</p></li>`).join('');
     modal.classList.add('active');
     requestAnimationFrame(function() {
@@ -5056,16 +5057,42 @@ function clearExerciseProgress(dayIdx) {
     localStorage.removeItem(_exKey(dayIdx));
 }
 
+// ── Resolve the REAL Exercise.id for workout logging ─────────────────────────
+// DB-backed day rows can include both:
+//   ex.id         = DayExercise row id
+//   ex.exerciseId = real Exercise id
+// /api/v1/progress expects the real Exercise.id. Passing DayExercise.id causes
+// "Failed to log workout" on DB programs whose day-exercise ids differ.
+function getWorkoutExerciseId(ex) {
+    return ex?.exercise?.id || ex?.exerciseId || ex?.id || '';
+}
+
 // ── Launch a specific exercise from the current day ───────────────────────────
 function goToSession(exIdx) {
     const d = getDayAt(_activeDayIndex);
-    if (!d || !d.exercises[exIdx]) return;
+    if (!d || !d.exercises || !d.exercises.length) return;
+
+    // If opened from preview modal, goToSession() may be called without an index.
+    // Derive the index from activeEx so the returned exIndex still marks correctly.
+    if (exIdx === undefined || exIdx === null || Number.isNaN(Number(exIdx))) {
+        exIdx = d.exercises.findIndex(ex => ex === activeEx);
+    }
+
+    exIdx = Number(exIdx);
+    if (exIdx < 0 || !d.exercises[exIdx]) return;
+
     const ex  = d.exercises[exIdx];
     const eid = enroll ? enroll.id : '';
-    const name = ex.name || ex.exercise?.name || 'Exercise';
+    const name = ex.name || ex.exercise?.name || ex.exerciseName || 'Exercise';
     const cat  = (ex.category || ex.exercise?.category || 'STRENGTH');
     const cal  = ex.caloriesPerMin || ex.exercise?.caloriesPerMin || 8;
-    const id   = ex.id || ex.exerciseId || ex.exercise?.id || '';
+    const id   = getWorkoutExerciseId(ex);
+
+    if (!id) {
+        Toast.error('This exercise is missing its database ID. Please refresh programs and try again.');
+        return;
+    }
+
     // Pass exIdx back so we know which exercise was completed on return
     const returnUrl = encodeURIComponent(
         `/program-detail?id=${PROG_ID}&enrollmentId=${eid}&exDone=1&dayIndex=${_activeDayIndex}&exIndex=${exIdx}`
