@@ -4641,7 +4641,9 @@ function _freeEnrollmentTimestamp(enrollment) {
 
 function _isThisMonthEnrollment(enrollment) {
     const raw = _freeEnrollmentTimestamp(enrollment);
-    // If timestamp is missing, count it defensively so Free users cannot bypass the quota.
+
+    // If timestamp is missing, count it defensively so Free users cannot bypass
+    // the monthly quota by using completed/old records with incomplete metadata.
     if (!raw) return true;
 
     const d = new Date(raw);
@@ -4652,8 +4654,8 @@ function _isThisMonthEnrollment(enrollment) {
 }
 
 function getFreeMonthlyEnrollmentCount() {
-    // Free-plan quota is per monthly enrollment usage, not active slots.
-    // Completed programs must still count until the month rolls over.
+    // Free-plan quota is monthly usage, not active slots.
+    // Completed programs still count until the calendar month changes.
     return myEnrollments.filter(_isThisMonthEnrollment).length;
 }
 
@@ -4772,7 +4774,7 @@ async function loadAll() {
         isFallback = true;
         document.getElementById('devBanner') && (document.getElementById('devBanner').style.display = 'block');
         renderEnrollments(myEnrollments);
-        renderPlanBanner(currentPlan);
+        if (currentPlan) renderPlanBanner(currentPlan);
         renderPrograms(allPrograms);
         Toast.warning('Could not reach server — showing sample programs');
     } finally {
@@ -4783,29 +4785,43 @@ async function loadAll() {
 
 
 // ── Enroll Again in a completed program ────────────────────────────────────
-async async function enrollAgain(progId) {
+async function enrollAgain(progId) {
     const prog = allPrograms.find(p => p.id === progId) || { title: 'this program' };
+    const isFree = currentPlan?.slug === 'free';
 
-    if (!canEnrollMore()) {
+    if (isFree && !canEnrollMore()) {
         showUpgradePrompt('More Monthly Program Slots', 'pro');
         return;
     }
 
     showConfirm({
         title: 'Restart Program',
-        message: `Start <strong style="color:var(--Au)">${(prog.title || prog.name || '')}</strong> again from the beginning? This will use one of your Free monthly program slots.`,
+        message: `Start <strong style="color:var(--Au)">${(prog.title || prog.name || '')}</strong> again from the beginning?${isFree ? ' This will use one of your Free monthly program slots.' : ''}`,
         okText: 'RESTART', cancelText: 'Cancel',
         onOk: async () => {
             try {
                 LoadingManager.show('Restarting...');
 
-                if (!canEnrollMore()) {
+                if (isFree && !canEnrollMore()) {
                     showUpgradePrompt('More Monthly Program Slots', 'pro');
                     return;
                 }
 
-                // Do not delete/cancel completed enrollments here.
-                // Completed programs still count toward the Free monthly quota.
+                const existing = myEnrollments.find(
+                    e => e.programId === progId || e.program?.id === progId
+                );
+
+                // Keep the old backend-compatible restart flow, but only after the
+                // Free monthly quota check has passed. This prevents completed
+                // programs from resetting Free slots before the month is over.
+                if (existing) {
+                    try {
+                        await ProgramsAPI.cancelEnrollment(existing.id);
+                    } catch (cancelErr) {
+                        console.warn('[enrollAgain] cancel step failed:', cancelErr.message);
+                    }
+                }
+
                 const r = await ProgramsAPI.enrollInProgram(progId);
                 if (r.success || r.data || r.id) {
                     Toast.success('Program restarted — good luck! 💪');
@@ -4929,7 +4945,7 @@ function renderPrograms(programs) {
               </div>` : ''}
                 <div class="program-cta">
                   ${isDone
-                        ? (!canEnrollMore() && currentPlan?.slug === 'free' ? `<button class="btn-program btn-details" onclick="showUpgradePrompt('More Monthly Program Slots','pro')">Upgrade to Restart</button>` : `<button class="btn-program btn-enroll-again" onclick="enrollAgain('${prog.id}')">Enroll Again</button>`)
+                        ? `<button class="btn-program btn-enroll-again" onclick="enrollAgain('${prog.id}')">Enroll Again</button>`
                         : isEnrolled
                             ? `<button class="btn-program btn-enrolled" disabled>✓ Enrolled</button>`
                             : isFallback
