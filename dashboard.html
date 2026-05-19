@@ -2130,13 +2130,15 @@ a.btn,
 /* ── Panel ─────────────────────────────────────────────────────────────── */
 .ai-modal-content {
   position: relative;
-  background: #0e0d17;
-  border: 1px solid var(--Au-28);
-  border-radius: 20px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(232,201,106,0.10), transparent 34%),
+    linear-gradient(145deg, #111019 0%, #080711 100%);
+  border: 1px solid var(--Au-35);
+  border-radius: 24px;
   width: 100%;
-  max-width: 600px;
-  height: 82vh;
-  max-height: 720px;
+  max-width: 720px;
+  height: 84vh;
+  max-height: 760px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2239,12 +2241,14 @@ a.btn,
 /* ── Message area ──────────────────────────────────────────────────────── */
 .chat-messages {
   flex: 1;
-  padding: 1.25rem 1.1rem;
+  padding: 1.35rem 1.2rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  background: #0b0a14;
+  gap: 0.9rem;
+  background:
+    radial-gradient(circle at 100% 10%, rgba(91,156,246,0.06), transparent 28%),
+    linear-gradient(180deg, #0b0a14 0%, #090812 100%);
   scrollbar-width: thin;
   scrollbar-color: var(--Au-20) transparent;
 }
@@ -2255,22 +2259,24 @@ a.btn,
 /* ── Bubbles ───────────────────────────────────────────────────────────── */
 .chat-message {
   max-width: 82%;
-  padding: 10px 14px;
+  padding: 11px 14px;
   border-radius: 16px;
   line-height: 1.5;
-  font-size: 0.78rem;    /* AI coach chat text: compact and matched for user/coach */
+  font-size: 0.8rem;
   font-family: 'Plus Jakarta Sans', sans-serif;
   word-break: break-word;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
 /* Coach bubble */
 .coach-message {
   align-self: flex-start;
-  background: rgba(20,18,32,0.85);
-  border: 1px solid var(--Au-14);
-  border-radius: 4px 16px 16px 16px;
+  background: linear-gradient(145deg, rgba(24,22,36,0.96), rgba(12,11,20,0.96));
+  border: 1px solid var(--Au-20);
+  border-left: 3px solid var(--Au);
+  border-radius: 6px 18px 18px 18px;
   color: var(--t1);
-  max-width: 88%;
+  max-width: 90%;
 }
 
 /* User bubble */
@@ -2285,10 +2291,17 @@ a.btn,
 }
 
 /* ── Coach message inner markdown-ish content ─────────────────────────── */
-.coach-message .coach-body { display: flex; flex-direction: column; gap: 0.5rem; }
-.coach-message p  { margin: 0; line-height: 1.55; }
-.coach-message strong { color: var(--Au-hi); font-weight: 650; }
+.coach-message .coach-body { display: flex; flex-direction: column; gap: 0.52rem; }
+.coach-message p  { margin: 0; line-height: 1.58; }
+.coach-message strong { color: var(--Au-hi); font-weight: 700; }
 .coach-message em { color: var(--t2); font-style: italic; }
+.coach-message .cm-small { color: var(--t2); font-size: 0.74rem; line-height: 1.45; }
+.coach-message .cm-section {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--Au-10);
+  border-radius: 12px;
+  background: rgba(212,175,55,0.045);
+}
 
 /* Headings inside coach reply */
 .coach-message .cm-heading {
@@ -5113,7 +5126,14 @@ function showConfirm({ icon = '', title = 'Are you sure?', message = '', okText 
 let currentCoachContext = null;
 
 function renderCoachWelcome() {
-  addCoachMessage("👋 Hey champion! I'm your FlowFit AI Coach.<br>I know your program, streak, volume, recovery, and metrics.<br>What’s on your mind today?", "coach");
+  addCoachMessage(
+    `👋 Hey champion! I'm your FlowFit AI Coach.
+
+I can help with today’s workout, past/future training, diet plans, recovery, progress, and smart recommendations from your program, workout history, goals, and metrics.
+
+What do you want to work on today?`,
+    "coach"
+  );
 }
 
 async function loadCoachHistory() {
@@ -5316,6 +5336,69 @@ function coachChip(button, message) {
   }
 }
 
+function escapeCoachHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatCoachReply(rawText) {
+  const normalized = String(rawText ?? '')
+    .replace(/<br\s*\/?>(\s*)/gi, '\n')
+    .replace(/\r?\n/g, '\n')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.*?)__/g, '<strong>$1</strong>')
+    .replace(/_(.*?)_/g, '<em>$1</em>')
+    .trim();
+
+  const safe = escapeCoachHtml(normalized)
+    .replace(/&lt;strong&gt;(.*?)&lt;\/strong&gt;/g, '<strong>$1</strong>')
+    .replace(/&lt;em&gt;(.*?)&lt;\/em&gt;/g, '<em>$1</em>');
+
+  const lines = safe.split('\n');
+  const blocks = [];
+  let listItems = [];
+
+  function flushList() {
+    if (!listItems.length) return;
+    blocks.push(`<ul class="cm-list">${listItems.map(item => `<li>${item}</li>`).join('')}</ul>`);
+    listItems = [];
+  }
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) { flushList(); return; }
+
+    const bullet = trimmed.match(/^(?:[-•*]|\d+[.)])\s+(.+)$/);
+    if (bullet) {
+      listItems.push(bullet[1]);
+      return;
+    }
+
+    flushList();
+
+    const plain = trimmed.replace(/<[^>]+>/g, '');
+    const looksLikeHeading = plain.length <= 72 && (
+      /:$/.test(plain) ||
+      /^(today|workout|fuel|diet|nutrition|recovery|progress|plan|quick answer|key rules|daily targets|meals|next|summary)/i.test(plain)
+    );
+
+    if (looksLikeHeading) {
+      blocks.push(`<div class="cm-heading">${trimmed.replace(/:$/, '')}</div>`);
+    } else if (trimmed.length <= 92 && !/[.!?]$/.test(plain)) {
+      blocks.push(`<div class="cm-section">${trimmed}</div>`);
+    } else {
+      blocks.push(`<p>${trimmed}</p>`);
+    }
+  });
+
+  flushList();
+  return `<div class="coach-body">${blocks.join('')}</div>`;
+}
+
 function addCoachMessage(text, sender) {
   const container = document.getElementById('chatMessages');
   if (!container) return;
@@ -5324,12 +5407,7 @@ function addCoachMessage(text, sender) {
   if (sender === 'user') {
     div.textContent = text;
   } else {
-    // ISSUE-1-FIX: Never use innerHTML for LLM-generated content — prompt injection
-    // can cause the model to return <script> or event-handler payloads that execute
-    // in the user's browser. textContent is always safe; pre-wrap preserves formatting.
-    div.textContent = text;
-    div.style.whiteSpace = 'pre-wrap';
-    div.style.lineHeight = '1.55';
+    div.innerHTML = formatCoachReply(text);
   }
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
