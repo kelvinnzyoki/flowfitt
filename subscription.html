@@ -5049,8 +5049,7 @@ async function checkUrlParams() {
                 // concurrent setTimeout(30 s) calls that all fired simultaneously.
                 // ISSUE-4a: paystackSubscriptionCode is always null from the API (security fix).
                 // Use isPendingActivation or non-ACTIVE status as the correct signal.
-                const needsCodesFetch = res.subscription?.isPendingActivation
-                    || (res.subscription?.status && res.subscription.status !== 'INCOMPLETE');
+                const needsCodesFetch = !!res.subscription?.isPendingActivation;
                 if (needsCodesFetch && !fetchCodesScheduled) {
                     fetchCodesScheduled = true;
                     setTimeout(async () => {
